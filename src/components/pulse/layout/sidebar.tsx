@@ -22,6 +22,7 @@ import {
   MessageSquare,
   PenLine,
   Package,
+  CalendarDays,
 } from 'lucide-react';
 import { useAppStore, type OwnerView } from '@/stores/app-store';
 import {
@@ -52,6 +53,7 @@ const navItems: { label: string; icon: React.ElementType; view: OwnerView }[] = 
   { label: 'Команда', icon: Users, view: 'team' },
   { label: 'SMM', icon: PenLine, view: 'smm' },
   { label: 'Инвентарь', icon: Package, view: 'inventory' },
+  { label: 'Бронирования', icon: CalendarDays, view: 'reservations' },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {

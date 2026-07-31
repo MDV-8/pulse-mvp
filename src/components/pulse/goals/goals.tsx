@@ -8,7 +8,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -78,13 +77,16 @@ export default function Goals() {
         </div>
         <Button
           size="sm"
-          className="bg-purple-600 hover:bg-purple-700 text-white"
+          className="bg-purple-600 hover:bg-purple-700 text-white border-glow"
           onClick={() => setShowDialog(true)}
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Поставить цель
         </Button>
       </motion.div>
+
+      {/* Neon Line Separator */}
+      <div className="neon-line" />
 
       {/* Goals List */}
       <div className="space-y-4">
@@ -102,7 +104,7 @@ export default function Goals() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
             >
-              <Card className={`border ${cfg.borderColor} ${cfg.bgColor}`}>
+              <Card className={`border ${cfg.borderColor} ${cfg.bgColor} card-hover-lift`}>
                 <CardContent className="p-4 space-y-4">
                   {/* Title + Status */}
                   <div className="flex items-start justify-between gap-3">
@@ -127,9 +129,14 @@ export default function Goals() {
                       <span className="font-medium">
                         {goal.currentValue} / {goal.targetValue} {goal.unit}
                       </span>
-                      <span className={cfg.color}>{percent}%</span>
+                      <span className={`${cfg.color} stat-glow-purple`}>{percent}%</span>
                     </div>
-                    <Progress value={percent} className="h-2.5" />
+                    <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-purple-500 via-violet-500 to-purple-400 transition-all duration-700"
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
                   </div>
 
                   {/* Monthly Plan */}

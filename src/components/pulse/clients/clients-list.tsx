@@ -114,7 +114,7 @@ export default function ClientsList() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="py-4 px-4">
+            <Card className="py-4 px-4 card-hover-lift">
               <CardContent className="p-0">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg bg-muted ${card.color}`}>
@@ -122,7 +122,7 @@ export default function ClientsList() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">{card.label}</p>
-                    <p className="text-xl font-bold">{card.value}</p>
+                    <p className={`text-xl font-bold ${card.label === 'Всего' ? 'stat-glow-purple number-glow' : card.label === 'VIP' ? 'number-glow' : ''}`}>{card.value}</p>
                   </div>
                 </div>
               </CardContent>
@@ -139,7 +139,7 @@ export default function ClientsList() {
             placeholder="Поиск по имени или телефону..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-9 focus:shadow-[0_0_12px_rgba(139,92,246,0.15)]"
           />
         </div>
 
@@ -182,7 +182,7 @@ export default function ClientsList() {
               {filtered.map((client) => (
                 <TableRow
                   key={client.id}
-                  className="border-b border-border/30 hover:bg-muted/30 cursor-pointer transition-colors"
+                  className={`border-b border-border/30 hover:bg-muted/30 cursor-pointer transition-colors card-hover-lift ${filtered.indexOf(client) % 2 === 0 ? 'bg-transparent' : 'bg-muted/[0.02]'}`}
                   onClick={() =>
                     setExpandedId(expandedId === client.id ? null : client.id)
                   }
@@ -247,7 +247,7 @@ export default function ClientsList() {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <ShoppingBag className="w-4 h-4 text-muted-foreground" />
-                  <span>{expandedClient.totalSpent.toLocaleString('ru')} ₸ всего</span>
+                  <span className="stat-glow-green">{expandedClient.totalSpent.toLocaleString('ru')} ₸</span> всего
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4 text-muted-foreground" />
@@ -298,7 +298,7 @@ export default function ClientsList() {
               </div>
               <Button
                 onClick={() => setShowReturnClients(true)}
-                className="bg-red-600 hover:bg-red-700 text-white whitespace-nowrap"
+                className="bg-red-600 hover:bg-red-700 text-white whitespace-nowrap micro-interaction"
               >
                 ВЕРНУТЬ КЛИЕНТОВ
               </Button>

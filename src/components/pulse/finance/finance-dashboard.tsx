@@ -157,12 +157,14 @@ function MetricCard({
   value,
   change,
   index,
+  valueGlowClass,
 }: {
   icon: React.ElementType;
   label: string;
   value: string;
   change: number;
   index: number;
+  valueGlowClass?: string;
 }) {
   const isPositive = change >= 0;
 
@@ -172,7 +174,7 @@ function MetricCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Card className="bg-card border-border card-hover">
+      <Card className="bg-card border-border card-hover card-hover-lift">
         <CardContent className="p-3 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -181,7 +183,7 @@ function MetricCard({
             </div>
             <ChangeIndicator value={change} />
           </div>
-          <div className="text-sm sm:text-lg font-semibold">{value}</div>
+          <div className={`text-sm sm:text-lg font-semibold number-glow ${valueGlowClass || ''}`}>{value}</div>
         </CardContent>
       </Card>
     </motion.div>
@@ -226,18 +228,21 @@ export function FinanceDashboard() {
       label: 'Выручка',
       value: `${data.revenue.toLocaleString('ru-RU')} ₸`,
       change: data.revenueChange,
+      valueGlowClass: 'stat-glow-green',
     },
     {
       icon: BarChart3,
       label: 'Расходы',
       value: `${data.expenses.toLocaleString('ru-RU')} ₸`,
       change: data.expensesChange,
+      valueGlowClass: 'stat-glow-red',
     },
     {
       icon: Wallet,
       label: 'Чистая прибыль',
       value: `${data.netProfit.toLocaleString('ru-RU')} ₸`,
       change: data.profitChange,
+      valueGlowClass: 'stat-glow-purple',
     },
     {
       icon: Percent,
@@ -270,7 +275,7 @@ export function FinanceDashboard() {
   const prevData = PERIOD_VARIANTS[prevPeriod[activePeriod]];
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col glass-card-premium rounded-2xl">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-4">
         <div className="flex items-center gap-2.5">
@@ -340,8 +345,11 @@ export function FinanceDashboard() {
           </div>
         )}
 
+        {/* Neon Line Separator */}
+        <div className="neon-line" />
+
         {/* Revenue/Expenses Chart */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border bg-gradient-to-b from-primary/3 to-transparent">
           <CardHeader className="pb-2 pt-4 px-4 sm:px-5">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               Выручка / Расходы
@@ -365,6 +373,9 @@ export function FinanceDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Neon Line Separator */}
+        <div className="neon-line" />
 
         {/* AI Financial Summary */}
         <Card className="bg-primary/5 border-primary/15">

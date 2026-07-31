@@ -636,3 +636,177 @@
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.5);
 }
+
+/* ============================================================
+   Task 14-d: New CSS Animations & Utility Classes
+   ============================================================ */
+
+/* Neon line — horizontal line with animated neon glow */
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(139, 92, 246, 0.3), 0 0 8px rgba(139, 92, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.6), 0 0 20px rgba(139, 92, 246, 0.25), 0 0 40px rgba(139, 92, 246, 0.1);
+  }
+}
+
+.neon-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), rgba(139, 92, 246, 0.8), rgba(139, 92, 246, 0.6), transparent);
+  animation: neon-pulse 3s ease-in-out infinite;
+  border: none;
+}
+
+/* Card spotlight — radial gradient follows mouse cursor (CSS custom property) */
+.card-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(139, 92, 246, 0.08), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.card-spotlight:hover::before {
+  opacity: 1;
+}
+
+.card-spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Text reveal — fades in from bottom with blur */
+@keyframes text-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.text-reveal {
+  animation: text-reveal 0.6s ease-out forwards;
+}
+
+/* Slide in right */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-right {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+/* Count up — scale bounce */
+@keyframes count-up {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.count-up {
+  animation: count-up 0.5s ease-out forwards;
+}
+
+/* Glass morphism strong — extra strong glass effect */
+.glass-morphism-strong {
+  background: rgba(18, 18, 26, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.light .glass-morphism-strong {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Border glow — animated border glow pulsing */
+@keyframes border-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.2), 0 0 10px rgba(139, 92, 246, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4), 0 0 25px rgba(139, 92, 246, 0.15), 0 0 50px rgba(139, 92, 246, 0.05);
+  }
+}
+
+.border-glow {
+  animation: border-glow-pulse 2s ease-in-out infinite;
+}
+
+/* Stagger delay classes */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+
+/* Stat glow red — for expense/negative values */
+.stat-glow-red {
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.5), 0 0 24px rgba(239, 68, 68, 0.2);
+}
+
+/* ============================================================
+   Task 14-c: Onboarding particle float animation
+   ============================================================ */
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-105vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+.particle-dot {
+  animation: particle-float var(--duration, 8s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}

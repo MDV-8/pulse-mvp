@@ -1,0 +1,1039 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useRef, useCallback } from 'react';
+     4→import { AnimatePresence, motion } from 'framer-motion';
+     5→import { useAppStore } from '@/stores/app-store';
+     6→
+     7→// Layout
+     8→import { Sidebar } from '@/components/pulse/layout/sidebar';
+     9→import { MobileHeader } from '@/components/pulse/layout/mobile-header';
+    10→import { ClientNav } from '@/components/pulse/layout/client-nav';
+    11→import { AdminNav } from '@/components/pulse/layout/admin-nav';
+    12→
+    13→// Onboarding
+    14→import { OnboardingFlow } from '@/components/pulse/onboarding/onboarding-flow';
+    15→
+    16→// Dashboard
+    17→import { PulseScore } from '@/components/pulse/dashboard/pulse-score';
+    18→import { BusinessHealth } from '@/components/pulse/dashboard/business-health';
+    19→import { AIInsight } from '@/components/pulse/dashboard/ai-insight';
+    20→import { TodayActions } from '@/components/pulse/dashboard/today-actions';
+    21→import { MetricsOverview } from '@/components/pulse/dashboard/metrics-overview';
+    22→import { WeeklyReport } from '@/components/pulse/dashboard/weekly-report';
+    23→
+    24→// Shared
+    25→import { NotificationCenter } from '@/components/pulse/shared/notification-center';
+    26→import { GlobalSearch } from '@/components/pulse/shared/global-search';
+    27→import { WelcomeTour } from '@/components/pulse/shared/welcome-tour';
+    28→
+    29→// AI
+    30→import { AIAssistant } from '@/components/pulse/ai/ai-assistant';
+    31→
+    32→// Promotions
+    33→import { PromotionsList } from '@/components/pulse/promotions/promotions-list';
+    34→import { CreatePromotion } from '@/components/pulse/promotions/create-promotion';
+    35→import { AISimulator } from '@/components/pulse/promotions/ai-simulator';
+    36→import { PromotionResults } from '@/components/pulse/promotions/promotion-results';
+    37→
+    38→// Finance
+    39→import { FinanceDashboard } from '@/components/pulse/finance/finance-dashboard';
+    40→
+    41→// Clients
+    42→import ClientsList from '@/components/pulse/clients/clients-list';
+    43→import Segments from '@/components/pulse/clients/segments';
+    44→
+    45→// Loyalty
+    46→import LoyaltyProgram from '@/components/pulse/loyalty/loyalty-program';
+    47→
+    48→// Client-facing
+    49→import ClientHome from '@/components/pulse/client-facing/client-home';
+    50→import ClientMap from '@/components/pulse/client-facing/client-map';
+    51→import ClientCoupons from '@/components/pulse/client-facing/client-coupons';
+    52→import { ClientProfileEnhanced } from '@/components/pulse/client-facing/client-profile-enhanced';
+    53→
+    54→// Admin
+    55→import AdminDashboard from '@/components/pulse/admin/admin-dashboard';
+    56→
+    57→// Goals & History
+    58→import Goals from '@/components/pulse/goals/goals';
+    59→import BusinessHistory from '@/components/pulse/goals/business-history';
+    60→
+    61→// Other
+    62→import AICalendar from '@/components/pulse/calendar/ai-calendar';
+    63→import Competitors from '@/components/pulse/competitors/competitors';
+    64→import AIContent from '@/components/pulse/smm/ai-content';
+    65→import AudienceInsights from '@/components/pulse/audience/audience-insights';
+    66→
+    67→// Reviews
+    68→import { ReviewsManager } from '@/components/pulse/reviews/reviews-manager';
+    69→// Staff
+    70→import { StaffOverview } from '@/components/pulse/staff/staff-overview';
+    71→// Product Sales
+    72→import { ProductSales } from '@/components/pulse/sales/product-sales';
+    73→// Inventory
+    74→import { InventoryList } from '@/components/pulse/inventory/inventory-list';
+    75→// AI Insights Feed
+    76→import { AIInsightsFeed } from '@/components/pulse/dashboard/ai-insights-feed';
+    77→// Toast Notifications
+    78→import { ToastNotifications } from '@/components/pulse/shared/toast-notifications';
+    79→// Animated Counter
+    80→import { useAnimatedCounter } from '@/hooks/use-animated-counter';
+    81→
+    82→import { Badge } from '@/components/ui/badge';
+    83→import { Button } from '@/components/ui/button';
+    84→import { Separator } from '@/components/ui/separator';
+    85→import { ScrollArea } from '@/components/ui/scroll-area';
+    86→import {
+    87→  Sparkles,
+    88→  Settings,
+    89→  Moon,
+    90→  Sun,
+    91→  Store,
+    92→  Bell,
+    93→  Target,
+    94→  UserPlus,
+    95→  PenLine,
+    96→  Pencil,
+    97→  MessageSquare,
+    98→  Clock,
+    99→  Mail,
+   100→  Shield,
+   101→  Lock,
+   102→  MapPin,
+   103→} from 'lucide-react';
+   104→import { Skeleton } from '@/components/ui/skeleton';
+   105→import { Switch } from '@/components/ui/switch';
+   106→
+   107→// ============================================================
+   108→// Owner Dashboard Router
+   109→// ============================================================
+   110→function OwnerDashboard() {
+   111→  const ownerView = useAppStore((s) => s.ownerView);
+   112→  const [isLoading, setIsLoading] = useState(false);
+   113→  const [currentView, setCurrentView] = useState(ownerView);
+   114→
+   115→  useEffect(() => {
+   116→    if (ownerView !== currentView) {
+   117→      const startTimer = requestAnimationFrame(() => {
+   118→        setIsLoading(true);
+   119→      });
+   120→      const timer = setTimeout(() => {
+   121→        setCurrentView(ownerView);
+   122→        setIsLoading(false);
+   123→      }, 200);
+   124→      return () => {
+   125→        cancelAnimationFrame(startTimer);
+   126→        clearTimeout(timer);
+   127→      };
+   128→    }
+   129→  }, [ownerView]);
+   130→
+   131→  const renderView = useCallback(() => {
+   132→    switch (currentView) {
+   133→      case 'dashboard':
+   134→        return <DashboardView />;
+   135→      case 'today':
+   136→        return <TodayView />;
+   137→      case 'ai':
+   138→        return <AIAssistant />;
+   139→      case 'sales':
+   140→        return <SalesView />;
+   141→      case 'clients':
+   142→        return <ClientsView />;
+   143→      case 'promotions':
+   144→        return <PromotionsView />;
+   145→      case 'finance':
+   146→        return <FinanceDashboard />;
+   147→      case 'analytics':
+   148→        return <AnalyticsView />;
+   149→      case 'loyalty':
+   150→        return <LoyaltyProgram />;
+   151→      case 'goals':
+   152→        return <GoalsView />;
+   153→      case 'settings':
+   154→        return <SettingsView />;
+   155→      case 'reviews':
+   156→        return <ReviewsManager />;
+   157→      case 'team':
+   158→        return <StaffOverview />;
+   159→      case 'smm':
+   160→        return <AIContent />;
+   161→      case 'inventory':
+   162→        return <InventoryList />;
+   163→      default:
+   164→        return <DashboardView />;
+   165→    }
+   166→  }, [currentView]);
+   167→
+   168→  return (
+   169→    <div className="flex-1 overflow-hidden">
+   170→      <ScrollArea className="h-full">
+   171→        <AnimatePresence mode="wait">
+   172→          {isLoading ? (
+   173→            <motion.div
+   174→              key="loading"
+   175→              initial={{ opacity: 0 }}
+   176→              animate={{ opacity: 1 }}
+   177→              exit={{ opacity: 0 }}
+   178→              transition={{ duration: 0.15 }}
+   179→              className="p-4 md:p-6 lg:p-8 space-y-6"
+   180→            >
+   181→              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+   182→                {Array.from({ length: 4 }).map((_, i) => (
+   183→                  <Skeleton key={i} className="h-24 rounded-xl" />
+   184→                ))}
+   185→              </div>
+   186→              <Skeleton className="h-48 rounded-xl" />
+   187→              <div className="space-y-3">
+   188→                {Array.from({ length: 3 }).map((_, i) => (
+   189→                  <Skeleton key={i} className="h-16 rounded-xl" />
+   190→                ))}
+   191→              </div>
+   192→            </motion.div>
+   193→          ) : (
+   194→            <motion.div
+   195→              key={currentView}
+   196→              initial={{ opacity: 0, y: 8 }}
+   197→              animate={{ opacity: 1, y: 0 }}
+   198→              exit={{ opacity: 0, y: -8 }}
+   199→              transition={{ duration: 0.2, ease: 'easeInOut' }}
+   200→              className="p-4 md:p-6 lg:p-8"
+   201→            >
+   202→              {renderView()}
+   203→            </motion.div>
+   204→          )}
+   205→        </AnimatePresence>
+   206→      </ScrollArea>
+   207→    </div>
+   208→  );
+   209→}
+   210→
+   211→// ============================================================
+   212→// Owner Views
+   213→// ============================================================
+   214→function DashboardView() {
+   215→  const [currentTime, setCurrentTime] = useState(new Date());
+   216→  const notifBellRef = useRef<HTMLButtonElement>(null);
+   217→  const showNotifications = useAppStore((s) => s.showNotifications);
+   218→  const setShowNotifications = useAppStore((s) => s.setShowNotifications);
+   219→  const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
+   220→  const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
+   221→  const setShowAIContent = useAppStore((s) => s.setShowAIContent);
+   222→  const setOwnerView = useAppStore((s) => s.setOwnerView);
+   223→
+   224→  // Live clock — update every minute
+   225→  useEffect(() => {
+   226→    const interval = setInterval(() => {
+   227→      setCurrentTime(new Date());
+   228→    }, 60_000);
+   229→    return () => clearInterval(interval);
+   230→  }, []);
+   231→
+   232→  // Greeting based on time of day
+   233→  const hour = currentTime.getHours();
+   234→  const greeting =
+   235→    hour >= 5 && hour < 12
+   236→      ? 'Доброе утро'
+   237→      : hour >= 12 && hour < 17
+   238→        ? 'Добрый день'
+   239→        : hour >= 17 && hour < 22
+   240→          ? 'Добрый вечер'
+   241→          : 'Доброй ночи';
+   242→
+   243→  const timeString = currentTime.toLocaleTimeString('ru-RU', {
+   244→    hour: '2-digit',
+   245→    minute: '2-digit',
+   246→  });
+   247→
+   248→  const quickActions = [
+   249→    {
+   250→      icon: Target,
+   251→      label: 'Создать акцию',
+   252→      emoji: '🎯',
+   253→      action: () => setShowCreatePromotion(true),
+   254→    },
+   255→    {
+   256→      icon: UserPlus,
+   257→      label: 'Вернуть клиентов',
+   258→      emoji: '👥',
+   259→      action: () => setShowReturnClients(true),
+   260→    },
+   261→    {
+   262→      icon: PenLine,
+   263→      label: 'Создать контент',
+   264→      emoji: '✍️',
+   265→      action: () => setShowAIContent(true),
+   266→    },
+   267→    {
+   268→      icon: MessageSquare,
+   269→      label: 'Спросить AI',
+   270→      emoji: '💬',
+   271→      action: () => setOwnerView('ai'),
+   272→    },
+   273→  ];
+   274→
+   275→  return (
+   276→    <div className="space-y-6">
+   277→      {/* Welcome Tour */}
+   278→      <WelcomeTour />
+   279→
+   280→      {/* ====== Animated Pulse Line ====== */}
+   281→      <div className="h-[2px] w-full rounded-full bg-gradient-to-r from-transparent via-purple-500 to-transparent pulse-line" />
+   282→
+   283→      {/* ====== Feature 4: Status Banner ====== */}
+   284→      <div>
+   285→        <div className="h-[3px] rounded-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-500 gradient-sweep" />
+   286→        <p className="text-[11px] text-muted-foreground/50 mt-1.5 tracking-wider uppercase">
+   287→          PULSE • Online • Demo Account
+   288→        </p>
+   289→      </div>
+   290→
+   291→      {/* ====== Live Activity Ticker ====== */}
+   292→      <div className="glass-card rounded-xl p-3 flex items-center gap-3 overflow-hidden">
+   293→        <div className="w-2 h-2 rounded-full bg-green-500 pulse-dot shrink-0" />
+   294→        <span className="text-xs text-muted-foreground whitespace-nowrap">Live</span>
+   295→        <div className="h-[1px] w-px bg-border shrink-0" />
+   296→        <p className="text-xs text-muted-foreground truncate">
+   297→          <span className="text-purple-400">+15%</span> выручки за последний час •{' '}
+   298→          <span className="text-green-400">3 новых клиента</span> сегодня •{' '}
+   299→          <span className="text-amber-400">Happy Hour</span> активен
+   300→        </p>
+   301→      </div>
+   302→
+   303→      {/* ====== Feature 2: Greeting Banner with Live Clock ====== */}
+   304→      <div className="rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+   305→        <div>
+   306→          <h1 className="text-2xl font-bold">
+   307→            {greeting}, владелец{' '}
+   308→            <span className="pulse-text-gradient">Coffee & Co</span>
+   309→          </h1>
+   310→          <p className="text-sm text-muted-foreground mt-1">
+   311→            Здесь обзор вашего бизнеса за сегодня
+   312→          </p>
+   313→        </div>
+   314→        <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+   315→          <Clock className="w-4 h-4" />
+   316→          <span className="text-2xl font-mono font-semibold tabular-nums">
+   317→            {timeString}
+   318→          </span>
+   319→        </div>
+   320→      </div>
+   321→
+   322→      {/* ====== Notification Bell (desktop only) ====== */}
+   323→      <div className="relative hidden md:flex justify-end">
+   324→        <button
+   325→          ref={notifBellRef}
+   326→          className="relative w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-purple-400 transition-colors"
+   327→          onClick={() => setShowNotifications(!showNotifications)}
+   328→          aria-label="Уведомления"
+   329→        >
+   330→          <Bell className="w-5 h-5" />
+   331→          <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-purple-500 ring-2 ring-background" />
+   332→        </button>
+   333→        <NotificationCenter
+   334→          open={showNotifications}
+   335→          onClose={() => setShowNotifications(false)}
+   336→          triggerRef={notifBellRef}
+   337→        />
+   338→      </div>
+   339→
+   340→      {/* ====== PULSE Score + Metrics ====== */}
+   341→      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+   342→        <div className="lg:col-span-1">
+   343→          <PulseScore />
+   344→        </div>
+   345→        <div className="lg:col-span-2 space-y-6">
+   346→          <AIInsight />
+   347→          <MetricsOverview />
+   348→          <WeeklyReport />
+   349→        </div>
+   350→      </div>
+   351→
+   352→      {/* ====== Feature 3: Quick Actions ====== */}
+   353→      <div>
+   354→        <h2 className="text-sm font-medium text-muted-foreground mb-3">
+   355→          Быстрые действия
+   356→        </h2>
+   357→        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+   358→          {quickActions.map((item) => (
+   359→            <button
+   360→              key={item.label}
+   361→              onClick={item.action}
+   362→              className={
+   363→                'glass-card rounded-xl p-4 flex flex-col items-center gap-2.5 text-center cursor-pointer ' +
+   364→                'quick-action-glow pulse-border pulse-border-hover'
+   365→              }
+   366→            >
+   367→              <span className="text-2xl leading-none">{item.emoji}</span>
+   368→              <span className="text-xs font-medium text-muted-foreground">
+   369→                {item.label}
+   370→              </span>
+   371→            </button>
+   372→          ))}
+   373→        </div>
+   374→      </div>
+   375→
+   376→      {/* ====== Business Health ====== */}
+   377→      <BusinessHealth />
+   378→
+   379→      {/* ====== AI Insights Feed ====== */}
+   380→      <AIInsightsFeed />
+   381→
+   382→      {/* ====== Weekly Report ====== */}
+   383→      <WeeklyReport />
+   384→
+   385→      {/* ====== Sales by Product ====== */}
+   386→      <ProductSales />
+   387→
+   388→      {/* ====== What to do today ====== */}
+   389→      <TodayActions />
+   390→
+   391→      {/* ====== AI Footer ====== */}
+   392→      <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+   393→        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
+   394→          <Sparkles className="w-5 h-5 text-purple-400" />
+   395→        </div>
+   396→        <div className="flex-1 min-w-0">
+   397→          <p className="text-sm text-muted-foreground">
+   398→            Нужен совет? Задайте вопрос{' '}
+   399→            <span className="text-purple-400 font-medium">AI ассистенту</span>
+   400→          </p>
+   401→        </div>
+   402→        <Button
+   403→          variant="outline"
+   404→          size="sm"
+   405→          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 shrink-0"
+   406→          onClick={() => useAppStore.getState().setOwnerView('ai')}
+   407→        >
+   408→          Открыть AI
+   409→        </Button>
+   410→      </div>
+   411→    </div>
+   412→  );
+   413→}
+   414→
+   415→function TodayView() {
+   416→  return (
+   417→    <div className="space-y-6">
+   418→      <div>
+   419→        <h1 className="text-2xl font-bold">Что делать сегодня</h1>
+   420→        <p className="text-muted-foreground mt-1">
+   421→          AI выбрал приоритетные действия для вашего бизнеса
+   422→        </p>
+   423→      </div>
+   424→      <TodayActions showHeader={false} />
+   425→    </div>
+   426→  );
+   427→}
+   428→
+   429→function SalesView() {
+   430→  return (
+   431→    <div className="space-y-6">
+   432→      <div>
+   433→        <h1 className="text-2xl font-bold">Продажи</h1>
+   434→        <p className="text-muted-foreground mt-1">
+   435→          Анализ продаж и выручки
+   436→        </p>
+   437→      </div>
+   438→      <MetricsOverview />
+   439→      <ProductSales />
+   440→      <BusinessHealth />
+   441→    </div>
+   442→  );
+   443→}
+   444→
+   445→function ClientsView() {
+   446→  return (
+   447→    <div className="space-y-6">
+   448→      <ClientsList />
+   449→      <Segments />
+   450→    </div>
+   451→  );
+   452→}
+   453→
+   454→function PromotionsView() {
+   455→  return (
+   456→    <div className="space-y-6">
+   457→      <PromotionsList />
+   458→      <AISimulator />
+   459→    </div>
+   460→  );
+   461→}
+   462→
+   463→function AnalyticsView() {
+   464→  return (
+   465→    <div className="space-y-6">
+   466→      <div>
+   467→        <h1 className="text-2xl font-bold">Аналитика</h1>
+   468→        <p className="text-muted-foreground mt-1">
+   469→          Подробная аналитика вашего бизнеса
+   470→        </p>
+   471→      </div>
+   472→      <BusinessHistory />
+   473→      <AudienceInsights />
+   474→      <AICalendar />
+   475→      <Competitors />
+   476→      <ReviewsManager />
+   477→      <StaffOverview />
+   478→    </div>
+   479→  );
+   480→}
+   481→
+   482→function GoalsView() {
+   483→  return (
+   484→    <div className="space-y-6">
+   485→      <Goals />
+   486→      <BusinessHistory />
+   487→    </div>
+   488→  );
+   489→}
+   490→
+   491→function SettingsView() {
+   492→  const theme = useAppStore((s) => s.theme);
+   493→  const setTheme = useAppStore((s) => s.setTheme);
+   494→  const [notifEmail, setNotifEmail] = useState(true);
+   495→  const [notifPush, setNotifPush] = useState(true);
+   496→  const [notifWeekly, setNotifWeekly] = useState(false);
+   497→
+   498→  return (
+   499→    <div className="space-y-6 max-w-2xl">
+   500→      <div>
+   501→        <h1 className="text-2xl font-bold">Настройки</h1>
+   502→        <p className="text-muted-foreground mt-1">
+   503→          Управление вашим профилем и бизнесом
+   504→        </p>
+   505→      </div>
+   506→
+   507→      {/* Profile Section */}
+   508→      <div className="glass-card rounded-xl p-6 space-y-4">
+   509→        <div className="flex items-center gap-4">
+   510→          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/30 to-violet-500/20 flex items-center justify-center border-2 border-purple-500/30">
+   511→            <span className="text-2xl font-bold pulse-text-gradient">CC</span>
+   512→          </div>
+   513→          <div className="flex-1">
+   514→            <h2 className="text-lg font-semibold">Coffee & Co</h2>
+   515→            <p className="text-sm text-muted-foreground">owner@coffee-co.kz</p>
+   516→            <Badge variant="secondary" className="mt-1 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
+   517→              Демо аккаунт
+   518→            </Badge>
+   519→          </div>
+   520→          <Button variant="outline" size="sm" className="gap-1.5">
+   521→            <Pencil className="w-3.5 h-3.5" />
+   522→            Редактировать
+   523→          </Button>
+   524→        </div>
+   525→      </div>
+   526→
+   527→      {/* Business Info */}
+   528→      <div className="glass-card rounded-xl p-6 space-y-4">
+   529→        <h2 className="text-lg font-semibold flex items-center gap-2">
+   530→          <Store className="w-5 h-5 text-purple-400" />
+   531→          Бизнес
+   532→        </h2>
+   533→        <Separator />
+   534→        <div className="space-y-3">
+   535→          <div className="flex items-center justify-between">
+   536→            <span className="text-muted-foreground flex items-center gap-2">
+   537→              <Store className="w-4 h-4 text-muted-foreground/50" />
+   538→              Название
+   539→            </span>
+   540→            <span className="font-medium">Coffee & Co</span>
+   541→          </div>
+   542→          <div className="flex items-center justify-between">
+   543→            <span className="text-muted-foreground flex items-center gap-2">
+   544→              <Sparkles className="w-4 h-4 text-muted-foreground/50" />
+   545→              Категория
+   546→            </span>
+   547→            <span className="font-medium">Кофейня</span>
+   548→          </div>
+   549→          <div className="flex items-center justify-between">
+   550→            <span className="text-muted-foreground flex items-center gap-2">
+   551→              <MapPin className="w-4 h-4 text-muted-foreground/50" />
+   552→              Город
+   553→            </span>
+   554→            <span className="font-medium">Алматы</span>
+   555→          </div>
+   556→          <div className="flex items-center justify-between">
+   557→            <span className="text-muted-foreground flex items-center gap-2">
+   558→              <UserPlus className="w-4 h-4 text-muted-foreground/50" />
+   559→              Размер
+   560→            </span>
+   561→            <span className="font-medium">Малый (1-5 сотрудников)</span>
+   562→          </div>
+   563→        </div>
+   564→      </div>
+   565→
+   566→      {/* Theme */}
+   567→      <div className="glass-card rounded-xl p-6 space-y-4">
+   568→        <h2 className="text-lg font-semibold flex items-center gap-2">
+   569→          <Settings className="w-5 h-5 text-purple-400" />
+   570→          Внешний вид
+   571→        </h2>
+   572→        <Separator />
+   573→        <div className="flex items-center justify-between">
+   574→          <span>Тема оформления</span>
+   575→          <Button
+   576→            variant="outline"
+   577→            size="sm"
+   578→            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+   579→            className="gap-2"
+   580→          >
+   581→            {theme === 'dark' ? (
+   582→              <>
+   583→                <Sun className="w-4 h-4" /> Светлая тема
+   584→              </>
+   585→            ) : (
+   586→              <>
+   587→                <Moon className="w-4 h-4" /> Тёмная тема
+   588→              </>
+   589→            )}
+   590→          </Button>
+   591→        </div>
+   592→      </div>
+   593→
+   594→      {/* Notifications */}
+   595→      <div className="glass-card rounded-xl p-6 space-y-4">
+   596→        <h2 className="text-lg font-semibold flex items-center gap-2">
+   597→          <Bell className="w-5 h-5 text-purple-400" />
+   598→          Уведомления
+   599→        </h2>
+   600→        <Separator />
+   601→        <div className="space-y-4">
+   602→          <div className="flex items-center justify-between">
+   603→            <div>
+   604→              <p className="text-sm font-medium flex items-center gap-2">
+   605→                <Mail className="w-4 h-4 text-muted-foreground/50" />
+   606→                Email уведомления
+   607→              </p>
+   608→              <p className="text-xs text-muted-foreground mt-0.5">Получайте важные обновления на почту</p>
+   609→            </div>
+   610→            <Switch checked={notifEmail} onCheckedChange={setNotifEmail} />
+   611→          </div>
+   612→          <Separator />
+   613→          <div className="flex items-center justify-between">
+   614→            <div>
+   615→              <p className="text-sm font-medium flex items-center gap-2">
+   616→                <Bell className="w-4 h-4 text-muted-foreground/50" />
+   617→                Push-уведомления
+   618→              </p>
+   619→              <p className="text-xs text-muted-foreground mt-0.5">Мгновенные уведомления в браузере</p>
+   620→            </div>
+   621→            <Switch checked={notifPush} onCheckedChange={setNotifPush} />
+   622→          </div>
+   623→          <Separator />
+   624→          <div className="flex items-center justify-between">
+   625→            <div>
+   626→              <p className="text-sm font-medium flex items-center gap-2">
+   627→                <Clock className="w-4 h-4 text-muted-foreground/50" />
+   628→                Еженедельный отчёт
+   629→              </p>
+   630→              <p className="text-xs text-muted-foreground mt-0.5">Сводка за неделю каждую пятницу</p>
+   631→            </div>
+   632→            <Switch checked={notifWeekly} onCheckedChange={setNotifWeekly} />
+   633→          </div>
+   634→        </div>
+   635→      </div>
+   636→
+   637→      {/* Security */}
+   638→      <div className="glass-card rounded-xl p-6 space-y-4">
+   639→        <h2 className="text-lg font-semibold flex items-center gap-2">
+   640→          <Shield className="w-5 h-5 text-purple-400" />
+   641→          Безопасность
+   642→        </h2>
+   643→        <Separator />
+   644→        <div className="space-y-4">
+   645→          <div className="flex items-center justify-between">
+   646→            <div>
+   647→              <p className="text-sm font-medium flex items-center gap-2">
+   648→                <Lock className="w-4 h-4 text-muted-foreground/50" />
+   649→                Смена пароля
+   650→              </p>
+   651→              <p className="text-xs text-muted-foreground mt-0.5">Последняя смена: 30 дней назад</p>
+   652→            </div>
+   653→            <Button variant="outline" size="sm">
+   654→              Изменить
+   655→            </Button>
+   656→          </div>
+   657→          <Separator />
+   658→          <div className="flex items-center justify-between">
+   659→            <div>
+   660→              <p className="text-sm font-medium flex items-center gap-2">
+   661→                <Shield className="w-4 h-4 text-muted-foreground/50" />
+   662→                Двухфакторная аутентификация
+   663→              </p>
+   664→              <p className="text-xs text-muted-foreground mt-0.5">Дополнительная защита аккаунта</p>
+   665→            </div>
+   666→            <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
+   667→              Выкл
+   668→            </Badge>
+   669→          </div>
+   670→        </div>
+   671→      </div>
+   672→
+   673→      {/* Account */}
+   674→      <div className="glass-card rounded-xl p-6 space-y-4">
+   675→        <h2 className="text-lg font-semibold">Аккаунт</h2>
+   676→        <Separator />
+   677→        <div className="space-y-3">
+   678→          <div className="flex justify-between">
+   679→            <span className="text-muted-foreground">Версия</span>
+   680→            <span className="font-medium">PULSE MVP v1.0</span>
+   681→          </div>
+   682→        </div>
+   683→      </div>
+   684→
+   685→      {/* Danger Zone */}
+   686→      <div className="glass-card rounded-xl p-6 space-y-4 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.08)]">
+   687→        <h2 className="text-lg font-semibold text-red-400">Опасная зона</h2>
+   688→        <Separator />
+   689→        <div className="flex items-center justify-between">
+   690→          <div>
+   691→            <p className="font-medium">Сбросить данные</p>
+   692→            <p className="text-sm text-muted-foreground">
+   693→              Удалить все демо-данные и начать заново
+   694→            </p>
+   695→          </div>
+   696→          <Button
+   697→            variant="destructive"
+   698→            size="sm"
+   699→            onClick={() => {
+   700→              useAppStore.getState().setAppMode('onboarding');
+   701→            }}
+   702→          >
+   703→            Сбросить
+   704→          </Button>
+   705→        </div>
+   706→      </div>
+   707→    </div>
+   708→  );
+   709→}
+   710→
+   711→// ============================================================
+   712→// Client Dashboard Router
+   713→// ============================================================
+   714→function ClientDashboard() {
+   715→  const clientView = useAppStore((s) => s.clientView);
+   716→
+   717→  const renderView = () => {
+   718→    switch (clientView) {
+   719→      case 'home':
+   720→        return <ClientHome />;
+   721→      case 'map':
+   722→        return <ClientMap />;
+   723→      case 'promotions':
+   724→        return <ClientCoupons />;
+   725→      case 'bonuses':
+   726→        return <ClientBonuses />;
+   727→      case 'favorites':
+   728→        return <ClientFavorites />;
+   729→      case 'profile':
+   730→        return <ClientProfileEnhanced />;
+   731→      default:
+   732→        return <ClientHome />;
+   733→    }
+   734→  };
+   735→
+   736→  return (
+   737→    <div className="flex-1 overflow-hidden pb-20 md:pb-0">
+   738→      <ScrollArea className="h-full">
+   739→        <AnimatePresence mode="wait">
+   740→          <motion.div
+   741→            key={clientView}
+   742→            initial={{ opacity: 0, y: 8 }}
+   743→            animate={{ opacity: 1, y: 0 }}
+   744→            exit={{ opacity: 0, y: -8 }}
+   745→            transition={{ duration: 0.2, ease: 'easeInOut' }}
+   746→            className="p-4 md:p-6 lg:p-8"
+   747→          >
+   748→            {renderView()}
+   749→          </motion.div>
+   750→        </AnimatePresence>
+   751→      </ScrollArea>
+   752→      <ClientNav />
+   753→    </div>
+   754→  );
+   755→}
+   756→
+   757→function ClientBonuses() {
+   758→  return (
+   759→    <div className="space-y-6">
+   760→      <div>
+   761→        <h1 className="text-2xl font-bold">Мои бонусы</h1>
+   762→        <p className="text-muted-foreground mt-1">
+   763→          Накопленные баллы и уровень лояльности
+   764→        </p>
+   765→      </div>
+   766→      <div className="glass-card rounded-xl p-6 text-center space-y-4">
+   767→        <p className="text-sm text-muted-foreground uppercase tracking-wider">
+   768→          Ваш баланс
+   769→        </p>
+   770→        <p className="text-5xl font-bold pulse-text-gradient">2 480</p>
+   771→        <p className="text-muted-foreground">баллов</p>
+   772→        <Separator />
+   773→        <div className="flex justify-around">
+   774→          <div className="text-center">
+   775→            <p className="text-2xl font-bold text-purple-400">Серебро</p>
+   776→            <p className="text-xs text-muted-foreground">Уровень</p>
+   777→          </div>
+   778→          <div className="text-center">
+   779→            <p className="text-2xl font-bold">2 500</p>
+   780→            <p className="text-xs text-muted-foreground">до Золота</p>
+   781→          </div>
+   782→        </div>
+   783→      </div>
+   784→      <div className="glass-card rounded-xl p-6 space-y-4">
+   785→        <h3 className="font-semibold">Преимущества уровня Серебро</h3>
+   786→        <ul className="space-y-2 text-sm text-muted-foreground">
+   787→          <li className="flex items-center gap-2">
+   788→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   789→            Накопление 1.5₸ = 1 балл
+   790→          </li>
+   791→          <li className="flex items-center gap-2">
+   792→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   793→            Сюрприз на день рождения
+   794→          </li>
+   795→          <li className="flex items-center gap-2">
+   796→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   797→            Персональные предложения
+   798→          </li>
+   799→        </ul>
+   800→      </div>
+   801→      <div className="glass-card rounded-xl p-6 space-y-3">
+   802→        <h3 className="font-semibold">Реферальная программа</h3>
+   803→        <p className="text-sm text-muted-foreground">
+   804→          Пригласите друга и получите бонус после его первой покупки
+   805→        </p>
+   806→        <div className="bg-secondary rounded-lg p-4 text-center">
+   807→          <p className="text-xs text-muted-foreground mb-2">Ваш промокод</p>
+   808→          <p className="text-2xl font-mono font-bold text-purple-400 tracking-widest">
+   809→            PULSE-USER-4821
+   810→          </p>
+   811→        </div>
+   812→        <Button variant="outline" className="w-full">
+   813→          Скопировать код
+   814→        </Button>
+   815→      </div>
+   816→    </div>
+   817→  );
+   818→}
+   819→
+   820→function ClientFavorites() {
+   821→  return (
+   822→    <div className="space-y-6">
+   823→      <div>
+   824→        <h1 className="text-2xl font-bold">Избранное</h1>
+   825→        <p className="text-muted-foreground mt-1">
+   826→          Сохранённые заведения и акции
+   827→        </p>
+   828→      </div>
+   829→      <div className="glass-card rounded-xl p-12 text-center">
+   830→        <p className="text-muted-foreground">Пока нет избранных</p>
+   831→        <p className="text-sm text-muted-foreground mt-1">
+   832→          Нажмите ♡ на карточке заведения, чтобы сохранить
+   833→        </p>
+   834→      </div>
+   835→    </div>
+   836→  );
+   837→}
+   838→
+   839→// ============================================================
+   840→// Main Page Component
+   841→// ============================================================
+   842→export default function HomePage() {
+   843→  const appMode = useAppStore((s) => s.appMode);
+   844→  const showCreatePromotion = useAppStore((s) => s.showCreatePromotion);
+   845→  const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
+   846→  const promotionFromInsight = useAppStore((s) => s.promotionFromInsight);
+   847→  const showReturnClients = useAppStore((s) => s.showReturnClients);
+   848→  const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
+   849→  const showAIContent = useAppStore((s) => s.showAIContent);
+   850→  const setShowAIContent = useAppStore((s) => s.setShowAIContent);
+   851→  const theme = useAppStore((s) => s.theme);
+   852→
+   853→  return (
+   854→    <div className={theme === 'dark' ? 'dark' : ''}>
+   855→      <div className="min-h-screen flex bg-background">
+   856→        {/* Global Search (always rendered) */}
+   857→        <GlobalSearch />
+   858→
+   859→        {/* Onboarding */}
+   860→        {appMode === 'onboarding' && (
+   861→          <div className="flex-1 flex items-center justify-center p-4">
+   862→            <OnboardingFlow />
+   863→          </div>
+   864→        )}
+   865→
+   866→        {/* Owner Mode */}
+   867→        {appMode === 'owner' && (
+   868→          <>
+   869→            <Sidebar />
+   870→            <MobileHeader />
+   871→            <OwnerDashboard />
+   872→          </>
+   873→        )}
+   874→
+   875→        {/* Client Mode */}
+   876→        {appMode === 'client' && (
+   877→          <>
+   878→            <div className="hidden md:flex md:w-64 md:flex-col md:border-r border-border bg-card pb-20">
+   879→              <div className="p-6">
+   880→                <h1 className="text-xl font-bold pulse-text-gradient">PULSE</h1>
+   881→                <p className="text-xs text-muted-foreground mt-1">Клиентская часть</p>
+   882→              </div>
+   883→              <div className="flex-1" />
+   884→              <div className="px-4 pb-4">
+   885→                <Button
+   886→                  variant="outline"
+   887→                  size="sm"
+   888→                  className="w-full"
+   889→                  onClick={() => useAppStore.getState().setAppMode('owner')}
+   890→                >
+   891→                  Режим бизнеса
+   892→                </Button>
+   893→              </div>
+   894→            </div>
+   895→            <div className="md:hidden">
+   896→              <MobileHeader />
+   897→            </div>
+   898→            <ClientDashboard />
+   899→          </>
+   900→        )}
+   901→
+   902→        {/* Admin Mode */}
+   903→        {appMode === 'admin' && (
+   904→          <>
+   905→            <AdminNav />
+   906→            <div className="hidden md:block">
+   907→              <MobileHeader />
+   908→            </div>
+   909→            <div className="flex-1 overflow-hidden">
+   910→              <ScrollArea className="h-full">
+   911→                <AnimatePresence mode="wait">
+   912→                  <motion.div
+   913→                    key="admin"
+   914→                    initial={{ opacity: 0, y: 8 }}
+   915→                    animate={{ opacity: 1, y: 0 }}
+   916→                    exit={{ opacity: 0, y: -8 }}
+   917→                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+   918→                    className="p-4 md:p-6 lg:p-8"
+   919→                  >
+   920→                    <AdminDashboard />
+   921→                  </motion.div>
+   922→                </AnimatePresence>
+   923→              </ScrollArea>
+   924→            </div>
+   925→          </>
+   926→        )}
+   927→
+   928→        {/* Dialogs */}
+   929→        {showCreatePromotion && (
+   930→          <CreatePromotion
+   931→            prefillDiscount={promotionFromInsight === 'happy-hour' ? 15 : undefined}
+   932→            prefillProduct={
+   933→              promotionFromInsight === 'happy-hour'
+   934→                ? 'Все кофейные напитки'
+   935→                : undefined
+   936→            }
+   937→            prefillName={
+   938→              promotionFromInsight === 'happy-hour' ? 'Happy Hour' : undefined
+   939→            }
+   940→          />
+   941→        )}
+   942→
+   943→        {showReturnClients && (
+   944→          <ReturnClientsDialog onClose={() => setShowReturnClients(false)} />
+   945→        )}
+   946→
+   947→        {showAIContent && (
+   948→          <AIContentDialog onClose={() => setShowAIContent(false)} />
+   949→        )}
+   950→
+   951→        {/* Toast Notifications */}
+   952→        <ToastNotifications />
+   953→      </div>
+   954→    </div>
+   955→  );
+   956→}
+   957→
+   958→// ============================================================
+   959→// Dialog Components
+   960→// ============================================================
+   961→function ReturnClientsDialog({ onClose }: { onClose: () => void }) {
+   962→  const addPromotion = useAppStore((s) => s.addPromotion);
+   963→
+   964→  const handleCreate = () => {
+   965→    addPromotion({
+   966→      id: `p-${Date.now()}`,
+   967→      name: 'Возвращение клиентов',
+   968→      discount: 15,
+   969→      product: 'Любой напиток',
+   970→      startTime: new Date().toISOString(),
+   971→      endTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+   972→      audience: 'Потерянные клиенты',
+   973→      status: 'active',
+   974→    });
+   975→    onClose();
+   976→  };
+   977→
+   978→  return (
+   979→    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+   980→      <div className="glass-card rounded-2xl p-6 w-full max-w-md space-y-4">
+   981→        <div>
+   982→          <h2 className="text-xl font-bold">Вернуть клиентов</h2>
+   983→          <p className="text-sm text-muted-foreground mt-1">
+   984→            AI создал персональное предложение для 18 потерянных клиентов
+   985→          </p>
+   986→        </div>
+   987→        <Separator />
+   988→        <div className="space-y-3 text-sm">
+   989→          <div className="flex items-center gap-2">
+   990→            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+   991→            <span className="text-muted-foreground">Бонус:</span>
+   992→            <span className="font-medium">500 ₸ на следующий визит</span>
+   993→          </div>
+   994→          <div className="flex items-center gap-2">
+   995→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   996→            <span className="text-muted-foreground">Аудитория:</span>
+   997→            <span className="font-medium">18 потерянных клиентов</span>
+   998→          </div>
+   999→          <div className="flex items-center gap-2">
+  1000→            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+  1001→            <span className="text-muted-foreground">Прогноз:</span>
+  1002→            <span className="font-medium">Возврат 40–60% клиентов</span>
+  1003→          </div>
+  1004→        </div>
+  1005→        <div className="bg-purple-500/10 rounded-lg p-3">
+  1006→          <p className="text-xs text-purple-300">
+  1007→            ⚠ AI прогноз на основе демо-данных
+  1008→          </p>
+  1009→        </div>
+  1010→        <div className="flex gap-3">
+  1011→          <Button variant="outline" className="flex-1" onClick={onClose}>
+  1012→            Отмена
+  1013→          </Button>
+  1014→          <Button className="flex-1" onClick={handleCreate}>
+  1015→            Создать акцию
+  1016→          </Button>
+  1017→        </div>
+  1018→      </div>
+  1019→    </div>
+  1020→  );
+  1021→}
+  1022→
+  1023→function AIContentDialog({ onClose }: { onClose: () => void }) {
+  1024→  return (
+  1025→    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  1026→      <div className="glass-card rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+  1027→        <div className="p-6">
+  1028→          <AIContent />
+  1029→        </div>
+  1030→        <div className="p-4 border-t border-border">
+  1031→          <Button variant="outline" className="w-full" onClick={onClose}>
+  1032→            Закрыть
+  1033→          </Button>
+  1034→        </div>
+  1035→      </div>
+  1036→    </div>
+  1037→  );
+  1038→}
+  1039→

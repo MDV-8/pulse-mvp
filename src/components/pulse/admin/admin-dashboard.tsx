@@ -89,7 +89,7 @@ function DashboardTab() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="py-4 px-4 overflow-hidden relative">
+            <Card className="py-4 px-4 overflow-hidden relative card-hover-lift micro-interaction">
               {/* Gradient left border accent */}
               <div className={cn('absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-gradient-to-b', statColors[i])} />
               <CardContent className="p-0">
@@ -226,7 +226,7 @@ function ToolsTab() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
             >
-              <Card className={cn('p-0 transition-opacity', !tool.enabled && 'opacity-60')}>
+              <Card className={cn('p-0 transition-opacity card-hover-lift micro-interaction', !tool.enabled && 'opacity-60')}>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
@@ -354,7 +354,7 @@ function TemplatesTab() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
             >
-              <Card className={cn('p-0 overflow-hidden hover:border-purple-500/30 transition-colors')}>
+              <Card className={cn('p-0 overflow-hidden hover:border-purple-500/30 transition-colors card-hover-lift micro-interaction')}>
                 {/* Top gradient strip */}
                 <div className={cn('h-1.5 bg-gradient-to-r', templateGradients[i % templateGradients.length])} />
                 <CardContent className="p-4">
@@ -520,7 +520,7 @@ function UsersTab() {
             </TableHeader>
             <TableBody>
               {filtered.map((user, idx) => (
-                <TableRow key={user.id} className="border-b border-border/30">
+                <TableRow key={user.id} className="border-b border-border/30 card-hover-lift">
                   <TableCell>
                     <div className="flex items-center gap-2.5">
                       <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0', avatarColors[idx % avatarColors.length])}>
@@ -627,8 +627,7 @@ export default function AdminDashboard() {
   const adminView = useAppStore((s) => s.adminView);
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
+    <div className="space-y-6 glass-shine rounded-2xl">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

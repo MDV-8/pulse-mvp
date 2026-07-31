@@ -44,13 +44,14 @@ function PromotionCard({ promotion, onSelectResults }: { promotion: Promotion; o
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <Card className="bg-card border-border card-hover">
+      <Card className="bg-card border-border card-hover card-hover-lift">
         <CardContent className="p-4 sm:p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h3 className="font-semibold text-sm truncate">{promotion.name}</h3>
                 <Badge variant="outline" className={statusConfig.className}>
+                  {promotion.status === 'active' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot inline-block mr-1.5" />}
                   {statusConfig.label}
                 </Badge>
               </div>
@@ -154,7 +155,7 @@ export function PromotionsList() {
           />
           <Button
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 border-glow"
             onClick={() => setShowCreatePromotion(true)}
           >
             <Plus className="h-4 w-4" />
@@ -167,17 +168,17 @@ export function PromotionsList() {
       <div className="px-4 sm:px-6 pt-4">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as FilterTab)}>
           <TabsList className="bg-muted/50 h-9">
-            <TabsTrigger value="all" className="text-xs px-3 h-7">Все</TabsTrigger>
-            <TabsTrigger value="active" className="text-xs px-3 h-7">Активные</TabsTrigger>
-            <TabsTrigger value="completed" className="text-xs px-3 h-7">Завершённые</TabsTrigger>
-            <TabsTrigger value="planned" className="text-xs px-3 h-7">Плановые</TabsTrigger>
+            <TabsTrigger value="all" className="text-xs px-3 h-7 slide-in-right stagger-1">Все</TabsTrigger>
+            <TabsTrigger value="active" className="text-xs px-3 h-7 slide-in-right stagger-2">Активные</TabsTrigger>
+            <TabsTrigger value="completed" className="text-xs px-3 h-7 slide-in-right stagger-3">Завершённые</TabsTrigger>
+            <TabsTrigger value="planned" className="text-xs px-3 h-7 slide-in-right stagger-4">Плановые</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       {/* Promotions List */}
       <ScrollArea className="flex-1 px-4 sm:px-6 py-4">
-        <div className="space-y-3">
+        <div className="space-y-3 count-up">
           {filteredPromotions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">

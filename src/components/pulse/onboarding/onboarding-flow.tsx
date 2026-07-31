@@ -159,6 +159,35 @@ export function OnboardingFlow() {
         }}
       />
 
+      {/* Floating particles background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Gradient mesh / bloom at top corners */}
+        <div className="absolute top-[-80px] left-[-80px] w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,_rgba(139,92,246,0.12)_0%,_rgba(139,92,246,0.04)_40%,_transparent_70%)]" />
+        <div className="absolute top-[-60px] right-[-60px] w-[280px] h-[280px] rounded-full bg-[radial-gradient(circle,_rgba(168,85,247,0.1)_0%,_rgba(168,85,247,0.03)_40%,_transparent_70%)]" />
+        {/* Additional bloom at bottom for depth */}
+        <div className="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-[400px] h-[250px] rounded-full bg-[radial-gradient(ellipse,_rgba(139,92,246,0.06)_0%,_transparent_60%)]" />
+
+        {/* Floating particle dots */}
+        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/30" style={{ left: '8%', bottom: '-10px', animation: 'particle-float 8s ease-in-out infinite', animationDelay: '0s' }} />
+        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/25" style={{ left: '15%', bottom: '-10px', animation: 'particle-float 10s ease-in-out infinite', animationDelay: '1.2s' }} />
+        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/35" style={{ left: '24%', bottom: '-10px', animation: 'particle-float 7s ease-in-out infinite', animationDelay: '0.5s' }} />
+        <span className="absolute w-[4px] h-[4px] rounded-full bg-purple-400/20" style={{ left: '33%', bottom: '-10px', animation: 'particle-float 11s ease-in-out infinite', animationDelay: '2.8s' }} />
+        <span className="absolute w-[6px] h-[6px] rounded-full bg-purple-400/15" style={{ left: '42%', bottom: '-10px', animation: 'particle-float 9s ease-in-out infinite', animationDelay: '0.9s' }} />
+        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/30" style={{ left: '51%', bottom: '-10px', animation: 'particle-float 8.5s ease-in-out infinite', animationDelay: '3.2s' }} />
+        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/35" style={{ left: '58%', bottom: '-10px', animation: 'particle-float 7.5s ease-in-out infinite', animationDelay: '1.7s' }} />
+        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/20" style={{ left: '65%', bottom: '-10px', animation: 'particle-float 10.5s ease-in-out infinite', animationDelay: '4.1s' }} />
+        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/25" style={{ left: '73%', bottom: '-10px', animation: 'particle-float 9.5s ease-in-out infinite', animationDelay: '0.3s' }} />
+        <span className="absolute w-[4px] h-[4px] rounded-full bg-purple-400/30" style={{ left: '80%', bottom: '-10px', animation: 'particle-float 8s ease-in-out infinite', animationDelay: '2.2s' }} />
+        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/35" style={{ left: '88%', bottom: '-10px', animation: 'particle-float 11.5s ease-in-out infinite', animationDelay: '5.0s' }} />
+        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/18" style={{ left: '95%', bottom: '-10px', animation: 'particle-float 9s ease-in-out infinite', animationDelay: '1.5s' }} />
+        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/28" style={{ left: '5%', bottom: '-10px', animation: 'particle-float 12s ease-in-out infinite', animationDelay: '3.8s' }} />
+        <span className="absolute w-[6px] h-[6px] rounded-full bg-purple-400/12" style={{ left: '20%', bottom: '-10px', animation: 'particle-float 13s ease-in-out infinite', animationDelay: '6.0s' }} />
+        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/30" style={{ left: '48%', bottom: '-10px', animation: 'particle-float 7.2s ease-in-out infinite', animationDelay: '2.5s' }} />
+        <span className="absolute w-[4px] h-[4px] rounded-full bg-purple-400/22" style={{ left: '70%', bottom: '-10px', animation: 'particle-float 10.2s ease-in-out infinite', animationDelay: '4.5s' }} />
+        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/26" style={{ left: '38%', bottom: '-10px', animation: 'particle-float 8.8s ease-in-out infinite', animationDelay: '1.0s' }} />
+        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/16" style={{ left: '55%', bottom: '-10px', animation: 'particle-float 11.8s ease-in-out infinite', animationDelay: '3.5s' }} />
+      </div>
+
       <div className="relative w-full max-w-md">
         {/* PULSE Logo */}
         <div className="text-center mb-8">

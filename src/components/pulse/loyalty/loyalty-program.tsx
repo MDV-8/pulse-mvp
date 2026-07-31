@@ -147,7 +147,7 @@ export default function LoyaltyProgram() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.08 }}
               >
-                <Card className={`border ${config.borderColor} ${config.bgColor} overflow-hidden`}>
+                <Card className={`border ${config.borderColor} ${config.bgColor} overflow-hidden glass-card-premium card-hover-lift ${i === 2 ? 'aurora-border' : ''}`}>
                   <div className={`h-1 ${config.accentColor}`} />
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
@@ -162,7 +162,7 @@ export default function LoyaltyProgram() {
                           </p>
                         </div>
                       </div>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs breathe">
                         {level.count} чел.
                       </Badge>
                     </div>
@@ -174,7 +174,7 @@ export default function LoyaltyProgram() {
                       </div>
                       <div className="relative h-2 w-full bg-muted rounded-full overflow-hidden">
                         <div
-                          className={`absolute left-0 top-0 h-full rounded-full ${config.progressColor} transition-all duration-700`}
+                          className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-purple-500 via-violet-500 to-purple-400 transition-all duration-700"
                           style={{ width: `${fillPercent}%` }}
                         />
                       </div>
@@ -187,7 +187,7 @@ export default function LoyaltyProgram() {
         </div>
       </div>
 
-      <Separator />
+      <div className="neon-line" />
 
       {/* Referral Program */}
       <motion.div
@@ -195,7 +195,7 @@ export default function LoyaltyProgram() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
+        <Card className="glass-card-deep border-glow border-purple-500/20">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-500/20">

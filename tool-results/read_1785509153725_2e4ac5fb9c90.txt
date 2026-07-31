@@ -1,0 +1,636 @@
+     1→    35→
+     2→    36→const adminTabs: { key: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+     3→    37→  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+     4→    38→  { key: 'tools', label: 'Инструменты', icon: Wrench },
+     5→    39→  { key: 'templates', label: 'Шаблоны', icon: FileText },
+     6→    40→  { key: 'users', label: 'Пользователи', icon: Users },
+     7→    41→  { key: 'content', label: 'Контент', icon: Pen },
+     8→    42→];
+     9→    43→
+    10→    44→const statColors = [
+    11→    45→  'from-purple-500 to-violet-500',
+    12→    46→  'from-green-500 to-emerald-500',
+    13→    47→  'from-cyan-500 to-blue-500',
+    14→    48→  'from-pink-500 to-rose-500',
+    15→    49→];
+    16→    50→
+    17→    51→const toolColors: Record<string, string> = {
+    18→    52→  'Brain': 'bg-purple-500/15 text-purple-400',
+    19→    53→  'Sparkles': 'bg-amber-500/15 text-amber-400',
+    20→    54→  'Users': 'bg-green-500/15 text-green-400',
+    21→    55→  'Heart': 'bg-pink-500/15 text-pink-400',
+    22→    56→  'Pen': 'bg-cyan-500/15 text-cyan-400',
+    23→    57→  'TrendingUp': 'bg-emerald-500/15 text-emerald-400',
+    24→    58→  'Eye': 'bg-blue-500/15 text-blue-400',
+    25→    59→  'Calendar': 'bg-orange-500/15 text-orange-400',
+    26→    60→  'Lightbulb': 'bg-yellow-500/15 text-yellow-400',
+    27→    61→  'MessageSquare': 'bg-teal-500/15 text-teal-400',
+    28→    62→};
+    29→    63→
+    30→    64→// ---- Dashboard Tab ----
+    31→    65→function DashboardTab() {
+    32→    66→  const stats = [
+    33→    67→    { label: 'Всего пользователей', value: '2 847', icon: Users, trend: '+12%', trendDir: 'up' as const },
+    34→    68→    { label: 'Активных бизнесов', value: '342', icon: Building2, trend: '+8%', trendDir: 'up' as const },
+    35→    69→    { label: 'Акций создано', value: '1 204', icon: Sparkles, trend: '-3%', trendDir: 'down' as const },
+    36→    70→    { label: 'AI-запросов', value: '18 942', icon: Brain, trend: '+24%', trendDir: 'up' as const },
+    37→    71→  ];
+    38→    72→
+    39→    73→  const recentActivity = [
+    40→    74→    { id: '1', text: 'Coffee & Co запустил акцию «Happy Hour»', time: '5 мин назад' },
+    41→    75→    { id: '2', text: 'Новый бизнес зарегистрирован: FitZone', time: '12 мин назад' },
+    42→    76→    { id: '3', text: 'AI сгенерировал 8 рекомендаций', time: '18 мин назад' },
+    43→    77→    { id: '4', text: 'Обновлён шаблон «Комбо-набор»', time: '1 час назад' },
+    44→    78→    { id: '5', text: 'Регистрация 23 новых пользователей', time: '2 часа назад' },
+    45→    79→    { id: '6', text: 'Отчёт по финансам за январь готов', time: '3 часа назад' },
+    46→    80→  ];
+    47→    81→
+    48→    82→  return (
+    49→    83→    <div className="space-y-6">
+    50→    84→      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    51→    85→        {stats.map((s, i) => (
+    52→    86→          <motion.div
+    53→    87→            key={s.label}
+    54→    88→            initial={{ opacity: 0, y: 20 }}
+    55→    89→            animate={{ opacity: 1, y: 0 }}
+    56→    90→            transition={{ delay: i * 0.05 }}
+    57→    91→          >
+    58→    92→            <Card className="py-4 px-4 overflow-hidden relative">
+    59→    93→              {/* Gradient left border accent */}
+    60→    94→              <div className={cn('absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-gradient-to-b', statColors[i])} />
+    61→    95→              <CardContent className="p-0">
+    62→    96→                <div className="flex items-center gap-3 pl-2">
+    63→    97→                  <div className="p-2 rounded-lg bg-muted">
+    64→    98→                    <s.icon className="w-4 h-4" />
+    65→    99→                  </div>
+    66→   100→                  <div className="flex-1 min-w-0">
+    67→   101→                    <p className="text-xs text-muted-foreground truncate">{s.label}</p>
+    68→   102→                    <div className="flex items-center gap-2">
+    69→   103→                      <p className="text-xl font-bold">{s.value}</p>
+    70→   104→                    </div>
+    71→   105→                  </div>
+    72→   106→                  <div className={cn(
+    73→   107→                    'flex items-center gap-0.5 text-xs font-medium shrink-0',
+    74→   108→                    s.trendDir === 'up' ? 'text-green-400' : 'text-red-400'
+    75→   109→                  )}>
+    76→   110→                    {s.trendDir === 'up' ? (
+    77→   111→                      <ArrowUpRight className="w-3.5 h-3.5" />
+    78→   112→                    ) : (
+    79→   113→                      <ArrowDownRight className="w-3.5 h-3.5" />
+    80→   114→                    )}
+    81→   115→                    {s.trend}
+    82→   116→                  </div>
+    83→   117→                </div>
+    84→   118→              </CardContent>
+    85→   119→            </Card>
+    86→   120→          </motion.div>
+    87→   121→        ))}
+    88→   122→      </div>
+    89→   123→
+    90→   124→      <Card>
+    91→   125→        <CardHeader>
+    92→   126→          <CardTitle className="text-base flex items-center gap-2">
+    93→   127→            <Activity className="w-4 h-4 text-purple-400" />
+    94→   128→            Последняя активность
+    95→   129→          </CardTitle>
+    96→   130→        </CardHeader>
+    97→   131→        <CardContent>
+    98→   132→          <div className="space-y-3">
+    99→   133→            {recentActivity.map((a, i) => (
+   100→   134→              <motion.div
+   101→   135→                key={a.id}
+   102→   136→                initial={{ opacity: 0, x: -10 }}
+   103→   137→                animate={{ opacity: 1, x: 0 }}
+   104→   138→                transition={{ delay: 0.05 + i * 0.03 }}
+   105→   139→                className="flex items-center justify-between gap-4"
+   106→   140→              >
+   107→   141→                <div className="flex items-center gap-2 text-sm">
+   108→   142→                  <div className="w-2 h-2 rounded-full bg-purple-500" />
+   109→   143→                  <span>{a.text}</span>
+   110→   144→                </div>
+   111→   145→                <span className="text-xs text-muted-foreground whitespace-nowrap">
+   112→   146→                  {a.time}
+   113→   147→                </span>
+   114→   148→              </motion.div>
+   115→   149→            ))}
+   116→   150→          </div>
+   117→   151→        </CardContent>
+   118→   152→      </Card>
+   119→   153→    </div>
+   120→   154→  );
+   121→   155→}
+   122→   156→
+   123→   157→// ---- Tools Tab ----
+   124→   158→interface AdminTool {
+   125→   159→  id: string;
+   126→   160→  name: string;
+   127→   161→  description: string;
+   128→   162→  icon: string;
+   129→   163→  enabled: boolean;
+   130→   164→}
+   131→   165→
+   132→   166→function ToolsTab() {
+   133→   167→  const [tools, setTools] = useState<AdminTool[]>(mockAdminTools);
+   134→   168→  const [editingId, setEditingId] = useState<string | null>(null);
+   135→   169→  const [editName, setEditName] = useState('');
+   136→   170→  const [editDesc, setEditDesc] = useState('');
+   137→   171→
+   138→   172→  const toggleTool = (id: string) => {
+   139→   173→    setTools((prev) =>
+   140→   174→      prev.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t))
+   141→   175→    );
+   142→   176→  };
+   143→   177→
+   144→   178→  const startEdit = (tool: AdminTool) => {
+   145→   179→    setEditingId(tool.id);
+   146→   180→    setEditName(tool.name);
+   147→   181→    setEditDesc(tool.description);
+   148→   182→  };
+   149→   183→
+   150→   184→  const saveEdit = () => {
+   151→   185→    if (!editingId) return;
+   152→   186→    setTools((prev) =>
+   153→   187→      prev.map((t) =>
+   154→   188→        t.id === editingId ? { ...t, name: editName, description: editDesc } : t
+   155→   189→      )
+   156→   190→    );
+   157→   191→    setEditingId(null);
+   158→   192→  };
+   159→   193→
+   160→   194→  const addTool = () => {
+   161→   195→    const newTool: AdminTool = {
+   162→   196→      id: `at-${Date.now()}`,
+   163→   197→      name: 'Новый инструмент',
+   164→   198→      description: 'Описание инструмента',
+   165→   199→      icon: 'Lightbulb',
+   166→   200→      enabled: false,
+   167→   201→    };
+   168→   202→    setTools((prev) => [...prev, newTool]);
+   169→   203→    startEdit(newTool);
+   170→   204→  };
+   171→   205→
+   172→   206→  return (
+   173→   207→    <div className="space-y-4">
+   174→   208→      <div className="flex items-center justify-between">
+   175→   209→        <h2 className="text-lg font-semibold">Инструменты</h2>
+   176→   210→        <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={addTool}>
+   177→   211→          <Plus className="w-4 h-4 mr-1" />
+   178→   212→          Добавить
+   179→   213→        </Button>
+   180→   214→      </div>
+   181→   215→
+   182→   216→      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   183→   217→        {tools.map((tool, i) => {
+   184→   218→          const IconComponent = iconMap[tool.icon] || Lightbulb;
+   185→   219→          const isEditing = editingId === tool.id;
+   186→   220→          const colorClass = toolColors[tool.icon] || toolColors['Lightbulb'];
+   187→   221→
+   188→   222→          return (
+   189→   223→            <motion.div
+   190→   224→              key={tool.id}
+   191→   225→              initial={{ opacity: 0, y: 10 }}
+   192→   226→              animate={{ opacity: 1, y: 0 }}
+   193→   227→              transition={{ delay: i * 0.03 }}
+   194→   228→            >
+   195→   229→              <Card className={cn('p-0 transition-opacity', !tool.enabled && 'opacity-60')}>
+   196→   230→                <CardContent className="p-4 space-y-3">
+   197→   231→                  <div className="flex items-start justify-between">
+   198→   232→                    <div className="flex items-start gap-3">
+   199→   233→                      {/* Circular colored icon container */}
+   200→   234→                      <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', colorClass)}>
+   201→   235→                        <IconComponent className="w-5 h-5" />
+   202→   236→                      </div>
+   203→   237→                      {isEditing ? (
+   204→   238→                        <div className="space-y-1 flex-1">
+   205→   239→                          <Input
+   206→   240→                            value={editName}
+   207→   241→                            onChange={(e) => setEditName(e.target.value)}
+   208→   242→                            className="h-7 text-sm"
+   209→   243→                          />
+   210→   244→                          <Input
+   211→   245→                            value={editDesc}
+   212→   246→                            onChange={(e) => setEditDesc(e.target.value)}
+   213→   247→                            className="h-7 text-sm"
+   214→   248→                          />
+   215→   249→                        </div>
+   216→   250→                      ) : (
+   217→   251→                        <div>
+   218→   252→                          <h3 className="font-semibold text-sm">{tool.name}</h3>
+   219→   253→                          <p className="text-xs text-muted-foreground mt-0.5">
+   220→   254→                            {tool.description}
+   221→   255→                          </p>
+   222→   256→                        </div>
+   223→   257→                      )}
+   224→   258→                    </div>
+   225→   259→                    <div className="flex items-center gap-2 shrink-0">
+   226→   260→                      {isEditing ? (
+   227→   261→                        <Button size="sm" variant="ghost" onClick={saveEdit} className="text-green-400 hover:text-green-300">
+   228→   262→                          <Check className="w-4 h-4" />
+   229→   263→                        </Button>
+   230→   264→                      ) : (
+   231→   265→                        <Button size="sm" variant="ghost" onClick={() => startEdit(tool)} className="text-muted-foreground hover:text-foreground">
+   232→   266→                          <Pencil className="w-4 h-4" />
+   233→   267→                        </Button>
+   234→   268→                      )}
+   235→   269→                    </div>
+   236→   270→                  </div>
+   237→   271→                  <div className="flex items-center justify-between">
+   238→   272→                    <span className={cn(
+   239→   273→                      'text-xs font-medium',
+   240→   274→                      tool.enabled ? 'text-green-400' : 'text-red-400/70'
+   241→   275→                    )}>
+   242→   276→                      {tool.enabled ? '● Включён' : '○ Выключен'}
+   243→   277→                    </span>
+   244→   278→                    <Switch checked={tool.enabled} onCheckedChange={() => toggleTool(tool.id)} />
+   245→   279→                  </div>
+   246→   280→                </CardContent>
+   247→   281→              </Card>
+   248→   282→            </motion.div>
+   249→   283→          );
+   250→   284→        })}
+   251→   285→      </div>
+   252→   286→    </div>
+   253→   287→  );
+   254→   288→}
+   255→   289→
+   256→   290→// ---- Templates Tab ----
+   257→   291→interface Template {
+   258→   292→  id: string;
+   259→   293→  name: string;
+   260→   294→  description: string;
+   261→   295→  discount: number;
+   262→   296→  category: string;
+   263→   297→}
+   264→   298→
+   265→   299→const templateGradients = [
+   266→   300→  'from-purple-500/10 to-violet-500/5',
+   267→   301→  'from-green-500/10 to-emerald-500/5',
+   268→   302→  'from-cyan-500/10 to-blue-500/5',
+   269→   303→  'from-pink-500/10 to-rose-500/5',
+   270→   304→  'from-amber-500/10 to-orange-500/5',
+   271→   305→];
+   272→   306→
+   273→   307→function TemplatesTab() {
+   274→   308→  const [templates, setTemplates] = useState<Template[]>(mockAdminTemplates);
+   275→   309→  const [showAdd, setShowAdd] = useState(false);
+   276→   310→  const [newName, setNewName] = useState('');
+   277→   311→  const [newDesc, setNewDesc] = useState('');
+   278→   312→  const [newDiscount, setNewDiscount] = useState('');
+   279→   313→  const [newCategory, setNewCategory] = useState('');
+   280→   314→
+   281→   315→  const addTemplate = () => {
+   282→   316→    if (!newName.trim()) return;
+   283→   317→    setTemplates((prev) => [
+   284→   318→      ...prev,
+   285→   319→      {
+   286→   320→        id: `tpl-${Date.now()}`,
+   287→   321→        name: newName,
+   288→   322→        description: newDesc,
+   289→   323→        discount: parseInt(newDiscount) || 0,
+   290→   324→        category: newCategory || 'Все',
+   291→   325→      },
+   292→   326→    ]);
+   293→   327→    setShowAdd(false);
+   294→   328→    setNewName('');
+   295→   329→    setNewDesc('');
+   296→   330→    setNewDiscount('');
+   297→   331→    setNewCategory('');
+   298→   332→  };
+   299→   333→
+   300→   334→  const deleteTemplate = (id: string) => {
+   301→   335→    setTemplates((prev) => prev.filter((t) => t.id !== id));
+   302→   336→  };
+   303→   337→
+   304→   338→  return (
+   305→   339→    <div className="space-y-4">
+   306→   340→      <div className="flex items-center justify-between">
+   307→   341→        <h2 className="text-lg font-semibold">Шаблоны акций</h2>
+   308→   342→        <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => setShowAdd(true)}>
+   309→   343→          <Plus className="w-4 h-4 mr-1" />
+   310→   344→          Добавить шаблон
+   311→   345→        </Button>
+   312→   346→      </div>
+   313→   347→
+   314→   348→      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+   315→   349→        <ScrollArea className="max-h-[500px] md:contents">
+   316→   350→          {templates.map((tpl, i) => (
+   317→   351→            <motion.div
+   318→   352→              key={tpl.id}
+   319→   353→              initial={{ opacity: 0, y: 10 }}
+   320→   354→              animate={{ opacity: 1, y: 0 }}
+   321→   355→              transition={{ delay: i * 0.03 }}
+   322→   356→            >
+   323→   357→              <Card className={cn('p-0 overflow-hidden hover:border-purple-500/30 transition-colors')}>
+   324→   358→                {/* Top gradient strip */}
+   325→   359→                <div className={cn('h-1.5 bg-gradient-to-r', templateGradients[i % templateGradients.length])} />
+   326→   360→                <CardContent className="p-4">
+   327→   361→                  <div className="flex items-start justify-between gap-2 mb-3">
+   328→   362→                    <div className="flex-1 min-w-0">
+   329→   363→                      <h3 className="font-semibold text-sm">{tpl.name}</h3>
+   330→   364→                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+   331→   365→                        {tpl.description}
+   332→   366→                      </p>
+   333→   367→                    </div>
+   334→   368→                    {tpl.discount > 0 && (
+   335→   369→                      <div className="shrink-0 w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex flex-col items-center justify-center">
+   336→   370→                        <span className="text-lg font-bold text-green-400">-{tpl.discount}%</span>
+   337→   371→                      </div>
+   338→   372→                    )}
+   339→   373→                  </div>
+   340→   374→                  <div className="flex items-center justify-between">
+   341→   375→                    <Badge variant="outline" className="text-xs">
+   342→   376→                      {tpl.category}
+   343→   377→                    </Badge>
+   344→   378→                    <div className="flex gap-1">
+   345→   379→                      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground h-7 w-7 p-0">
+   346→   380→                        <Pencil className="w-3.5 h-3.5" />
+   347→   381→                      </Button>
+   348→   382→                      <Button
+   349→   383→                        size="sm"
+   350→   384→                        variant="ghost"
+   351→   385→                        className="text-muted-foreground hover:text-red-400 h-7 w-7 p-0"
+   352→   386→                        onClick={() => deleteTemplate(tpl.id)}
+   353→   387→                      >
+   354→   388→                        <Trash2 className="w-3.5 h-3.5" />
+   355→   389→                      </Button>
+   356→   390→                    </div>
+   357→   391→                  </div>
+   358→   392→                </CardContent>
+   359→   393→              </Card>
+   360→   394→            </motion.div>
+   361→   395→          ))}
+   362→   396→        </ScrollArea>
+   363→   397→      </div>
+   364→   398→
+   365→   399→      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+   366→   400→        <DialogContent className="bg-card border-border">
+   367→   401→          <DialogHeader>
+   368→   402→            <DialogTitle>Добавить шаблон</DialogTitle>
+   369→   403→          </DialogHeader>
+   370→   404→          <div className="space-y-3 py-2">
+   371→   405→            <div>
+   372→   406→              <label className="text-sm text-muted-foreground mb-1 block">Название</label>
+   373→   407→              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Название шаблона" />
+   374→   408→            </div>
+   375→   409→            <div>
+   376→   410→              <label className="text-sm text-muted-foreground mb-1 block">Описание</label>
+   377→   411→              <Input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="Описание" />
+   378→   412→            </div>
+   379→   413→            <div className="grid grid-cols-2 gap-3">
+   380→   414→              <div>
+   381→   415→                <label className="text-sm text-muted-foreground mb-1 block">Скидка (%)</label>
+   382→   416→                <Input value={newDiscount} onChange={(e) => setNewDiscount(e.target.value)} placeholder="0" type="number" />
+   383→   417→              </div>
+   384→   418→              <div>
+   385→   419→                <label className="text-sm text-muted-foreground mb-1 block">Категория</label>
+   386→   420→                <Input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Все" />
+   387→   421→              </div>
+   388→   422→            </div>
+   389→   423→          </div>
+   390→   424→          <DialogFooter>
+   391→   425→            <Button variant="outline" onClick={() => setShowAdd(false)}>Отмена</Button>
+   392→   426→            <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={addTemplate}>
+   393→   427→              Создать
+   394→   428→            </Button>
+   395→   429→          </DialogFooter>
+   396→   430→        </DialogContent>
+   397→   431→      </Dialog>
+   398→   432→    </div>
+   399→   433→  );
+   400→   434→}
+   401→   435→
+   402→   436→// ---- Users Tab ----
+   403→   437→const mockUsers = [
+   404→   438→  { id: 'u1', name: 'Айсара К.', email: 'aisara@coffee-co.kz', business: 'Coffee & Co', plan: 'Про', status: 'active', joined: '2024-03-15' },
+   405→   439→  { id: 'u2', name: 'Дмитрий С.', email: 'dmitry@beanbrew.kz', business: 'Bean & Brew', plan: 'Старт', status: 'active', joined: '2024-06-22' },
+   406→   440→  { id: 'u3', name: 'Мария Л.', email: 'maria@pizza-mi.kz', business: 'Pizza Milano', plan: 'Бизнес', status: 'active', joined: '2024-09-10' },
+   407→   441→  { id: 'u4', name: 'Арман Б.', email: 'arman@style.kz', business: 'Style Studio', plan: 'Старт', status: 'trial', joined: '2025-01-05' },
+   408→   442→  { id: 'u5', name: 'Нурлан Т.', email: 'nurlan@fitzone.kz', business: 'FitZone', plan: 'Бизнес', status: 'active', joined: '2024-11-18' },
+   409→   443→  { id: 'u6', name: 'Сауле М.', email: 'saul@citymart.kz', business: 'CityMart', plan: 'Про', status: 'inactive', joined: '2024-04-02' },
+   410→   444→];
+   411→   445→
+   412→   446→const avatarColors = [
+   413→   447→  'bg-purple-500/20 text-purple-400',
+   414→   448→  'bg-green-500/20 text-green-400',
+   415→   449→  'bg-cyan-500/20 text-cyan-400',
+   416→   450→  'bg-pink-500/20 text-pink-400',
+   417→   451→  'bg-amber-500/20 text-amber-400',
+   418→   452→  'bg-blue-500/20 text-blue-400',
+   419→   453→];
+   420→   454→
+   421→   455→function getInitials(name: string): string {
+   422→   456→  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+   423→   457→}
+   424→   458→
+   425→   459→function UsersTab() {
+   426→   460→  const [search, setSearch] = useState('');
+   427→   461→  const [statusFilter, setStatusFilter] = useState<string>('all');
+   428→   462→
+   429→   463→  const filtered = mockUsers.filter((u) => {
+   430→   464→    const matchSearch =
+   431→   465→      u.name.toLowerCase().includes(search.toLowerCase()) ||
+   432→   466→      u.email.toLowerCase().includes(search.toLowerCase()) ||
+   433→   467→      u.business.toLowerCase().includes(search.toLowerCase());
+   434→   468→    const matchStatus = statusFilter === 'all' || u.status === statusFilter;
+   435→   469→    return matchSearch && matchStatus;
+   436→   470→  });
+   437→   471→
+   438→   472→  const statusBadge = (status: string) => {
+   439→   473→    switch (status) {
+   440→   474→      case 'active': return <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">Активен</Badge>;
+   441→   475→      case 'trial': return <Badge className="text-[10px] bg-purple-500/20 text-purple-400 border-purple-500/30">Триал</Badge>;
+   442→   476→      case 'inactive': return <Badge className="text-[10px] bg-red-500/20 text-red-400 border-red-500/30">Неактивен</Badge>;
+   443→   477→      default: return null;
+   444→   478→    }
+   445→   479→  };
+   446→   480→
+   447→   481→  return (
+   448→   482→    <div className="space-y-4">
+   449→   483→      <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+   450→   484→        <h2 className="text-lg font-semibold">Пользователи</h2>
+   451→   485→        <div className="flex gap-2">
+   452→   486→          <div className="relative">
+   453→   487→            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+   454→   488→            <Input
+   455→   489→              placeholder="Поиск..."
+   456→   490→              value={search}
+   457→   491→              onChange={(e) => setSearch(e.target.value)}
+   458→   492→              className="pl-8 h-8 text-sm w-48"
+   459→   493→            />
+   460→   494→          </div>
+   461→   495→          <select
+   462→   496→            value={statusFilter}
+   463→   497→            onChange={(e) => setStatusFilter(e.target.value)}
+   464→   498→            className="h-8 bg-muted border border-border rounded-md text-sm px-2 text-foreground"
+   465→   499→          >
+   466→   500→            <option value="all">Все</option>
+   467→   501→            <option value="active">Активные</option>
+   468→   502→            <option value="trial">Триал</option>
+   469→   503→            <option value="inactive">Неактивные</option>
+   470→   504→          </select>
+   471→   505→        </div>
+   472→   506→      </div>
+   473→   507→
+   474→   508→      <Card className="p-0 overflow-hidden">
+   475→   509→        <ScrollArea className="max-h-[400px]">
+   476→   510→          <Table>
+   477→   511→            <TableHeader>
+   478→   512→              <TableRow className="hover:bg-transparent border-b border-border/50">
+   479→   513→                <TableHead>Пользователь</TableHead>
+   480→   514→                <TableHead className="hidden md:table-cell">Email</TableHead>
+   481→   515→                <TableHead>Бизнес</TableHead>
+   482→   516→                <TableHead className="hidden sm:table-cell">План</TableHead>
+   483→   517→                <TableHead>Статус</TableHead>
+   484→   518→                <TableHead className="hidden lg:table-cell">Дата</TableHead>
+   485→   519→              </TableRow>
+   486→   520→            </TableHeader>
+   487→   521→            <TableBody>
+   488→   522→              {filtered.map((user, idx) => (
+   489→   523→                <TableRow key={user.id} className="border-b border-border/30">
+   490→   524→                  <TableCell>
+   491→   525→                    <div className="flex items-center gap-2.5">
+   492→   526→                      <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0', avatarColors[idx % avatarColors.length])}>
+   493→   527→                        {getInitials(user.name)}
+   494→   528→                      </div>
+   495→   529→                      <span className="font-medium text-sm">{user.name}</span>
+   496→   530→                    </div>
+   497→   531→                  </TableCell>
+   498→   532→                  <TableCell className="hidden md:table-cell text-muted-foreground text-sm">{user.email}</TableCell>
+   499→   533→                  <TableCell className="text-sm">{user.business}</TableCell>
+   500→   534→                  <TableCell className="hidden sm:table-cell">
+   501→   535→                    <Badge variant="outline" className="text-xs">{user.plan}</Badge>
+   502→   536→                  </TableCell>
+   503→   537→                  <TableCell>{statusBadge(user.status)}</TableCell>
+   504→   538→                  <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">{user.joined}</TableCell>
+   505→   539→                </TableRow>
+   506→   540→              ))}
+   507→   541→            </TableBody>
+   508→   542→          </Table>
+   509→   543→        </ScrollArea>
+   510→   544→      </Card>
+   511→   545→    </div>
+   512→   546→  );
+   513→   547→}
+   514→   548→
+   515→   549→// ---- Content Tab ----
+   516→   550→const contentBlocks = [
+   517→   551→  { id: 'cb1', name: 'Instagram посты', description: 'Автоматическая генерация постов', enabled: true, icon: Instagram },
+   518→   552→  { id: 'cb2', name: 'Stories', description: 'Короткий контент для Stories', enabled: true, icon: Sparkles },
+   519→   553→  { id: 'cb3', name: 'Reels сценарии', description: 'Сценарии для коротких видео', enabled: false, icon: Megaphone },
+   520→   554→  { id: 'cb4', name: 'Email-рассылки', description: 'Недельные новости и предложения', enabled: true, icon: Mail },
+   521→   555→  { id: 'cb5', name: 'Push-уведомления', description: 'Уведомления для клиентов', enabled: false, icon: Bell },
+   522→   556→  { id: 'cb6', name: 'AI рекомендации', description: 'Персонализированные предложения', enabled: true, icon: Zap },
+   523→   557→];
+   524→   558→
+   525→   559→const contentColors = [
+   526→   560→  'bg-pink-500/15 text-pink-400',
+   527→   561→  'bg-purple-500/15 text-purple-400',
+   528→   562→  'bg-amber-500/15 text-amber-400',
+   529→   563→  'bg-cyan-500/15 text-cyan-400',
+   530→   564→  'bg-orange-500/15 text-orange-400',
+   531→   565→  'bg-yellow-500/15 text-yellow-400',
+   532→   566→];
+   533→   567→
+   534→   568→function ContentTab() {
+   535→   569→  const [blocks, setBlocks] = useState(contentBlocks);
+   536→   570→
+   537→   571→  const toggleBlock = (id: string) => {
+   538→   572→    setBlocks((prev) =>
+   539→   573→      prev.map((b) => (b.id === id ? { ...b, enabled: !b.enabled } : b))
+   540→   574→    );
+   541→   575→  };
+   542→   576→
+   543→   577→  return (
+   544→   578→    <div className="space-y-4">
+   545→   579→      <div className="flex items-center gap-3">
+   546→   580→        <div className="p-2 rounded-lg bg-purple-500/20">
+   547→   581→          <Pen className="w-5 h-5 text-purple-400" />
+   548→   582→        </div>
+   549→   583→        <div>
+   550→   584→          <h2 className="text-lg font-semibold">Управление контентом</h2>
+   551→   585→          <p className="text-xs text-muted-foreground">Включайте и выключайте типы генерируемого контента</p>
+   552→   586→        </div>
+   553→   587→      </div>
+   554→   588→
+   555→   589→      <Separator />
+   556→   590→
+   557→   591→      <div className="space-y-3">
+   558→   592→        {blocks.map((block, i) => {
+   559→   593→          const BlockIcon = block.icon;
+   560→   594→          return (
+   561→   595→            <motion.div
+   562→   596→              key={block.id}
+   563→   597→              initial={{ opacity: 0, x: -10 }}
+   564→   598→              animate={{ opacity: 1, x: 0 }}
+   565→   599→              transition={{ delay: i * 0.04 }}
+   566→   600→            >
+   567→   601→              <Card className={cn('p-0 transition-opacity', !block.enabled && 'opacity-60')}>
+   568→   602→                <CardContent className="p-4">
+   569→   603→                  <div className="flex items-center justify-between gap-3">
+   570→   604→                    <div className="flex items-center gap-3 flex-1 min-w-0">
+   571→   605→                      <div className={cn('w-9 h-9 rounded-full flex items-center justify-center shrink-0', contentColors[i])}>
+   572→   606→                        <BlockIcon className="w-4 h-4" />
+   573→   607→                      </div>
+   574→   608→                      <div className="flex-1 min-w-0">
+   575→   609→                        <h3 className="font-semibold text-sm">{block.name}</h3>
+   576→   610→                        <p className="text-xs text-muted-foreground mt-0.5">{block.description}</p>
+   577→   611→                      </div>
+   578→   612→                    </div>
+   579→   613→                    <Switch checked={block.enabled} onCheckedChange={() => toggleBlock(block.id)} />
+   580→   614→                  </div>
+   581→   615→                </CardContent>
+   582→   616→              </Card>
+   583→   617→            </motion.div>
+   584→   618→          );
+   585→   619→        })}
+   586→   620→      </div>
+   587→   621→    </div>
+   588→   622→  );
+   589→   623→}
+   590→   624→
+   591→   625→// ---- Main Component ----
+   592→   626→export default function AdminDashboard() {
+   593→   627→  const adminView = useAppStore((s) => s.adminView);
+   594→   628→
+   595→   629→  return (
+   596→   630→    <div className="space-y-6">
+   597→   631→      {/* Welcome Header */}
+   598→   632→      <motion.div
+   599→   633→        initial={{ opacity: 0, y: -10 }}
+   600→   634→        animate={{ opacity: 1, y: 0 }}
+   601→   635→        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600/15 via-purple-500/5 to-transparent border border-purple-500/10 p-5"
+   602→   636→      >
+   603→   637→        <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/5 rounded-full blur-[80px]" />
+   604→   638→        <div className="relative flex items-center gap-3">
+   605→   639→          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
+   606→   640→            <LayoutDashboard className="w-5 h-5 text-purple-400" />
+   607→   641→          </div>
+   608→   642→          <div>
+   609→   643→            <h1 className="text-xl font-bold">Добро пожаловать в панель управления</h1>
+   610→   644→            <p className="text-sm text-muted-foreground mt-0.5">
+   611→   645→              <span className="pulse-text-gradient font-medium">PULSE</span> • Admin Dashboard
+   612→   646→            </p>
+   613→   647→          </div>
+   614→   648→        </div>
+   615→   649→      </motion.div>
+   616→   650→
+   617→   651→      {/* Tab Content — driven by sidebar (adminView from store) */}
+   618→   652→      <AnimatePresence mode="wait">
+   619→   653→        <motion.div
+   620→   654→          key={adminView}
+   621→   655→          initial={{ opacity: 0, y: 10 }}
+   622→   656→          animate={{ opacity: 1, y: 0 }}
+   623→   657→          exit={{ opacity: 0, y: -10 }}
+   624→   658→          transition={{ duration: 0.15 }}
+   625→   659→        >
+   626→   660→          {adminView === 'dashboard' && <DashboardTab />}
+   627→   661→          {adminView === 'tools' && <ToolsTab />}
+   628→   662→          {adminView === 'templates' && <TemplatesTab />}
+   629→   663→          {adminView === 'users' && <UsersTab />}
+   630→   664→          {adminView === 'content' && <ContentTab />}
+   631→   665→        </motion.div>
+   632→   666→      </AnimatePresence>
+   633→   667→    </div>
+   634→   668→  );
+   635→   669→}
+   636→   670→

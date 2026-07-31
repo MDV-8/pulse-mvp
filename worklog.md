@@ -802,3 +802,287 @@ PULSE MVP is now at v1.1 — a highly polished, feature-rich AI Operating System
 6. **Charts enhancement** — Add a simple SVG donut chart for audience demographics or loyalty tier distribution
 7. **Sound notifications** — Optional audio feedback for toast notifications (new order, etc.)
 8. **Accessibility audit** — Full keyboard navigation, screen reader labels, focus management
+
+---
+Task ID: 14-b
+Agent: full-stack-developer (Agent 14-b)
+Task: Real-time data simulation, live banner, keyboard shortcuts, live orders
+
+Work Log:
+- Created `useRealtimeSimulation` hook — simulates real-time business metrics with ±1-3% fluctuations every 15s (revenue, clients, average check, profit, PULSE score)
+- Created `RealtimeBanner` component — compact glass-card banner with LIVE indicator, 4 mini metrics, green/red flash on value change, "Обновлено: X сек назад" counter
+- Created `useKeyboardShortcuts` hook — global shortcuts for owner mode: Escape (close dialogs), Cmd/Ctrl+K (search), Cmd/Ctrl+1-5 (views), Cmd/Ctrl+D (theme toggle), ? (search). Ignores input/textarea focus except Escape.
+- Created `LiveOrders` component — scrollable feed (max 300px) of simulated incoming orders every 8-12s, 15 realistic Kazakh coffee shop items, status transitions (Новый → Готов after 5s), AnimatePresence enter/exit, max 10 visible orders
+
+Stage Summary:
+- 4 files created:
+  - `src/hooks/use-realtime-simulation.ts` — Real-time data simulation hook
+  - `src/components/pulse/dashboard/realtime-banner.tsx` — Live metrics banner
+  - `src/hooks/use-keyboard-shortcuts.ts` — Global keyboard shortcuts
+  - `src/components/pulse/dashboard/live-orders.tsx` — Live order feed
+- ✅ ESLint: 0 errors
+- Note: Components created but not yet integrated into page.tsx (integration left for a subsequent task)
+---
+Task ID: 14-a
+Agent: Main Orchestrator
+Task: Split page.tsx into Separate View Files
+
+Work Log:
+- Read full page.tsx (1039 lines) and mapped all function boundaries and dependencies
+- Created `src/components/pulse/views/` directory
+- Extracted 8 owner view functions into `owner-views.tsx` (560 lines): DashboardView, TodayView, SalesView, ClientsView, PromotionsView, AnalyticsView, GoalsView, SettingsView
+- Extracted 2 client view functions into `client-views.tsx` (89 lines): ClientBonuses, ClientFavorites
+- Extracted 2 dialog components into `dialog-views.tsx` (88 lines): ReturnClientsDialog, AIContentDialog
+- Extracted OwnerDashboard router into `owner-dashboard-router.tsx` (132 lines): loading skeleton, AnimatePresence, view switch
+- Rewrote page.tsx (202 lines) to import from new files, kept ClientDashboard + HomePage inline
+- All extracted files have `'use client'` directive and self-contained imports
+- ESLint: 0 errors
+
+Stage Summary:
+- Files created: 4 (owner-views.tsx, client-views.tsx, dialog-views.tsx, owner-dashboard-router.tsx)
+- Lines moved: ~837 lines out of 1039
+- Final page.tsx size: 202 lines (down from 1039, 80.6% reduction)
+- Lint result: 0 errors
+- Pure refactor — no functional changes
+
+---
+Task ID: 14-c
+Agent: Agent 14-c
+Task: Reservations View, Performance Radar Chart, Enhanced Onboarding Particles
+
+Work Log:
+- Created `/src/components/pulse/reservations/reservations-view.tsx` (290 lines)
+  - Named export `ReservationsView` with 'use client' directive
+  - Header with CalendarDays icon, subtitle, and "New reservation" button
+  - Stats row: 3 glass-card stat cards (Today: 12, Free: 4, Cancelled: 2) with glow effects
+  - Date navigator with prev/next chevron buttons (non-functional demo)
+  - Timeline view: 7 time slots (10:00–22:00), 6 mock reservations with colored left borders
+  - Status badges: green=confirmed, amber=pending, red=cancelled
+  - Action buttons: "Подтвердить" on pending, "Отменить" on confirmed (stateful)
+  - AI suggestion box with glass-card-premium styling
+  - Table map: 4x3 CSS grid, 12 tables color-coded (green/purple/red/amber) with hover tooltips and legend
+
+- Created `/src/components/pulse/dashboard/performance-radar.tsx` (170 lines)
+  - Named export `PerformanceRadar` with 'use client' directive
+  - SVG hexagonal radar chart with 6 metrics (Продажи 85%, Клиенты 72%, Удовлетворённость 91%, Маркетинг 65%, Инновации 78%, Финансы 88%)
+  - 3 concentric grid polygons (33%, 66%, 100%) with subtle strokes
+  - 6 axis lines from center to vertices
+  - Data polygon with purple gradient fill and glow filter
+  - Data point circles at each vertex with staggered framer-motion entrance animation
+  - Labels with metric name and percentage at each vertex
+  - AI Analysis box below radar with colored highlights
+
+- Enhanced `/src/components/pulse/onboarding/onboarding-flow.tsx`
+  - Added 18 floating particle dots (2-6px, purple-400/12-35 opacity)
+  - Each particle uses inline animation with unique duration (7-13s) and delay (0-6s)
+  - Added gradient mesh/bloom at top-left and top-right corners via CSS radial-gradient
+  - Added subtle bottom bloom for depth
+  - All particles positioned absolute with pointer-events-none
+  - No changes to existing onboarding functionality
+
+- Added `particle-float` keyframes and `.particle-dot` class to `globals.css`
+
+- ESLint: 0 errors
+
+Stage Summary:
+- Files created: 2 (reservations-view.tsx, performance-radar.tsx)
+- Files modified: 2 (onboarding-flow.tsx, globals.css)
+- Lint result: 0 errors
+
+---
+Task ID: 14-d
+Agent: Styling Enhancement Agent
+Task: Apply premium CSS animations and styling enhancements across 6 components
+
+Work Log:
+- Added 11 new CSS utility classes to globals.css:
+  - `.neon-line` — Horizontal neon glow line (box-shadow pulse, purple)
+  - `.card-spotlight` — Mouse-following radial gradient spotlight (CSS custom properties)
+  - `.text-reveal` — Fade-in from bottom with blur (0.6s)
+  - `.slide-in-right` — Slide in from right (0.4s ease-out)
+  - `.count-up` — Scale bounce animation (0.5s)
+  - `.glass-morphism-strong` — Extra strong glass (24px blur, saturate 180%, bright border)
+  - `.border-glow` — Animated border glow pulsing (2s cycle)
+  - `.stagger-1` through `.stagger-5` — Animation delay classes (0.05s–0.25s)
+  - `.stat-glow-red` — Red text-shadow glow for expense/negative values
+- Enhanced FinanceDashboard:
+  - Main container gets `glass-card-premium rounded-2xl`
+  - Each metric card gets `card-hover-lift`
+  - Revenue values get `stat-glow-green`, expense values get `stat-glow-red`, profit gets `stat-glow-purple`
+  - All total values get `number-glow`
+  - `neon-line` separators between chart and AI sections
+  - Chart area gets subtle gradient background (`bg-gradient-to-b from-primary/3`)
+- Enhanced LoyaltyProgram:
+  - Tier cards get `glass-card-premium card-hover-lift`
+  - Gold tier (index 2) gets `aurora-border` for highlighted tier
+  - Tier badges get `breathe` animation
+  - Progress bars get gradient fill (`from-purple-500 via-violet-500 to-purple-400`)
+  - Separator replaced with `neon-line`
+  - Referral section uses `glass-card-deep border-glow` for prominence
+- Enhanced ClientsList:
+  - Summary cards get `card-hover-lift`
+  - Client count gets `stat-glow-purple number-glow`, VIP gets `number-glow`
+  - Search bar gets subtle purple glow on focus
+  - Table rows get `card-hover-lift` + alternating backgrounds
+  - Total spend in expanded detail gets `stat-glow-green`
+  - Action button gets `micro-interaction`
+- Enhanced PromotionsList:
+  - Promotion cards get `card-hover-lift`
+  - Active status badges get `pulse-dot` animation
+  - Create button gets `border-glow`
+  - Promotions list container gets `count-up` animation
+  - Filter tabs get `slide-in-right stagger-*` animations
+- Enhanced AdminDashboard:
+  - Main container gets `glass-shine rounded-2xl`
+  - Stat cards get `card-hover-lift micro-interaction`
+  - Tool cards get `card-hover-lift micro-interaction`
+  - Template cards get `card-hover-lift micro-interaction`
+  - User table rows get `card-hover-lift`
+- Enhanced Goals:
+  - Progress bars replaced with gradient fills (`from-purple-500 via-violet-500 to-purple-400`)
+  - Goal cards get `card-hover-lift`
+  - `neon-line` separator added before goals list
+  - Percentage values get `stat-glow-purple`
+  - "Add goal" button gets `border-glow`
+  - Removed unused `Progress` import
+
+Stage Summary:
+- Files modified: 7 (globals.css, finance-dashboard.tsx, loyalty-program.tsx, clients-list.tsx, promotions-list.tsx, admin-dashboard.tsx, goals.tsx)
+- 11 new CSS animation classes added
+- All existing CSS classes preserved (no modifications)
+- ESLint: 0 errors
+
+---
+Task ID: 14-a
+Agent: Refactor Agent
+Task: Split page.tsx into separate view files
+
+Work Log:
+- Created 4 new files in `/src/components/pulse/views/`:
+  - `owner-views.tsx` (564 lines) — DashboardView, TodayView, SalesView, ClientsView, PromotionsView, AnalyticsView, GoalsView, SettingsView
+  - `client-views.tsx` (89 lines) — ClientBonuses, ClientFavorites
+  - `dialog-views.tsx` (88 lines) — ReturnClientsDialog, AIContentDialog
+  - `owner-dashboard-router.tsx` (135 lines) — OwnerDashboard with loading skeleton + view switch
+- page.tsx reduced from 1039 → 202 lines (80.6% reduction)
+- All imports properly relocated to each file
+- ESLint: 0 errors ✅
+
+Stage Summary:
+- Pure structural refactor, zero functional changes
+- page.tsx is now a clean 202-line orchestrator
+
+---
+Task ID: 14-b
+Agent: Real-time Agent
+Task: Real-time simulation, keyboard shortcuts, live orders
+
+Work Log:
+- Created `useRealtimeSimulation` hook — simulates live metric changes every 15s
+- Created `RealtimeBanner` component — live data display with pulsing dot and value change flashes
+- Created `useKeyboardShortcuts` hook — Escape, ⌘K, ⌘1-5, ⌘D, ? shortcuts (owner mode only)
+- Created `LiveOrders` component — auto-generating mock coffee orders every 8-12s with status transitions
+
+Stage Summary:
+- 2 hooks + 2 components created
+- ESLint: 0 errors ✅
+
+---
+Task ID: 14-c
+Agent: Feature Agent
+Task: Reservations view, performance radar chart, onboarding particles
+
+Work Log:
+- Created `ReservationsView` (reservations-view.tsx) — 6 mock reservations, timeline view, table map (4x3 grid), AI suggestions, date navigator
+- Created `PerformanceRadar` (performance-radar.tsx) — SVG hexagonal radar with 6 business metrics, animated polygon entrance, AI analysis
+- Enhanced `onboarding-flow.tsx` — Added 18 floating purple particle dots, gradient mesh/bloom at corners
+
+Stage Summary:
+- 2 new component files + 1 enhanced file
+- ESLint: 0 errors ✅
+
+---
+Task ID: 14-d
+Agent: Styling Agent
+Task: CSS animations + styling polish across 7 components
+
+Work Log:
+- Added 11 new CSS animation classes: neon-line, card-spotlight, text-reveal, slide-in-right, count-up, glass-morphism-strong, border-glow, stagger-1..5, stat-glow-red
+- Enhanced FinanceDashboard: glass-card-premium, card-hover-lift, stat-glow colors, neon-line separators, number-glow
+- Enhanced LoyaltyProgram: glass-card-premium tiers, aurora-border on gold, breathe animation, gradient progress bars
+- Enhanced ClientsList: card-hover-lift, search glow on focus, alternating row backgrounds, stat-glow
+- Enhanced PromotionsList: card-hover-lift, pulse-dot on active badges, border-glow create button, count-up animation
+- Enhanced AdminDashboard: glass-shine, card-hover-lift on stat/tool/template cards
+- Enhanced Goals: gradient progress bars, card-hover-lift, neon-line, stat-glow, border-glow add button
+
+Stage Summary:
+- 11 new CSS classes + 7 components enhanced
+- ESLint: 0 errors ✅
+
+---
+Task ID: 14-e
+Agent: Main Orchestrator (Integration)
+Task: Integrate all new features, verify, update worklog
+
+Work Log:
+- Added 'reservations' to OwnerView type in app-store.ts
+- Added CalendarDays icon + 'Бронирования' nav item to sidebar.tsx (now 17 nav items)
+- Added ReservationsView import and switch case in owner-dashboard-router.tsx
+- Added RealtimeBanner + LiveOrders imports to owner-views.tsx
+- Replaced static Live Activity Ticker with RealtimeBanner component
+- Added LiveOrders feed component below ticker on dashboard
+- Added PerformanceRadar between WeeklyReport and ProductSales on dashboard
+- Wired useKeyboardShortcuts() into DashboardView
+- ESLint: 0 errors ✅
+- Dev server: 200 OK, compiles in ~5.9s ✅
+
+Stage Summary:
+- 3 files modified: app-store.ts, sidebar.tsx, owner-dashboard-router.tsx, owner-views.tsx
+- 4 new components integrated into dashboard
+- 1 new hook (keyboard shortcuts) wired
+- Total owner views: 17
+
+---
+## Current Project Status
+
+### Assessment:
+PULSE MVP is now at **v1.2** — a production-quality AI Operating System demo with **50 component files**, **4 custom hooks**, and **31+ CSS animation classes**. The codebase has been refactored from a monolithic 1038-line page.tsx into a clean 202-line orchestrator with 4 extracted view files. The app now features real-time data simulation, live order feeds, an SVG radar chart, reservation management, keyboard shortcuts, and extensive styling polish across all components.
+
+### Completed in This Phase (Task 14):
+- ✅ page.tsx refactored: 1039 → 202 lines (80.6% reduction)
+- ✅ 4 extracted view files (owner-views, client-views, dialog-views, owner-dashboard-router)
+- ✅ Real-time data simulation hook (metrics update every 15s)
+- ✅ Real-time dashboard banner with live metrics and value change flashes
+- ✅ Live order feed (auto-generating orders every 8-12s with status transitions)
+- ✅ Keyboard shortcuts (Escape, ⌘K, ⌘1-5, ⌘D, ?)
+- ✅ Reservations / Booking view (timeline, table map, AI suggestions)
+- ✅ Performance radar chart (SVG hexagonal, 6 metrics, animated)
+- ✅ Onboarding particles (18 floating dots, gradient mesh)
+- ✅ 11 new CSS animation classes (neon-line, card-spotlight, etc.)
+- ✅ 7 components enhanced with premium styling (Finance, Loyalty, Clients, Promotions, Admin, Goals)
+- ✅ All features integrated into routing + sidebar (17 nav items)
+- ✅ ESLint: 0 errors
+- ✅ Dev server: 200 OK
+
+### Total Project Inventory:
+- **Owner views (17):** Главная, Что делать, AI, Продажи, Клиенты, Акции, Финансы, Аналитика, Лояльность, Цели, Настройки, Отзывы, Команда, SMM, Инвентарь, Бронирования
+- **Client views (6):** Главная, Карта, Акции, Бонусы, Избранное, Профиль (Enhanced)
+- **Admin views (5):** Dashboard, Инструменты, Шаблоны, Пользователи, Контент
+- **Special features:** Global Search (⌘K), Welcome Tour, Notification Center, Toast Notifications, Export Data, Theme Toggle, Onboarding Flow, localStorage Persistence, Animated Counters, Real-time Simulation, Live Orders, Keyboard Shortcuts, Performance Radar, Reservations
+- **Components:** 50 React component files + 4 custom hooks + 700+ lines CSS animations
+- **Total codebase:** ~19,466 lines across all TypeScript files
+- **page.tsx:** 202 lines (clean orchestrator)
+
+### Unresolved Issues / Risks:
+1. **OOM in sandbox:** Dev server occasionally OOMs during heavy compilation — sandbox limitation
+2. **Agent-browser testing:** Cannot test via agent-browser due to sandbox network isolation
+3. **Real-time data is client-side only:** Simulation runs in browser, no actual backend
+
+### Priority Recommendations for Next Phase:
+1. **Backend API routes** — Add real API endpoints using z-ai-web-dev-sdk for AI chat (replace keyword matching with real LLM)
+2. **Database integration** — Use Prisma to persist promotions, reservations, orders
+3. **WebSocket service** — Create a mini-service for real-time multi-user updates
+4. **Print-ready reports** — Generate PDF reports with proper formatting
+5. **Drag & drop** — Allow reordering TodayActions and dashboard widgets
+6. **Accessibility audit** — Full keyboard navigation, ARIA labels, focus management
+7. **Light theme refinements** — Ensure all new components look good in both themes
+8. **Performance optimization** — Lazy load non-critical components, reduce bundle size
