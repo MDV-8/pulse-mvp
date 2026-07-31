@@ -3,11 +3,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
+import { cn } from '@/lib/utils';
 
 function getHealthColor(score: number): string {
   if (score >= 80) return '#10b981';
   if (score >= 60) return '#f59e0b';
   return '#ef4444';
+}
+
+function getGlowClass(key: string): string {
+  switch (key) {
+    case 'sales': return 'stat-glow-green';
+    case 'clients': return 'stat-glow-purple';
+    case 'loyalty': return 'stat-glow-cyan';
+    case 'marketing': return 'stat-glow-amber';
+    case 'profit': return 'stat-glow-green';
+    default: return '';
+  }
 }
 
 const healthLabels: { key: keyof typeof import('@/data/mock-data').mockPulseScore.breakdown; label: string }[] = [
@@ -93,12 +105,17 @@ export function BusinessHealth() {
         {healthLabels.map((metric) => {
           const score = breakdown[metric.key];
           const color = getHealthColor(score);
+          const glowClass = getGlowClass(metric.key);
           return (
-            <motion.div key={metric.key} variants={item} className="space-y-1.5 group cursor-default">
+            <motion.div
+              key={metric.key}
+              variants={item}
+              className="glass-card-premium card-hover-lift micro-interaction rounded-xl p-3 sm:p-4 group cursor-default space-y-1.5"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground">{metric.label}</span>
                 <span
-                  className="text-sm font-semibold tabular-nums"
+                  className={cn('text-sm font-semibold tabular-nums', glowClass)}
                   style={{ color }}
                 >
                   {score}
@@ -113,8 +130,18 @@ export function BusinessHealth() {
                   transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
                 />
               </div>
+              {/* Subtle gradient fill bar */}
+              <div className="h-[2px] w-full rounded-full overflow-hidden bg-muted/50">
+                <div
+                  className="h-full rounded-full transition-all duration-1000"
+                  style={{
+                    width: `${score}%`,
+                    background: `linear-gradient(90deg, ${color}66, ${color})`,
+                  }}
+                />
+              </div>
               {/* Tooltip on hover */}
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-muted-foreground/60 -mt-1">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-muted-foreground/60">
                 Оценка: {score}/100
               </div>
             </motion.div>

@@ -165,8 +165,11 @@ export function ToastNotifications() {
                   </p>
                 </div>
                 <button
-                  onClick={() => dismissToast(toast.id)}
-                  className="text-muted-foreground hover:text-foreground transition-colors shrink-0 p-0.5 rounded hover:bg-muted/50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dismissToast(toast.id);
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors shrink-0 p-0.5 rounded hover:bg-muted/50 relative z-10 cursor-pointer"
                   aria-label="Закрыть"
                 >
                   <X className="h-3.5 w-3.5" />

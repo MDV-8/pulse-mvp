@@ -52,6 +52,12 @@ function getActionIcon(type: string) {
   }
 }
 
+function getPriorityDotColor(priority: number): string {
+  if (priority <= 2) return 'bg-red-400'; // high
+  if (priority <= 3) return 'bg-amber-400'; // medium
+  return 'bg-emerald-400'; // low
+}
+
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -71,6 +77,9 @@ export function TodayActions({ showHeader = true }: { showHeader?: boolean }) {
   const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
   const setShowAIContent = useAppStore((s) => s.setShowAIContent);
 
+  const completedCount = 0; // no completed state in mock, always 0
+  const totalCount = todayActions.length;
+
   const handleAction = (actionType: string) => {
     switch (actionType) {
       case 'promotion':
@@ -86,16 +95,30 @@ export function TodayActions({ showHeader = true }: { showHeader?: boolean }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="glass-card-premium rounded-2xl p-4 md:p-6 space-y-4">
       {showHeader && (
-      <div>
-        <h2 className="text-lg font-semibold text-foreground">
-          Что делать сегодня
-        </h2>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          AI выбрал приоритетные действия для вас
-        </p>
-      </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Что делать сегодня
+            </h2>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              AI выбрал приоритетные действия для вас
+            </p>
+          </div>
+          {/* Progress indicator */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {completedCount}/{totalCount}
+            </span>
+            <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-500"
+                style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       <motion.div
@@ -109,13 +132,15 @@ export function TodayActions({ showHeader = true }: { showHeader?: boolean }) {
             key={action.id}
             variants={item}
             className={cn(
-              'flex items-start gap-3 rounded-xl border border-border border-l-[3px] bg-card p-4 transition-colors duration-200 hover:border-primary/10',
+              'flex items-start gap-3 rounded-xl border border-border border-l-[3px] bg-card p-3 md:p-4 transition-colors duration-200 hover:border-primary/10 card-hover-lift micro-interaction',
               getActionBorderColor(action.actionType)
             )}
           >
             {/* Number badge with gradient */}
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-500/5 text-xs font-bold text-purple-300">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-500/5 text-xs font-bold text-purple-300 relative">
               {index + 1}
+              {/* Priority dot */}
+              <span className={cn('absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full', getPriorityDotColor(action.priority))} />
             </div>
 
             {/* Content */}

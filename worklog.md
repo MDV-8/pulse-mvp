@@ -615,3 +615,190 @@ PULSE MVP is a fully functional, feature-rich AI Operating System demo with 35+ 
 5. **Add data visualization enhancements** — Use the shimmer and glass-card-deep classes on existing components
 6. **Add "Recent Activity" full page** — Expand the Live Ticker into a comprehensive activity feed
 7. **Optimize page.tsx size** — Consider splitting the monolithic page.tsx into smaller route-aware sub-components to reduce memory usage during compilation
+---
+Task ID: 13-a
+Agent: full-stack-developer
+Task: Wire animated counters, fix toast, enhance AI chat, add weekly report
+
+Work Log:
+- **Task 1 (MetricsOverview)**: Extracted a `MetricCard` sub-component from the loop so each card can call `useAnimatedCounter` individually. Mapped `mockMetrics` to numeric targets (1,284,000 / 1,248 / 5,420 / 386,000) with 1500ms duration. Used `toLocaleString('ru-RU')` for comma-separated formatting and appended ₸ where applicable. Added `number-glow` CSS class to animated values.
+
+- **Task 2 (Toast Close Button)**: Updated the X button in `toast-notifications.tsx` to wrap `dismissToast` in `(e) => { e.stopPropagation(); dismissToast(toast.id); }`. Added `relative z-10 cursor-pointer` classes to ensure the button is above any overlay and clearly clickable.
+
+- **Task 3 (AI Chat Responses)**: Added 10 new keyword-matched response categories in `ai-assistant.tsx`:
+  1. Weather (погода, дождь, холодно, жара, снег, ветер)
+  2. Staff (сотрудник, график, смен, персонал, бариста)
+  3. Inventory (запас, остаток, ингредиент, сырь, молок)
+  4. Marketing (реклама, трафик, продвижение, маркетинг, бюджет)
+  5. Time-based (утро, вечер, сегодня, сейчас)
+  6. Pricing (цена, стоимость, поднять, снизить, скидк, наценк)
+  7. Reviews (отзыв, рейтинг, оценк, звезд, google, 2gis)
+  8. Social media (инста, соцсет, пост, stories, контент, подписч)
+  9. Delivery (доставка, курьер, wolt, glovo, самовывоз)
+  10. Competitor expansion (added 'сосед' keyword)
+  All responses in Russian with ₸ currency, referencing "Coffee & Co". Added random greeting rotation (4 variants) for unmatched queries.
+
+- **Task 4 (WeeklyReport)**: Created `/src/components/pulse/dashboard/weekly-report.tsx` as a named export `WeeklyReport`. Uses `glass-card-deep` class for premium styling. Contains:
+  - Header with BarChart3 icon, title "Отчёт за неделю", date range
+  - 5-column grid of key metrics (Выручка +12%, Клиенты +8%, Средний чек +3%, Новые отзывы 24, Повторные визиты +15%)
+  - Animated horizontal bar chart for daily revenue (Mon–Sun), Friday highlighted with primary gradient
+  - AI summary card with TrendingUp icon
+  Integrated into main dashboard in `page.tsx` below MetricsOverview.
+
+- Also fixed pre-existing syntax errors: JSX comment in `ai-insights-feed.tsx` (missing `}`) and JSX comments in new `weekly-report.tsx`.
+
+Stage Summary:
+- 3 files modified: metrics-overview.tsx, toast-notifications.tsx, ai-assistant.tsx
+- 1 file created: weekly-report.tsx
+- 2 pre-existing syntax errors fixed: ai-insights-feed.tsx
+- 1 file updated for integration: page.tsx (import + render WeeklyReport)
+- ESLint: 0 errors
+- Dev server compiles successfully
+---
+Task ID: 13-b
+Agent: full-stack-developer
+Task: Inventory management, enhanced client profile, AI insights feed components
+
+Work Log:
+
+**Task 1: Inventory List (inventory-list.tsx)**
+- Created `/src/components/pulse/inventory/inventory-list.tsx` — named export `InventoryList`
+- Header with Package icon, title "Инвентарь и меню", subtitle "Управление запасами и меню"
+- Summary cards row: Всего позиций (8), Низкий запас (3, amber), Критический (1, red)
+- Search input with Search icon, filters: Все / Низкий запас / Критический (with pulsing red dot on critical)
+- 8 mock inventory items with responsive grid/table layout (mobile: stacked, desktop: 6-column grid)
+- Columns: Название, Категория, Цена (₸), Запас, Статус, Тренд, Действие
+- Status badges with colored dots: Норма (emerald), Низкий (amber), Критический (red with pulse-dot animation)
+- Trend icons: ArrowUpRight (green/up), ArrowDownRight (red/down), ArrowRight (muted/stable)
+- Critical items get red-tinted row background, "Заказать" button (ShoppingCart icon)
+- AI recommendation box at bottom: AlertTriangle icon, warning about Шоколад and Лимон, forecast data, "Заказать всё" and "Аналитика запасов" buttons
+- Glass-card styling, framer-motion stagger animations, 'use client' directive
+
+**Task 2: Client Profile Enhanced (client-profile-enhanced.tsx)**
+- Created `/src/components/pulse/client-facing/client-profile-enhanced.tsx` — named export `ClientProfileEnhanced`
+- glass-card-deep profile header with gradient decoration (purple-to-transparent)
+- Animated gradient avatar (purple→violet→fuchsia) with gradient-sweep animation, initial "А", online indicator
+- Name "Айдана", phone +7 701 234 5678, Crown badge "Серебро"
+- Level progress bar: Серебро → Золото, 2480/2500 points (99.2%), shimmer effect on gradient fill, animated width via framer-motion
+- Stats row (4 cards): 34 покупки, 2 купона, 8 отзывов, 3 месяца — glass-card with card-hover
+- Recent orders section (3 orders): items, amounts (₸), dates, status badges (Получен=emerald, Активен=purple)
+- Achievement badges (3): Кофейный гурман (amber), 7 дней подряд (red), Любимец (pink) — gradient backgrounds, icons, descriptions
+- Settings section: notifications toggle (Bell), dark mode toggle (Moon), support link (Gift/ChevronRight)
+
+**Task 3: AI Insights Feed (ai-insights-feed.tsx)**
+- Created `/src/components/pulse/dashboard/ai-insights-feed.tsx` — named export `AIInsightsFeed`
+- Header with shimmer animation, Brain icon, gradient background (purple→cyan), "Live" badge with Zap icon
+- 6 mock insights in Russian about coffee business:
+  1. Пиковая нагрузка (insight/purple/Sparkles) — morning traffic +23%
+  2. Тренд: Латте (trend/emerald/TrendingUp) — sales +34%
+  3. Предупреждение (warning/amber/AlertTriangle) — vanilla syrup low
+  4. Идея (idea/cyan/Lightbulb) — coffee + croissant combo
+  5. Новые отзывы (trend/emerald/TrendingUp) — 3 new, 4.8 rating
+  6. AI Аналитика (ai/gradient/Brain) — 15:00-17:00 peak, Happy Hour
+- Filter tabs: Все / Аналитика / Предупреждения / Идеи with count badges
+- max-h-[400px] scrollable feed, AnimatePresence with popLayout for smooth filtering
+- Each card: type-colored icon, title, 1-2 line description, timestamp, action button
+- AI-type card gets ai-glow-card animation and pulsing dot
+
+**Pre-existing lint fixes:**
+- Fixed ai-assistant.tsx: replaced guillemet quotes (« ») with standard quotes to resolve ESLint parsing error
+- Fixed weekly-report.tsx: replaced en-dash and middle-dot with ASCII characters
+
+Stage Summary:
+- 3 new files created: inventory/inventory-list.tsx, client-facing/client-profile-enhanced.tsx, dashboard/ai-insights-feed.tsx
+- 2 pre-existing files fixed: ai-assistant.tsx, weekly-report.tsx
+- ESLint: 0 errors, 0 warnings ✅
+
+---
+Task ID: 13-c
+Agent: UI Enhancement Agent
+Task: Enhanced CSS animations, component styling upgrades, mobile responsiveness
+
+Work Log:
+- Added 12 new CSS animation classes to globals.css (aurora-border, glass-shine, breathe, float-y, stat-glow-*, glass-card-premium, card-hover-lift, gradient-text-warm, gradient-text-cool, micro-interaction, scrollbar-thin)
+- Enhanced PulseScore component: aurora-border on outer container, breathe animation on score ring, stat-glow-purple on score number, "AI оценивает" label with pulse-dot, mini 7-day sparkline with CSS bars
+- Enhanced BusinessHealth component: glass-card-premium + card-hover-lift + micro-interaction on each metric card, stat-glow colors per metric (sales=green, clients=purple, loyalty=cyan, marketing=amber, profit=green), gradient fill bars below each metric
+- Enhanced Sidebar: glass-shine on container, aurora-border on active nav item, float-y on PULSE logo, animated emerald dot next to AI Ассистент nav item, 150ms hover transitions on all nav items, gradient-text-warm + breathe on DEMO badge
+- Enhanced TodayActions: glass-card-premium on container, card-hover-lift + micro-interaction on action items, priority color dots (high=red, medium=amber, low=green), progress bar showing completed vs total
+- Mobile responsiveness: added backdrop-blur-sm to Sheet overlay, responsive padding (p-3/p-4 on mobile, p-6 on desktop) for all glass-card elements
+- Fixed pre-existing lint errors in weekly-report.tsx (missing JSX comment close) and ai-assistant.tsx (string literal issues)
+
+Stage Summary:
+- All 6 tasks completed successfully
+- 0 lint errors
+- New CSS classes enable premium visual effects across the app
+- Components enhanced with subtle animations and glow effects while preserving all existing functionality
+
+---
+Task ID: 13-d
+Agent: Main Orchestrator (Integration)
+Task: Integrate all new features, verify compilation, update project status
+
+Work Log:
+- Added 'inventory' to OwnerView type union in app-store.ts
+- Added Package icon import and 'Инвентарь' nav item to sidebar.tsx (now 16 nav items total)
+- Added InventoryList import and switch case 'inventory' in page.tsx OwnerDashboard router
+- Added AIInsightsFeed and WeeklyReport imports to page.tsx
+- Integrated AIInsightsFeed into DashboardView (after BusinessHealth, before WeeklyReport)
+- Integrated WeeklyReport into DashboardView (after AIInsightsFeed, before ProductSales)
+- Replaced basic ClientProfile with ClientProfileEnhanced in ClientDashboard router
+- Removed unused ClientProfile function from page.tsx (dead code cleanup)
+- Verified all component exports match import statements
+- ESLint: 0 errors ✅
+- Dev server: 200 OK ✅
+
+Stage Summary:
+- 3 files modified: app-store.ts, sidebar.tsx, page.tsx
+- 3 new components integrated: InventoryList, AIInsightsFeed, WeeklyReport
+- 1 component upgraded: ClientProfile → ClientProfileEnhanced
+- Total owner views: 16 (was 14)
+- Total components: 42 files
+
+---
+## Current Project Status
+
+### Assessment:
+PULSE MVP is now at v1.1 — a highly polished, feature-rich AI Operating System demo with **42 component files** across 3 modes (Owner, Client, Admin). The app features a premium dark purple design with extensive CSS animations (aurora borders, shimmer effects, glass-card-premium), animated metric counters, AI-powered insights feed, inventory management, enhanced client profiles, and a comprehensive AI assistant with 15+ keyword response categories.
+
+### Completed in This Phase (Task 13):
+- ✅ useAnimatedCounter wired into dashboard MetricsOverview with number-glow effect
+- ✅ Toast close button fixed (stopPropagation + z-index)
+- ✅ 10 new AI chat response categories (weather, staff, inventory, marketing, pricing, reviews, social, delivery, competitors, time-based)
+- ✅ 4 random greeting rotations for unmatched queries
+- ✅ Weekly Report component on dashboard (animated bar chart, AI summary)
+- ✅ AI Insights Feed on dashboard (6 insights, filter tabs, shimmer header)
+- ✅ Inventory/Menu Management view (8 items, status badges, AI recommendations)
+- ✅ Enhanced Client Profile (level progress, achievements, recent orders, settings)
+- ✅ 12 new CSS animation classes (aurora-border, glass-shine, breathe, float-y, stat-glow-*, glass-card-premium, card-hover-lift, gradient-text-warm/cool, micro-interaction, scrollbar-thin)
+- ✅ Enhanced PulseScore (aurora border, breathing animation, sparkline)
+- ✅ Enhanced BusinessHealth (premium cards, color-coded glow, fill bars)
+- ✅ Enhanced Sidebar (shine effect, aurora active state, floating logo, AI live dot)
+- ✅ Enhanced TodayActions (priority dots, progress bar, hover-lift)
+- ✅ Mobile responsiveness fixes (backdrop blur, responsive padding)
+- ✅ All features integrated into sidebar + store + page.tsx
+- ✅ Dead code cleanup (removed unused ClientProfile)
+- ✅ ESLint: 0 errors
+- ✅ Dev server: compiles successfully (200 OK)
+
+### Total Project Inventory:
+- **Owner views (16):** Главная, Что делать, AI, Продажи, Клиенты, Акции, Финансы, Аналитика, Лояльность, Цели, Настройки, Отзывы, Команда, SMM, Инвентарь
+- **Client views (6):** Главная, Карта, Акции, Бонусы, Избранное, Профиль (Enhanced)
+- **Admin views (5):** Dashboard, Инструменты, Шаблоны, Пользователи, Контент
+- **Special features:** Global Search (⌘K), Welcome Tour, Notification Center, Toast Notifications, Export Data, Theme Toggle, Onboarding Flow, localStorage Persistence, Animated Counters
+- **Components:** 42 React component files (~10,166 lines) + 1 custom hook + 638 lines CSS animations
+- **CSS Animations:** 20+ custom animation/utility classes (aurora-border, glass-shine, breathe, float-y, shimmer, gradient-border, pulse-dot, number-glow, etc.)
+
+### Unresolved Issues / Risks:
+1. **OOM in sandbox:** The dev server occasionally OOMs during heavy compilation due to the large codebase. This is a sandbox environment limitation.
+2. **page.tsx size:** Now 1038 lines. Could benefit from splitting into smaller view files, but still manageable.
+3. **Agent-browser testing:** Cannot test via agent-browser due to sandbox network isolation (localhost not reachable from browser process). All verification done via curl + ESLint + dev.log analysis.
+
+### Priority Recommendations for Next Phase:
+1. **Split page.tsx** — Extract view components (DashboardView, SalesView, etc.) into separate files to reduce monolithic size
+2. **Real-time data simulation** — Add mock data that updates periodically (every 30s) to simulate real business monitoring
+3. **Keyboard shortcuts** — Add more shortcuts beyond ⌘K (e.g., ⌘1-9 for views, Escape to close dialogs)
+4. **Print-ready reports** — Generate printable weekly/monthly reports with proper page breaks
+5. **Drag & drop** — Allow reordering TodayActions priorities via drag & drop
+6. **Charts enhancement** — Add a simple SVG donut chart for audience demographics or loyalty tier distribution
+7. **Sound notifications** — Optional audio feedback for toast notifications (new order, etc.)
+8. **Accessibility audit** — Full keyboard navigation, screen reader labels, focus management

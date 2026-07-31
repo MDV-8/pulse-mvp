@@ -21,6 +21,7 @@ import {
   Moon,
   MessageSquare,
   PenLine,
+  Package,
 } from 'lucide-react';
 import { useAppStore, type OwnerView } from '@/stores/app-store';
 import {
@@ -38,7 +39,7 @@ import { cn } from '@/lib/utils';
 const navItems: { label: string; icon: React.ElementType; view: OwnerView }[] = [
   { label: 'Главная', icon: LayoutDashboard, view: 'dashboard' },
   { label: 'Что делать', icon: Zap, view: 'today' },
-  { label: 'AI', icon: Brain, view: 'ai' },
+  { label: 'AI Ассистент', icon: Brain, view: 'ai' },
   { label: 'Продажи', icon: TrendingUp, view: 'sales' },
   { label: 'Клиенты', icon: Users, view: 'clients' },
   { label: 'Акции', icon: Tag, view: 'promotions' },
@@ -50,6 +51,7 @@ const navItems: { label: string; icon: React.ElementType; view: OwnerView }[] = 
   { label: 'Отзывы', icon: MessageSquare, view: 'reviews' },
   { label: 'Команда', icon: Users, view: 'team' },
   { label: 'SMM', icon: PenLine, view: 'smm' },
+  { label: 'Инвентарь', icon: Package, view: 'inventory' },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -77,11 +79,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   };
 
   return (
-    <div className="flex h-full flex-col bg-sidebar">
+    <div className="flex h-full flex-col bg-sidebar glass-shine">
       {/* Logo with animated gradient line */}
       <div className="flex flex-col">
         <div className="flex h-16 items-center px-5">
-          <span className="text-2xl font-bold tracking-tight pulse-text-gradient">
+          <span className="text-2xl font-bold tracking-tight pulse-text-gradient float-y">
             PULSE
           </span>
         </div>
@@ -96,7 +98,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-accent"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
           onClick={() => setShowSearch(true)}
         >
           <Search className="size-4" />
@@ -108,19 +110,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-2">
+      <ScrollArea className="flex-1 px-3 py-2 scrollbar-thin">
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
             const isActive = ownerView === item.view;
+            const isAI = item.view === 'ai';
             const Icon = item.icon;
             return (
               <button
                 key={item.view}
                 onClick={() => handleNavClick(item.view)}
                 className={cn(
-                  'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer',
+                  'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 cursor-pointer',
                   isActive
-                    ? 'bg-primary/15 text-primary'
+                    ? 'text-primary'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
@@ -132,12 +135,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                     transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                   />
                 )}
+                {/* Active aurora border background */}
+                {isActive && (
+                  <div className="aurora-border absolute inset-0 rounded-lg pointer-events-none" style={{ zIndex: 0 }} />
+                )}
                 {/* Subtle background glow for active item */}
                 {isActive && (
                   <div className="absolute inset-0 rounded-lg bg-primary/5 pointer-events-none" />
                 )}
-                <Icon className={cn('size-4 shrink-0', isActive && 'text-primary')} />
-                <span>{item.label}</span>
+                <Icon className={cn('size-4 shrink-0 relative z-10', isActive && 'text-primary')} />
+                <span className="relative z-10">{item.label}</span>
+                {/* Live status dot next to AI Ассистент */}
+                {isAI && (
+                  <span className="ml-auto inline-block h-2 w-2 rounded-full bg-emerald-400 pulse-dot relative z-10" />
+                )}
               </button>
             );
           })}
@@ -150,10 +161,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <div className="mb-3 flex justify-center">
             <Badge
               variant="outline"
-              className="border-amber-500/20 bg-amber-500/5 text-amber-400/80 text-[10px] font-medium tracking-wider uppercase px-2.5 py-0.5"
+              className="border-amber-500/20 bg-amber-500/5 text-[10px] font-medium tracking-wider uppercase px-2.5 py-0.5 breathe"
             >
-              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-400/60" />
-              Demo аккаунт
+              <span className="gradient-text-warm font-semibold">DEMO</span>
             </Badge>
           </div>
         )}
@@ -162,7 +172,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
             onClick={handleSwitchToClient}
           >
             <Smartphone className="size-4" />
@@ -172,7 +182,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
             onClick={handleSwitchToAdmin}
           >
             <Shield className="size-4" />
@@ -183,7 +193,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           >
             {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}

@@ -34,7 +34,8 @@ export type OwnerView =
   | 'settings'
   | 'reviews'
   | 'team'
-  | 'smm';
+  | 'smm'
+  | 'inventory';
 export type ClientView =
   | 'home'
   | 'map'

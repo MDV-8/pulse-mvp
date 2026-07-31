@@ -19,6 +19,7 @@ import { BusinessHealth } from '@/components/pulse/dashboard/business-health';
 import { AIInsight } from '@/components/pulse/dashboard/ai-insight';
 import { TodayActions } from '@/components/pulse/dashboard/today-actions';
 import { MetricsOverview } from '@/components/pulse/dashboard/metrics-overview';
+import { WeeklyReport } from '@/components/pulse/dashboard/weekly-report';
 
 // Shared
 import { NotificationCenter } from '@/components/pulse/shared/notification-center';
@@ -48,6 +49,7 @@ import LoyaltyProgram from '@/components/pulse/loyalty/loyalty-program';
 import ClientHome from '@/components/pulse/client-facing/client-home';
 import ClientMap from '@/components/pulse/client-facing/client-map';
 import ClientCoupons from '@/components/pulse/client-facing/client-coupons';
+import { ClientProfileEnhanced } from '@/components/pulse/client-facing/client-profile-enhanced';
 
 // Admin
 import AdminDashboard from '@/components/pulse/admin/admin-dashboard';
@@ -68,6 +70,10 @@ import { ReviewsManager } from '@/components/pulse/reviews/reviews-manager';
 import { StaffOverview } from '@/components/pulse/staff/staff-overview';
 // Product Sales
 import { ProductSales } from '@/components/pulse/sales/product-sales';
+// Inventory
+import { InventoryList } from '@/components/pulse/inventory/inventory-list';
+// AI Insights Feed
+import { AIInsightsFeed } from '@/components/pulse/dashboard/ai-insights-feed';
 // Toast Notifications
 import { ToastNotifications } from '@/components/pulse/shared/toast-notifications';
 // Animated Counter
@@ -152,6 +158,8 @@ function OwnerDashboard() {
         return <StaffOverview />;
       case 'smm':
         return <AIContent />;
+      case 'inventory':
+        return <InventoryList />;
       default:
         return <DashboardView />;
     }
@@ -337,6 +345,7 @@ function DashboardView() {
         <div className="lg:col-span-2 space-y-6">
           <AIInsight />
           <MetricsOverview />
+          <WeeklyReport />
         </div>
       </div>
 
@@ -366,6 +375,12 @@ function DashboardView() {
 
       {/* ====== Business Health ====== */}
       <BusinessHealth />
+
+      {/* ====== AI Insights Feed ====== */}
+      <AIInsightsFeed />
+
+      {/* ====== Weekly Report ====== */}
+      <WeeklyReport />
 
       {/* ====== Sales by Product ====== */}
       <ProductSales />
@@ -712,7 +727,7 @@ function ClientDashboard() {
       case 'favorites':
         return <ClientFavorites />;
       case 'profile':
-        return <ClientProfile />;
+        return <ClientProfileEnhanced />;
       default:
         return <ClientHome />;
     }
@@ -817,50 +832,6 @@ function ClientFavorites() {
           Нажмите ♡ на карточке заведения, чтобы сохранить
         </p>
       </div>
-    </div>
-  );
-}
-
-function ClientProfile() {
-  return (
-    <div className="space-y-6 max-w-lg mx-auto">
-      <div className="text-center space-y-4">
-        <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto">
-          <span className="text-3xl font-bold text-purple-400">А</span>
-        </div>
-        <div>
-          <h2 className="text-xl font-bold">Айдана</h2>
-          <p className="text-muted-foreground">+7 771 123 4567</p>
-        </div>
-      </div>
-      <div className="glass-card rounded-xl p-6 space-y-4">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Баллы</span>
-          <span className="font-bold text-purple-400">2 480</span>
-        </div>
-        <Separator />
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Уровень</span>
-          <span className="font-medium">Серебро</span>
-        </div>
-        <Separator />
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Покупки</span>
-          <span className="font-medium">34</span>
-        </div>
-        <Separator />
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Купоны</span>
-          <span className="font-medium">2</span>
-        </div>
-      </div>
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={() => useAppStore.getState().setAppMode('owner')}
-      >
-        Перейти в режим бизнеса
-      </Button>
     </div>
   );
 }
