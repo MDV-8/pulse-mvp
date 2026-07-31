@@ -174,7 +174,7 @@ function MetricCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Card className="bg-card border-border card-hover card-hover-lift">
+      <Card className="bg-card border-border card-hover card-hover-lift hover-scale">
         <CardContent className="p-3 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -283,7 +283,7 @@ export function FinanceDashboard() {
             <Wallet className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-gradient-animate">Финансы</h2>
+            <h2 className="text-base font-semibold text-gradient-animate text-gradient-cycle">Финансы</h2>
           </div>
           <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px]">
             Демо-данные
@@ -345,8 +345,10 @@ export function FinanceDashboard() {
           </div>
         )}
 
-        {/* Neon Line Separator */}
-        <div className="neon-line" />
+        {/* Vertical Neon Line Separator */}
+        <div className="flex items-center justify-center py-1">
+          <div className="neon-line-vertical h-8" />
+        </div>
 
         {/* Revenue/Expenses Chart */}
         <Card className="bg-card border-border bg-gradient-to-b from-primary/3 to-transparent">

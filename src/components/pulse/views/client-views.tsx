@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { Heart, Coffee, UtensilsCrossed, Scissors, Plus } from 'lucide-react';
+import { QRBusinessCard } from '@/components/pulse/shared/qr-business-card';
 
 // ============================================================
 // ClientBonuses — with level progress ring
@@ -132,6 +133,9 @@ export function ClientBonuses() {
           Скопировать код
         </Button>
       </div>
+
+      {/* QR Business Card */}
+      <QRBusinessCard />
     </div>
   );
 }

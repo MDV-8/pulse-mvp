@@ -130,7 +130,7 @@ export function LiveOrders() {
   }, [orders.length]);
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
+    <div className="rounded-xl border border-border bg-card overflow-hidden border-pulse-soft">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
         <div className="flex items-center gap-2">
@@ -163,11 +163,11 @@ export function LiveOrders() {
               transition={{ duration: 0.3, ease: 'easeOut' }}
               className="border-b border-border/30 last:border-b-0"
             >
-              <div className="flex items-start gap-3 px-4 py-3">
+              <div className="flex items-start gap-3 px-4 py-3 glass-card-accent-emerald">
                 {/* Icon */}
                 <div className="mt-0.5 shrink-0">
                   {order.status === 'new' ? (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 pulse-ring">
                       <Package className="size-4 text-purple-400" />
                     </div>
                   ) : (

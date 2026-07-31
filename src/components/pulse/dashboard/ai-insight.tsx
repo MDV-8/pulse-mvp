@@ -44,7 +44,7 @@ export function AIInsight() {
     <div className="space-y-3">
       {/* Main insight card */}
       <motion.div
-        className="relative rounded-xl border border-primary/20 bg-card p-4 sm:p-5 overflow-hidden ai-glow-card"
+        className="relative rounded-xl border border-primary/20 bg-card p-4 sm:p-5 overflow-hidden ai-glow-card border-pulse-soft shimmer-overlay"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -73,7 +73,7 @@ export function AIInsight() {
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-foreground leading-snug">
+            <h3 className="text-base font-semibold text-foreground leading-snug animated-underline">
               {mainInsight.title}
             </h3>
             <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">

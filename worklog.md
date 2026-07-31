@@ -1659,3 +1659,170 @@ PULSE MVP is now at **v1.5** — a comprehensive, polished AI Operating System d
 6. **Accessibility audit** — Full keyboard nav, ARIA labels, focus management
 7. **Performance optimization** — Code splitting, lazy loading views, reduce bundle size
 8. **Light theme refinements** — Test all new components and CSS classes in light mode
+
+---
+Task ID: 18-b
+Agent: Main Orchestrator
+Task: Create Revenue Goal Tracker + QR Business Card components
+
+Work Log:
+- Created `/src/components/pulse/dashboard/revenue-goal-tracker.tsx` — RevenueGoalTracker component
+  - Animated SVG ring progress (200px) with linearGradient purple-500 → violet-400
+  - framer-motion stroke-dashoffset animation for entrance
+  - Center displays "78%" in number-glow + "3,240,000 ₸" in pulse-text-gradient
+  - Right side: 3 metric cards (Цель, Текущая with stat-glow-green, Осталось with stat-glow-amber) + days left with Calendar icon
+  - Horizontal progress bar with gradient fill (purple-500 → violet-500 → purple-400) and shimmer animation
+  - AI Prediction box with Sparkles icon, glass-card-deep styling, aurora-border
+  - Header with Target icon, "Цель по выручке" title with text-shadow-glow, month/year display
+- Created `/src/components/pulse/shared/qr-business-card.tsx` — QRBusinessCard component
+  - glass-card-premium container with aurora-border
+  - Header: "Ваша визитка" with text-gradient-animate, QrCode icon
+  - Business card preview mockup: purple→violet gradient, business name, category, address (MapPin), rating (Star, 4.8 ★, 248 отзывов), promo badge (-15%)
+  - Decorative CSS-only QR pattern (5x5 grid) with spring animations + pulse-dot center
+  - Share buttons row: Поделиться (Share2), Сохранить (Download), Распечатать (Printer) — glass-card style with hover scale
+  - Subtext: "Поделитесь с клиентами для получения бонусов"
+- ESLint: 0 errors
+
+Stage Summary:
+- 2 new components created: RevenueGoalTracker, QRBusinessCard
+- Total component files: 61 (from 59)
+- All existing CSS utility classes reused (number-glow, stat-glow-green, stat-glow-amber, glass-card-deep, aurora-border, glass-card-premium, text-gradient-animate, pulse-dot, text-shadow-glow, shimmer, pulse-text-gradient)
+
+---
+Task ID: 18-a
+Agent: fullstack-developer
+Task: Create Cash Register (Касса) View
+
+Work Log:
+- Created `/src/components/pulse/cashier/cashier-view.tsx` — a full POS cash register interface
+- Built header with Calculator icon, "Касса" title (text-shadow-glow), green pulsing "Касса открыта" status indicator, live Russian-locale date/time
+- Built 3 stat glass-cards: Сегодня (47 заказов, 386,000₸ with stat-glow-purple + number-glow), Средний чек (8,214₸, +12% от вчера), Время работы (7ч 32м)
+- Built 2-column layout (3/5 + 2/5 on desktop): left = order queue with filter tabs, right = active order + quick add + payment selector
+- Implemented 4 filter tabs (Все/Новый/Готов/Оплачен) with active state styling
+- Created 8 mock coffee shop orders (#001–#008) with realistic Kazakh customer names and items in ₸
+- Each order card shows: number, time, customer, items with quantities, total, status badge (Новый=purple, Готов=amber, Оплачен=emerald)
+- Action buttons: "Принять" (Новый→Готов), "Выдать" (Готов→Оплачен), checkmark for Оплачен
+- Active order detail panel with item list, remove buttons, total with neon-line divider
+- Quick add section with 6 popular products (Капучино, Латте, Раф, Американо, Чизкейк, Круассан) as glass-card buttons with icons and border-glow on add
+- Payment method selector: Наличные/Картой/Счёт with active state
+- Recent transactions section: 5 compact rows with slide-in-right animation, payment method icons, emerald checkmarks
+- Used framer-motion AnimatePresence for order filtering, active order transitions, and layout animations
+- Staggered entrance (stagger-1 to stagger-5) for order cards and transaction rows
+- All text in Russian, currency in Kazakh Tenge (₸)
+- Lint passed with zero errors
+
+Stage Summary:
+- 1 new component created: CashierView at src/components/pulse/cashier/cashier-view.tsx
+- Total component files: 62 (from 61)
+- All existing CSS utility classes reused: glass-card, glass-card-premium, card-hover-lift, text-shadow-glow, section-divider, neon-line, stat-glow-purple, number-glow, border-glow, stagger-1–5, slide-in-right, scrollbar-thin, pulse-dot, pulse-text-gradient, pulse-border, pulse-border-hover, quick-action-glow
+
+---
+Task ID: 18-c
+Agent: Main Orchestrator
+Task: Add 15 New CSS Animation Classes + Enhance 8 Components
+
+Work Log:
+- Appended 15 new CSS animation classes to src/app/globals.css (did NOT modify existing classes)
+  - text-gradient-cycle: Animated gradient text cycling purple→fuchsia→cyan
+  - border-pulse-soft: Soft pulsing border for important cards
+  - particle-drift: Floating particle dots background animation
+  - badge-bounce: Counter badge bounce animation
+  - slide-up-fade: Slide up and fade in entrance
+  - glow-rotate: Rotating glow drop-shadow effect
+  - typewriter-text: Typewriter text reveal with blinking cursor
+  - hover-scale: Smooth scale on hover with box-shadow
+  - glass-card-accent-purple/emerald/amber/cyan: Glass cards with colored top borders
+  - animated-underline: Animated underline grow effect
+  - shimmer-overlay: Shimmering overlay for loading states
+  - neon-line-vertical: Vertical neon line separator
+  - pulse-ring: Pulse ring effect for icons
+- Added light theme overrides for border-pulse-soft, text-gradient-cycle, glow-rotate, hover-scale, shimmer-overlay
+
+- Enhanced 8 components with new styling classes:
+  1. pulse-score.tsx: Added glow-rotate to SVG, text-gradient-cycle to score number, badge-bounce to Top 5% badge
+  2. ai-insight.tsx: Added border-pulse-soft + shimmer-overlay to main card, animated-underline to title
+  3. metrics-overview.tsx: Added hover-scale + slide-up-fade to metric cards, glass-card-accent-purple to grid container
+  4. live-orders.tsx: Added pulse-ring to new order status icon, border-pulse-soft to container, glass-card-accent-emerald to order items
+  5. finance-dashboard.tsx: Added text-gradient-cycle to title, hover-scale to metric cards, neon-line-vertical as section divider
+  6. loyalty-program.tsx: Added glass-card-accent-cyan to Silver tier, glow-rotate to points counter, badge-bounce to referral code
+  7. clients-list.tsx: Added hover-scale to client rows + summary cards, glass-card-accent-amber to VIP card, particle-drift to header dot
+  8. goals.tsx: Added text-gradient-cycle to title, glass-card-accent-purple to goals container, slide-up-fade to goal cards, border-pulse-soft to add button
+
+- Lint passed with zero errors
+
+Stage Summary:
+- 15 new CSS animation classes added to globals.css (total now 62+ custom animation classes)
+- 5 light theme override rules added
+- 8 components enhanced with new animation classes
+- Total component files: 62 (unchanged)
+- All changes are additive — no existing classes or functionality removed
+
+---
+Task ID: 18-d
+Agent: Main Orchestrator (Integration)
+Task: Integrate new features into router, store, sidebar + bug fixes
+
+Work Log:
+- Added 'cashier' to OwnerView type union in app-store.ts (total: 19 views)
+- Added Calculator icon import + 'Касса' nav item to sidebar.tsx (now 19 nav items total)
+- Added CashierView import and 'cashier' switch case in owner-dashboard-router.tsx
+- Added RevenueGoalTracker import to owner-views.tsx
+- Integrated RevenueGoalTracker into DashboardView (after AIInsightsFeed, before section divider)
+- Added QRBusinessCard import to client-views.tsx
+- Integrated QRBusinessCard into ClientBonuses (after referral code section)
+- Fixed CSS compilation error: replaced @apply glass-card with raw CSS properties in glass-card-accent-* classes (glass-card is a custom class, not a Tailwind utility)
+- Added light theme overrides for glass-card-accent-* variants
+- Updated version number from v1.3→v1.6 in sidebar, v1.5→v1.6 in settings
+
+Stage Summary:
+- 5 files modified: app-store.ts, sidebar.tsx, owner-dashboard-router.tsx, owner-views.tsx, client-views.tsx
+- 1 CSS fix: glass-card-accent-* classes rewritten without @apply
+- ESLint: 0 errors
+- Dev server: 200 OK (compiles in 5.2s)
+- Total owner views: 19
+- Total component files: 65 (was 62, +3 new)
+
+---
+## Current Project Status
+
+### Assessment:
+PULSE MVP is now at **v1.6** — the most feature-rich version yet with **65 component files**, **4 custom hooks**, **6 API routes**, **62+ CSS animation classes**, and **19 owner views**. This round introduces the Cash Register (Касса) POS interface, Revenue Goal Tracker, QR Business Card for clients, and 15 new CSS animation utilities applied across 8 components.
+
+### Completed in This Phase (Task 18):
+- Created CashierView (784 lines) — Full POS interface with order queue, active order management, quick add products, payment methods, recent transactions
+- Created RevenueGoalTracker (214 lines) — SVG circular progress ring with monthly revenue tracking, AI prediction
+- Created QRBusinessCard (141 lines) — Shareable business card with CSS-only QR pattern, share/save/print buttons
+- 15 new CSS animation classes: text-gradient-cycle, border-pulse-soft, particle-drift, badge-bounce, slide-up-fade, glow-rotate, typewriter-text, hover-scale, glass-card-accent-purple/emerald/amber/cyan, animated-underline, shimmer-overlay, neon-line-vertical, pulse-ring
+- 5 light theme overrides for new classes
+- 8 components enhanced: pulse-score, ai-insight, metrics-overview, live-orders, finance-dashboard, loyalty-program, clients-list, goals
+- All new features integrated into routing, store, sidebar
+- Version synced: v1.6 across sidebar and settings
+- ESLint: 0 errors
+- Dev server: 200 OK
+
+### Total Project Inventory:
+- **Owner views (19):** Главная, Что делать, AI, Продажи, Клиенты, Акции, Финансы, Аналитика, Лояльность, Цели, Настройки, Отзывы, Команда, SMM, Инвентарь, Бронирования, График, Касса
+- **Client views (6):** Главная, Карта, Акции, Бонусы, Избранное, Профиль (Enhanced + QR Card)
+- **Admin views (5):** Dashboard, Инструменты, Шаблоны, Пользователи, Контент
+- **API Routes (6):** promotions, orders, notifications, ai-chat, ai-analysis, route
+- **DB Models (4):** Promotion, Order, Review, NotificationRecord
+- **Special features:** Global Search (Cmd+K), Welcome Tour, Notification Center, Toast Notifications, Export Data, Theme Toggle, Onboarding Flow, localStorage Persistence, Animated Counters, Real-time Simulation, Live Orders, Keyboard Shortcuts, Performance Radar, Reservations, Schedule, Feedback Popup, Peak Hours Heatmap, Dashboard Ambient Background, Bottom Sheet, Notification History, Drag & Drop Actions, AI Chat (Neural + Keywords), Revenue Trend Chart, Customer Feedback Summary, Quick Stats, Revenue Goal Tracker, QR Business Card, Cash Register POS
+- **Components:** 65 React component files + 6 custom hooks + 1747 lines CSS animations
+- **Total codebase:** ~25,000+ lines
+- **page.tsx:** 208 lines (clean orchestrator)
+
+### Unresolved Issues / Risks:
+1. **OOM in sandbox:** Dev server compiles successfully (200 OK) but crashes after first compilation due to sandbox memory limits (~512MB). This is a sandbox environment limitation, not a code issue.
+2. **Agent-browser testing:** Cannot reliably test via agent-browser due to server instability from OOM. QA performed via ESLint + dev.log analysis + curl.
+3. **useDBData hook:** Wired into PromotionsView for display only; not yet replacing mock data in dashboard/finance views.
+4. **TodayActionsDraggable:** Now default in DashboardView but TodayView still uses static TodayActions.
+
+### Priority Recommendations for Next Phase:
+1. **Wire useDBData into dashboard/finance** — Replace mock data with real DB data for all views
+2. **Auto-save promotions/orders to DB** — When created through UI, POST to /api/promotions and /api/orders
+3. **WebSocket mini-service** — Real-time multi-user notifications and order updates
+4. **Print-ready PDF reports** — Weekly/monthly business reports via PDF generation
+5. **Mobile responsiveness audit** — Test all 19 views at 375px width
+6. **Accessibility audit** — Full keyboard nav, ARIA labels, focus management
+7. **Performance optimization** — Code splitting, lazy loading non-visible views
+8. **Sound notifications** — Optional audio feedback for toast notifications

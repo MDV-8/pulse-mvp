@@ -24,6 +24,7 @@ import {
   Package,
   CalendarDays,
   CalendarRange,
+  Calculator,
 } from 'lucide-react';
 import { useAppStore, type OwnerView } from '@/stores/app-store';
 import {
@@ -56,6 +57,7 @@ const navItems: { label: string; icon: React.ElementType; view: OwnerView }[] = 
   { label: 'Инвентарь', icon: Package, view: 'inventory' },
   { label: 'Бронирования', icon: CalendarDays, view: 'reservations' },
   { label: 'График', icon: CalendarRange, view: 'schedule' },
+  { label: 'Касса', icon: Calculator, view: 'cashier' },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -101,7 +103,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             <span className="text-2xl font-bold tracking-tight pulse-text-gradient float-y">
               PULSE
             </span>
-            <span className="text-[9px] text-muted-foreground/40 tracking-widest">v1.3</span>
+            <span className="text-[9px] text-muted-foreground/40 tracking-widest">v1.6</span>
           </div>
         </div>
         {/* Animated gradient line below logo */}

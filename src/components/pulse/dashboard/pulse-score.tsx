@@ -138,7 +138,7 @@ export function PulseScore() {
         <svg
           width={radius * 2}
           height={radius * 2}
-          className="relative transform -rotate-90 score-glow"
+          className="relative transform -rotate-90 score-glow glow-rotate"
         >
           {/* Background circle */}
           <circle
@@ -173,7 +173,7 @@ export function PulseScore() {
           <HoverCard openDelay={400} closeDelay={100}>
             <HoverCardTrigger asChild>
               <motion.span
-                className="text-5xl font-bold tracking-tighter pulse-text-gradient cursor-default stat-glow-purple"
+                className="text-5xl font-bold tracking-tighter pulse-text-gradient cursor-default stat-glow-purple text-gradient-cycle"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
@@ -222,6 +222,9 @@ export function PulseScore() {
 
       {/* Mini metric breakdown with tooltips */}
       <div className="mt-3 space-y-1.5 w-full max-w-[200px]">
+        <div className="badge-bounce inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold mb-1">
+          Top 5%
+        </div>
         {(Object.entries(breakdown) as [string, number][]).map(([key, val]) => (
           <div key={key} className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">{METRIC_LABELS[key] ?? key}</span>

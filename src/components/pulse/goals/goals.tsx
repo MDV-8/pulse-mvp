@@ -73,11 +73,11 @@ export default function Goals() {
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
             <Target className="w-5 h-5 text-purple-400" />
           </div>
-          <h1 className="text-2xl font-bold text-shadow-glow">Цели</h1>
+          <h1 className="text-2xl font-bold text-shadow-glow text-gradient-cycle">Цели</h1>
         </div>
         <Button
           size="sm"
-          className="bg-purple-600 hover:bg-purple-700 text-white border-glow"
+          className="bg-purple-600 hover:bg-purple-700 text-white border-glow border-pulse-soft"
           onClick={() => setShowDialog(true)}
         >
           <Plus className="w-4 h-4 mr-1.5" />
@@ -89,7 +89,8 @@ export default function Goals() {
       <div className="neon-line" />
 
       {/* Goals List */}
-      <div className="space-y-4">
+      <div className="space-y-4 glass-card-accent-purple p-4 rounded-xl">
+        
         {goals.map((goal, i) => {
           const cfg = statusConfig[goal.status];
           const percent = goal.targetValue > 0
@@ -104,7 +105,7 @@ export default function Goals() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
             >
-              <Card className={`border ${cfg.borderColor} ${cfg.bgColor} card-hover-lift`}>
+              <Card className={`border ${cfg.borderColor} ${cfg.bgColor} card-hover-lift slide-up-fade`}>
                 <CardContent className="p-4 space-y-4">
                   {/* Title + Status */}
                   <div className="flex items-start justify-between gap-3">

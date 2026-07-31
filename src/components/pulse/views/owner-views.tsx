@@ -16,6 +16,7 @@ import { RealtimeBanner } from '@/components/pulse/dashboard/realtime-banner';
 import { LiveOrders } from '@/components/pulse/dashboard/live-orders';
 import { PerformanceRadar } from '@/components/pulse/dashboard/performance-radar';
 import { PeakHours } from '@/components/pulse/dashboard/peak-hours';
+import { RevenueGoalTracker } from '@/components/pulse/dashboard/revenue-goal-tracker';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useDBData } from '@/hooks/use-db-data';
 
@@ -28,6 +29,7 @@ import { NotificationHistory } from '@/components/pulse/shared/notification-hist
 import { RevenueChart } from '@/components/pulse/shared/revenue-chart';
 import { CustomerFeedback } from '@/components/pulse/shared/customer-feedback';
 import { QuickStats } from '@/components/pulse/shared/quick-stats';
+import { QRBusinessCard } from '@/components/pulse/shared/qr-business-card';
 
 // Clients
 import ClientsList from '@/components/pulse/clients/clients-list';
@@ -264,6 +266,9 @@ export function DashboardView() {
 
       {/* ====== AI Insights Feed ====== */}
       <AIInsightsFeed />
+
+      {/* ====== Revenue Goal Tracker ====== */}
+      <RevenueGoalTracker />
 
       {/* ====== Section Divider: AI Feed → Radar ====== */}
       <div className="section-divider" aria-hidden="true">
@@ -613,7 +618,7 @@ export function SettingsView() {
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Версия</span>
-            <span className="font-medium">PULSE MVP v1.5</span>
+            <span className="font-medium">PULSE MVP v1.6</span>
           </div>
         </div>
       </div>

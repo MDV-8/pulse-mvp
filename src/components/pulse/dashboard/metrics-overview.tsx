@@ -85,7 +85,7 @@ function MetricCard({
       key={metric.label}
       variants={item}
       className={cn(
-        'group relative rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-primary/15 card-hover overflow-hidden'
+        'group relative rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-primary/15 card-hover overflow-hidden hover-scale slide-up-fade'
       )}
     >
       {/* Subtle gradient overlay */}
@@ -137,7 +137,7 @@ function MetricCard({
 export function MetricsOverview() {
   return (
     <motion.div
-      className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+      className="grid grid-cols-2 lg:grid-cols-4 gap-3 glass-card-accent-purple p-3"
       variants={container}
       initial="hidden"
       animate="show"

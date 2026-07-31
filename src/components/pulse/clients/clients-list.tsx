@@ -90,6 +90,7 @@ export default function ClientsList() {
           <Users className="w-5 h-5 text-purple-400" />
         </div>
         <h1 className="text-2xl font-bold text-shadow-glow">Клиенты</h1>
+        <span className="w-2 h-2 rounded-full bg-purple-400 particle-drift" />
         <div className="ml-auto">
           <ExportButton
             title="Клиенты"
@@ -114,7 +115,7 @@ export default function ClientsList() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="py-4 px-4 card-hover-lift">
+            <Card className={`py-4 px-4 card-hover-lift hover-scale ${card.label === 'VIP' ? 'glass-card-accent-amber' : ''}`}>
               <CardContent className="p-0">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg bg-muted ${card.color}`}>
@@ -182,7 +183,7 @@ export default function ClientsList() {
               {filtered.map((client) => (
                 <TableRow
                   key={client.id}
-                  className={`border-b border-border/30 hover:bg-muted/30 cursor-pointer transition-colors card-hover-lift ${filtered.indexOf(client) % 2 === 0 ? 'bg-transparent' : 'bg-muted/[0.02]'}`}
+                  className={`border-b border-border/30 hover:bg-muted/30 cursor-pointer transition-colors card-hover-lift hover-scale ${filtered.indexOf(client) % 2 === 0 ? 'bg-transparent' : 'bg-muted/[0.02]'}`}
                   onClick={() =>
                     setExpandedId(expandedId === client.id ? null : client.id)
                   }

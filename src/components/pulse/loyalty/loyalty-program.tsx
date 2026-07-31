@@ -122,7 +122,7 @@ export default function LoyaltyProgram() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">{s.label}</p>
-                    <p className="text-xl font-bold">{s.value}</p>
+                    <p className="text-xl font-bold glow-rotate">{s.value}</p>
                   </div>
                 </div>
               </CardContent>
@@ -147,7 +147,7 @@ export default function LoyaltyProgram() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.08 }}
               >
-                <Card className={`border ${config.borderColor} ${config.bgColor} overflow-hidden glass-card-premium card-hover-lift ${i === 2 ? 'aurora-border' : ''}`}>
+                <Card className={`border ${config.borderColor} ${config.bgColor} overflow-hidden glass-card-premium card-hover-lift ${i === 1 ? 'glass-card-accent-cyan' : ''} ${i === 2 ? 'aurora-border' : ''}`}>
                   <div className={`h-1 ${config.accentColor}`} />
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
@@ -222,7 +222,7 @@ export default function LoyaltyProgram() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex-1 flex items-center gap-2 bg-background/50 border border-border/50 rounded-lg px-4 py-3">
-                <code className="text-lg font-mono font-bold tracking-wider text-purple-300">
+                <code className="text-lg font-mono font-bold tracking-wider text-purple-300 badge-bounce">
                   {referralCode}
                 </code>
               </div>
