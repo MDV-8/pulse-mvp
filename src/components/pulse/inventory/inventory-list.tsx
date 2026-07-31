@@ -169,7 +169,7 @@ export function InventoryList() {
             <Package className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-shadow-glow">Инвентарь и меню</h2>
+            <h2 className="text-xl font-bold text-gradient-warm">Инвентарь и меню</h2>
             <p className="text-xs text-muted-foreground">
               Управление запасами и меню
             </p>
@@ -260,7 +260,7 @@ export function InventoryList() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: index * 0.04 }}
               className={cn(
-                'grid grid-cols-1 md:grid-cols-[1fr_0.7fr_0.7fr_0.6fr_0.9fr_0.6fr_0.5fr] gap-2 md:gap-3 px-4 py-3.5 items-center transition-colors hover:bg-white/[0.02]',
+                'grid grid-cols-1 md:grid-cols-[1fr_0.7fr_0.7fr_0.6fr_0.9fr_0.6fr_0.5fr] gap-2 md:gap-3 px-4 py-3.5 items-center transition-colors hover:bg-white/[0.02] card-press',
                 isCritical && 'bg-red-500/[0.03]'
               )}
             >
@@ -288,7 +288,7 @@ export function InventoryList() {
               <div className="flex items-center gap-2">
                 <span className="text-sm">{item.stock}</span>
                 {isCritical && (
-                  <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="relative flex h-2 w-2 shrink-0 active-indicator">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400 pulse-dot" />
                   </span>

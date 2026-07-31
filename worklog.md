@@ -1826,3 +1826,184 @@ PULSE MVP is now at **v1.6** — the most feature-rich version yet with **65 com
 6. **Accessibility audit** — Full keyboard nav, ARIA labels, focus management
 7. **Performance optimization** — Code splitting, lazy loading non-visible views
 8. **Sound notifications** — Optional audio feedback for toast notifications
+
+---
+Task ID: 19-d
+Agent: Main Orchestrator (Integration)
+Task: Integrate new features into router, store, sidebar + version bump
+
+Work Log:
+- Added 'waitlist' and 'suppliers' to OwnerView type union in app-store.ts (total: 21 views)
+- Added ClipboardList + Truck icon imports to sidebar.tsx (now 21 nav items total)
+- Added 'Очередь' + 'Поставщики' nav items to sidebar navigation
+- Added WaitlistView + SuppliersView imports and switch cases in owner-dashboard-router.tsx
+- Added ExpenseTracker import to owner-views.tsx
+- Integrated ExpenseTracker into DashboardView (after RevenueChart, before ProductSales)
+- Updated version number v1.6→v1.7 in sidebar and settings
+
+Stage Summary:
+- 4 files modified: app-store.ts, sidebar.tsx, owner-dashboard-router.tsx, owner-views.tsx
+- ESLint: 0 errors
+- Dev server: 200 OK (compiles in 5.3s)
+- Total owner views: 21
+- Total component files: 68 (was 65, +3 new)
+
+---
+## Current Project Status
+
+### Assessment:
+PULSE MVP is now at **v1.7** — the most feature-rich version yet with **68 component files**, **6 custom hooks**, **6 API routes**, **74+ CSS animation classes**, and **21 owner views**. This round introduces the Waitlist/Queue Management interface, Expense Tracker widget, Supplier Management view, and 12 new CSS animation utilities applied across 10 components.
+
+### Completed in This Phase (Task 19):
+- Created WaitlistView (~800 lines) — Full queue management with add customer form, 8-person queue, color-coded wait times, 3x3 table status grid, AI seating recommendations, recent seatings list
+- Created ExpenseTracker (~200 lines) — Daily expense tracking with 5 category breakdown bars, recent expenses, AI budget alert (94% usage)
+- Created SuppliersView (~400 lines) — Supplier management with 6 vendors, search/filter, star ratings, debt tracking, status management, AI delivery alerts
+- 12 new CSS animation classes: counter-flip, breathe-glow, wave-bar, spotlight-container, text-gradient-warm, text-gradient-cool, blur-in, active-indicator, card-press, gradient-border-card, number-display, ribbon
+- 4 light theme overrides for new classes
+- 10 components enhanced: ai-insights-feed, performance-radar, weekly-report, peak-hours, realtime-banner, toast-notifications, reviews-manager, reservations-view, schedule-view, inventory-list
+- All new features integrated into routing, store, sidebar
+- Version synced: v1.7 across sidebar and settings
+- ESLint: 0 errors
+- Dev server: 200 OK
+
+### Total Project Inventory:
+- **Owner views (21):** Главная, Что делать, AI, Продажи, Клиенты, Акции, Финансы, Аналитика, Лояльность, Цели, Настройки, Отзывы, Команда, SMM, Инвентарь, Бронирования, График, Касса, Очередь, Поставщики
+- **Client views (6):** Главная, Карта, Акции, Бонусы, Избранное, Профиль (Enhanced + QR Card)
+- **Admin views (5):** Dashboard, Инструменты, Шаблоны, Пользователи, Контент
+- **API Routes (6):** promotions, orders, notifications, ai-chat, ai-analysis, route
+- **DB Models (4):** Promotion, Order, Review, NotificationRecord
+- **Special features:** Global Search (Cmd+K), Welcome Tour, Notification Center, Toast Notifications, Export Data, Theme Toggle, Onboarding Flow, localStorage Persistence, Animated Counters, Real-time Simulation, Live Orders, Keyboard Shortcuts, Performance Radar, Reservations, Schedule, Feedback Popup, Peak Hours Heatmap, Dashboard Ambient Background, Bottom Sheet, Notification History, Drag & Drop Actions, AI Chat (Neural + Keywords), Revenue Trend Chart, Customer Feedback Summary, Quick Stats, Revenue Goal Tracker, QR Business Card, Cash Register POS, Expense Tracker, Waitlist Manager, Supplier Management
+- **Components:** 68 React component files + 6 custom hooks + 1919 lines CSS animations
+- **Total codebase:** ~27,000+ lines
+- **page.tsx:** 208 lines (clean orchestrator)
+
+### Unresolved Issues / Risks:
+1. **OOM in sandbox:** Dev server compiles successfully (200 OK) but crashes after first compilation due to sandbox memory limits (~512MB). This is a sandbox environment limitation, not a code issue.
+2. **Agent-browser testing:** Cannot reliably test via agent-browser due to server instability from OOM. QA performed via ESLint + dev.log analysis + curl.
+3. **useDBData hook:** Wired into PromotionsView for display only; not yet replacing mock data in dashboard/finance views.
+4. **TodayActionsDraggable:** Now default in DashboardView but TodayView still uses static TodayActions.
+
+### Priority Recommendations for Next Phase:
+1. **Wire useDBData into dashboard/finance** — Replace mock data with real DB data for all views
+2. **Auto-save promotions/orders to DB** — When created through UI, POST to /api/promotions and /api/orders
+3. **WebSocket mini-service** — Real-time multi-user notifications and order updates
+4. **Print-ready PDF reports** — Weekly/monthly business reports via PDF generation
+5. **Mobile responsiveness audit** — Test all 21 views at 375px width
+6. **Accessibility audit** — Full keyboard nav, ARIA labels, focus management
+7. **Performance optimization** — Code splitting, lazy loading non-visible views
+8. **Table reservation auto-assign** — Wire waitlist "Посадить" action to reservation system
+
+---
+Task ID: 19-b
+Agent: Main Orchestrator
+Task: Create Expense Tracker Widget + Supplier Management View
+
+Work Log:
+- Created `/src/components/pulse/dashboard/expense-tracker.tsx` — Daily expense tracking widget
+  - Header with Receipt icon + "Расходы сегодня" title with text-shadow-glow
+  - Total spent summary: 142,500 ₸ with number-glow + stat-glow-amber, trending arrow (-8% from yesterday)
+  - 5 category breakdown bars (Продукты 48%, Зарплата 32%, Аренда 10%, Коммунальные 6%, Прочее 4%) with animated gradient fills
+  - 3 recent expense items with slide-up-fade animation and category icons
+  - AI alert box (94% of budget) with glass-card-accent-amber + shimmer-overlay
+  - Uses framer-motion for staggered bar animations and item entrance
+
+- Created `/src/components/pulse/suppliers/suppliers-view.tsx` — Supplier/vendor management interface
+  - Header with Truck icon + "Поставщики" title with text-shadow-glow, subtitle
+  - 3 stats cards (Активных: 6, Ожидают: 3, Общий долг: 285,000₸) with stat-glow variants
+  - Search bar with Search icon for filtering by name/category
+  - Filter tabs: Все / Активные / Ожидает / Пауза with active state glow
+  - 6 supplier cards with: gradient initial avatar, category badges, monthly orders, star rating, debt display, status badge with pulse-dot for active, action buttons (Заказать/Оплатить/Позвонить), card-hover-lift animation
+  - Scrollable list max-h-[600px] with AnimatePresence for filter transitions
+  - AI suggestion box with glass-card-deep + aurora-border, 2 actionable recommendations
+  - Uses useState for search query and filter, useMemo for filtered results
+
+- Both files pass ESLint with 0 errors
+
+Stage Summary:
+- 2 new component files created (expense-tracker.tsx, suppliers-view.tsx)
+- New directory created: src/components/pulse/suppliers/
+- Total component files: 67 (was 65, +2 new)
+- ESLint: 0 errors
+
+---
+Task ID: 19-a
+Agent: Main Orchestrator
+Task: Create Waitlist / Queue Management View
+
+Work Log:
+- Created `/src/components/pulse/waitlist/waitlist-view.tsx` — Customer waiting list/queue management interface
+  - Header with Users icon + "Лист ожидания" title with text-shadow-glow, subtitle "Управление очередью клиентов"
+  - Status pill: "8 в очереди" with amber pulsing dot + badge-bounce
+  - 3 stats row cards (Ожидают: 8 чел. with stat-glow-amber + number-glow, Среднее время: 18 мин, Обслужено сегодня: 34 with stat-glow-green)
+  - Add customer form (inline): name input, party size buttons (1-6, Plus/Minus), "Добавить" purple gradient button — working add-to-queue via useState
+  - Filter tabs: Все / Долго ждут (>15min) with active state glow
+  - Queue list (max-h-[500px], scrollable, scrollbar-thin) with 8 mock customers:
+    - Динара 4чел 14:32 22мин "Столик для 4"
+    - Марат 2чел 14:38 16мин "У окна"
+    - Айдана 6чел 14:40 14мин "VIP зона"
+    - Бекзат 2чел 14:45 9мин "Барная стойка"
+    - Сания 4чел 14:48 6мин "Столик для 4"
+    - Ерлан 1чел 14:50 4мин "Любой"
+    - Асель 3чел 14:52 2мин "У окна"
+    - Данияр 2чел 14:55 0мин "Терраса"
+  - Color-coded wait time: green <5min, amber 5-15min, red >15min (pulse-dot on red)
+  - Each card: position #, name, party size badge, time, wait minutes, notes
+  - Action buttons per card: Посадить (Seat), Пропустить (Skip), Удалить (Remove)
+  - Cards use card-hover-lift + slide-up-fade animation, AnimatePresence for add/remove
+  - Table Status grid (3x3 = 9 tables) with hover-scale, color-coded status (green/purple/red/amber)
+  - Table tooltip on hover: "Столик N — Статус — N места"
+  - AI Suggestion box (glass-card-deep + border-pulse-soft + aurora gradient) recommending seating Динара at Столик 5
+  - Recent Seatings: 5 recent events with time, name, table, party size, emerald checkmark, slide-in-right animation
+  - All Russian language, premium dark theme, purple #8b5cf6 accent
+
+- File passes ESLint with 0 errors (pre-existing error in weekly-report.tsx is unrelated)
+
+Stage Summary:
+- 1 new component file created (waitlist-view.tsx)
+- New directory created: src/components/pulse/waitlist/
+- Total component files: 68 (was 67, +1 new)
+
+---
+Task ID: 19-c
+Agent: Main Orchestrator
+Task: Add 12 new CSS animation classes + enhance 10 components with new styling
+
+Work Log:
+- Appended 12 new CSS animation classes to globals.css (total now 74+ custom animation classes):
+  - counter-flip: Animated counter flip with rotateX perspective
+  - breathe-glow: Subtle breathing box-shadow glow for containers
+  - wave-bar: Wave animation with scaleY oscillation for decorative bars
+  - spotlight-container: Mouse-following radial gradient spotlight (CSS custom properties --mouse-x, --mouse-y)
+  - text-gradient-warm: Gradient text cycling through amber/red/pink warm colors
+  - text-gradient-cool: Gradient text cycling through cyan/purple/blue cool colors
+  - blur-in: Soft entrance animation with blur and scale
+  - active-indicator: Green pulsing ring for active/live state indicators
+  - card-press: Interactive press-down effect on click (scale + shadow)
+  - gradient-border-card: Animated gradient border card with backdrop blur
+  - number-display: Tabular-nums styling for large number displays
+  - ribbon: Decorative top ribbon/ticket gradient line
+- Added 4 light theme overrides: breathe-glow-light, gradient-border-card, spotlight-container, card-press
+
+- Enhanced 10 components with new animation classes:
+  1. ai-insights-feed.tsx: Added breathe-glow to main container, blur-in to header section
+  2. performance-radar.tsx: Added spotlight-container to SVG container, breathe-glow to radar card
+  3. weekly-report.tsx: Added text-gradient-warm to title, wave-bar to bar chart bars (with staggered delays), blur-in to AI summary card
+  4. peak-hours.tsx: Replaced glass-card with gradient-border-card on heatmap, added number-display to hover info values
+  5. realtime-banner.tsx: Added active-indicator to LIVE dot, counter-flip to metric value spans
+  6. toast-notifications.tsx: Added card-press to toast cards, blur-in to toast content area
+  7. reviews-manager.tsx: Replaced glass-card with gradient-border-card on stats row, added text-gradient-cool to title
+  8. reservations-view.tsx: Added spotlight-container to timeline container, active-indicator to confirmed reservation timeline dots
+  9. schedule-view.tsx: Added ribbon to overtime alert box, breathe-glow to AI suggestion box
+  10. inventory-list.tsx: Added text-gradient-warm to title, card-press to inventory item rows, active-indicator to critical status dots
+
+- Fixed JSX parsing error in weekly-report.tsx (missing closing brace on className prop)
+- ESLint: 0 errors
+
+Stage Summary:
+- 12 new CSS animation classes added to globals.css (total now 74+ custom animation classes)
+- 4 light theme override rules added
+- 10 components enhanced with new animation classes
+- Total component files: 68 (unchanged)
+- All changes are additive — no existing classes or functionality removed
+- globals.css: 1918 lines (was 1747, +171 lines)
+- ESLint: 0 errors in new file

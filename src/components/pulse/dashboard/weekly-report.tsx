@@ -54,7 +54,7 @@ export function WeeklyReport() {
         </div>
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            Отчёт за неделю
+            <span className="text-gradient-warm">Отчёт за неделю</span>
           </h3>
           <p className="text-xs text-muted-foreground">
             20.01 - 26.01 . Coffee & Co
@@ -106,11 +106,12 @@ export function WeeklyReport() {
               <div className="flex-1 h-5 rounded-md bg-card/80 border border-border/30 overflow-hidden relative">
                 <motion.div
                   className={cn(
-                    'h-full rounded-md',
+                    'h-full rounded-md wave-bar',
                     i === 4
                       ? 'bg-gradient-to-r from-primary to-primary/70'
                       : 'bg-primary/30'
                   )}
+                  style={{ animationDelay: `${i * 0.15}s` }}
                   initial={{ width: 0 }}
                   animate={{ width: `${d.percent}%` }}
                   transition={{
@@ -129,7 +130,7 @@ export function WeeklyReport() {
       </div>
 
       {/* AI Summary */}
-      <div className="rounded-xl bg-primary/5 border border-primary/10 p-3.5">
+      <div className="rounded-xl bg-primary/5 border border-primary/10 p-3.5 blur-in">
         <div className="flex items-start gap-2.5">
           <div className="mt-0.5 shrink-0">
             <TrendingUp className="h-4 w-4 text-primary" />

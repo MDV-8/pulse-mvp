@@ -17,6 +17,7 @@ import { LiveOrders } from '@/components/pulse/dashboard/live-orders';
 import { PerformanceRadar } from '@/components/pulse/dashboard/performance-radar';
 import { PeakHours } from '@/components/pulse/dashboard/peak-hours';
 import { RevenueGoalTracker } from '@/components/pulse/dashboard/revenue-goal-tracker';
+import { ExpenseTracker } from '@/components/pulse/dashboard/expense-tracker';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { useDBData } from '@/hooks/use-db-data';
 
@@ -283,6 +284,9 @@ export function DashboardView() {
 
       {/* ====== Revenue Trend Chart ====== */}
       <RevenueChart />
+
+      {/* ====== Expense Tracker ====== */}
+      <ExpenseTracker />
 
       {/* ====== Sales by Product ====== */}
       <ProductSales />
@@ -618,7 +622,7 @@ export function SettingsView() {
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Версия</span>
-            <span className="font-medium">PULSE MVP v1.6</span>
+            <span className="font-medium">PULSE MVP v1.7</span>
           </div>
         </div>
       </div>

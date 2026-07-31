@@ -29,6 +29,8 @@ import { InventoryList } from '@/components/pulse/inventory/inventory-list';
 import { ReservationsView } from '@/components/pulse/reservations/reservations-view';
 import { ScheduleView } from '@/components/pulse/staff/schedule-view';
 import { CashierView } from '@/components/pulse/cashier/cashier-view';
+import { WaitlistView } from '@/components/pulse/waitlist/waitlist-view';
+import { SuppliersView } from '@/components/pulse/suppliers/suppliers-view';
 
 // ============================================================
 // Owner Dashboard Router
@@ -92,6 +94,10 @@ export function OwnerDashboard() {
         return <ReservationsView />;
       case 'cashier':
         return <CashierView />;
+      case 'waitlist':
+        return <WaitlistView />;
+      case 'suppliers':
+        return <SuppliersView />;
       default:
         return <DashboardView />;
     }

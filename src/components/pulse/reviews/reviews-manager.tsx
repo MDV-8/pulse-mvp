@@ -116,7 +116,7 @@ export function ReviewsManager() {
             <MessageSquare className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-shadow-glow">Отзывы клиентов</h2>
+            <h2 className="text-xl font-bold text-gradient-cool">Отзывы клиентов</h2>
             <div className="flex items-center gap-2 mt-0.5">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -129,7 +129,7 @@ export function ReviewsManager() {
       </div>
 
       {/* Quick Stats Row */}
-      <div className="glass-card rounded-xl p-4">
+      <div className="gradient-border-card rounded-xl p-4">
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 fill-amber-400 text-amber-400" />

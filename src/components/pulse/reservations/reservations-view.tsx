@@ -247,7 +247,7 @@ export function ReservationsView() {
       </motion.div>
 
       {/* Timeline View */}
-      <motion.div variants={itemVariants} className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-thin pr-1">
+      <motion.div variants={itemVariants} className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-thin pr-1 spotlight-container">
         {timeSlots.map((slot) => {
           const slotReservations = getReservationsForSlot(slot);
           return (
@@ -261,9 +261,11 @@ export function ReservationsView() {
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className={cn(
                   'w-2.5 h-2.5 rounded-full mt-0.5',
-                  slotReservations.length > 0
-                    ? 'bg-purple-500 shadow-[0_0_8px_rgba(139,92,246,0.4)]'
-                    : 'bg-muted-foreground/20'
+                  slotReservations.some(r => r.status === 'confirmed')
+                    ? 'bg-emerald-500 active-indicator'
+                    : slotReservations.length > 0
+                      ? 'bg-purple-500 shadow-[0_0_8px_rgba(139,92,246,0.4)]'
+                      : 'bg-muted-foreground/20'
                 )} />
                 <div className="w-px flex-1 bg-border" />
               </div>

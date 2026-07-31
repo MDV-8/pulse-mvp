@@ -284,7 +284,7 @@ export function ScheduleView() {
           </div>
         </div>
 
-        <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+        <div className="glass-card rounded-xl p-4 flex items-center gap-3 ribbon">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500/20">
             <Calendar className="w-5 h-5 text-amber-400" />
           </div>
@@ -303,7 +303,7 @@ export function ScheduleView() {
       </div>
 
       {/* ── AI Suggestion Box ──────────────────────────────── */}
-      <div className="glass-card rounded-xl p-4 ai-glow-card">
+      <div className="glass-card rounded-xl p-4 ai-glow-card breathe-glow">
         <div className="flex items-start gap-3">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/20 shrink-0 mt-0.5">
             <span className="text-sm">🤖</span>

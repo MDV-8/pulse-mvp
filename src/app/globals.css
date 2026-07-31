@@ -1745,3 +1745,175 @@
   background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.03), transparent);
 }
 
+/* ===================================
+   Task 19-c: New CSS Animation Classes
+   =================================== */
+
+/* Animated counter flip */
+@keyframes counter-flip {
+  0% { transform: rotateX(0deg); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+.counter-flip {
+  animation: counter-flip 0.6s ease-in-out;
+  perspective: 200px;
+}
+
+/* Subtle breathing glow for containers */
+@keyframes breathe-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.05); }
+  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.12); }
+}
+.breathe-glow {
+  animation: breathe-glow 4s ease-in-out infinite;
+}
+
+/* Wave animation for decorative elements */
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1.5); }
+}
+.wave-bar {
+  transform-origin: bottom;
+  animation: wave 1.5s ease-in-out infinite;
+}
+
+/* Spotlight effect following mouse (use with JS mousemove) */
+.spotlight-container {
+  position: relative;
+  overflow: hidden;
+}
+.spotlight-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(139, 92, 246, 0.06), transparent 40%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Gradient text that shifts through warm colors */
+@keyframes gradient-warm-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.text-gradient-warm {
+  background: linear-gradient(270deg, #f59e0b, #ef4444, #ec4899, #f59e0b);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-warm-shift 5s ease infinite;
+}
+
+/* Gradient text that shifts through cool colors */
+@keyframes gradient-cool-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.text-gradient-cool {
+  background: linear-gradient(270deg, #06b6d4, #8b5cf6, #3b82f6, #06b6d4);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-cool-shift 5s ease infinite;
+}
+
+/* Soft entrance with blur */
+@keyframes blur-in {
+  from { opacity: 0; filter: blur(8px); transform: scale(0.95); }
+  to { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+.blur-in {
+  animation: blur-in 0.6s ease-out forwards;
+}
+
+/* Active state indicator pulse */
+@keyframes active-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.active-indicator {
+  animation: active-pulse 2s ease infinite;
+}
+
+/* Card press effect */
+.card-press {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+.card-press:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Animated gradient border (full card) */
+@keyframes gradient-border-animated {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.gradient-border-card {
+  position: relative;
+  border-radius: 0.75rem;
+  background: rgba(18, 18, 26, 0.8);
+  backdrop-filter: blur(12px);
+}
+.gradient-border-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(0.75rem + 2px);
+  background: linear-gradient(90deg, #8b5cf6, #d946ef, #06b6d4, #8b5cf6);
+  background-size: 300% 300%;
+  animation: gradient-border-animated 4s ease infinite;
+  z-index: -1;
+}
+
+/* Number text styling for large displays */
+.number-display {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* Ribbon/ticket effect */
+.ribbon {
+  position: relative;
+  overflow: hidden;
+}
+.ribbon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #d946ef, transparent);
+}
+
+/* Light theme overrides for Task 19-c */
+.light .breathe-glow {
+  animation: breathe-glow-light 4s ease-in-out infinite;
+}
+@keyframes breathe-glow-light {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.03); }
+  50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.06); }
+}
+
+.light .gradient-border-card {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.light .spotlight-container::before {
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(139, 92, 246, 0.03), transparent 40%);
+}
+
+.light .card-press:active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+

@@ -88,7 +88,7 @@ export function PerformanceRadar() {
 
   return (
     <motion.div
-      className="glass-card rounded-xl p-4 sm:p-6"
+      className="glass-card rounded-xl p-4 sm:p-6 breathe-glow"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -105,7 +105,7 @@ export function PerformanceRadar() {
       </div>
 
       {/* SVG Radar Chart */}
-      <div className="flex justify-center">
+      <div className="flex justify-center spotlight-container">
         <svg
           viewBox="0 0 300 300"
           className="w-full max-w-[300px]"

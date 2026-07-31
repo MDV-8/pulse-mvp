@@ -52,7 +52,7 @@ function MetricValue({
 
   return (
     <span
-      className={`tabular-nums font-semibold text-sm transition-colors duration-300 ${flash ?? 'text-foreground'}`}
+      className={`tabular-nums font-semibold text-sm transition-colors duration-300 counter-flip ${flash ?? 'text-foreground'}`}
     >
       {formatter(current)}
     </span>
@@ -89,7 +89,7 @@ export function RealtimeBanner() {
     <div className="flex items-center justify-between gap-3 rounded-xl border border-border/50 bg-card/50 backdrop-blur-md px-4 py-2">
       {/* Left: LIVE indicator */}
       <div className="flex items-center gap-2 shrink-0">
-        <span className="relative flex h-2 w-2">
+        <span className="relative flex h-2 w-2 active-indicator">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
         </span>

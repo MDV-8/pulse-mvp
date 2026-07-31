@@ -88,7 +88,7 @@ export function PeakHours() {
       </div>
 
       {/* ── Heatmap Grid ──────────────────────────────────── */}
-      <div className="glass-card rounded-xl p-4 sm:p-5">
+      <div className="gradient-border-card rounded-xl p-4 sm:p-5">
           {/* Column labels (time slots) */}
           <div className="grid grid-cols-[36px_repeat(7,1fr)] gap-1 sm:gap-1.5 mb-1.5">
             <div /> {/* spacer for row labels */}
@@ -161,10 +161,10 @@ export function PeakHours() {
                   {hoveredCell.day}, {hoveredCell.time}
                 </span>
               </div>
-              <span className="font-semibold text-purple-300">
+              <span className="font-semibold text-purple-300 number-display">
                 {hoveredCell.value}%
               </span>
-              <span className="text-muted-foreground">
+              <span className="text-muted-foreground number-display">
                 ≈ {hoveredCell.orders} заказов
               </span>
             </motion.div>

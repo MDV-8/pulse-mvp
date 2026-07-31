@@ -38,7 +38,9 @@ export type OwnerView =
   | 'inventory'
   | 'reservations'
   | 'schedule'
-  | 'cashier';
+  | 'cashier'
+  | 'waitlist'
+  | 'suppliers';
 export type ClientView =
   | 'home'
   | 'map'

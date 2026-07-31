@@ -147,9 +147,9 @@ export function AIInsightsFeed() {
   const filtered = mockInsights.filter((i) => filterInsight(i, activeTab));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 breathe-glow">
       {/* Header with shimmer */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600/10 via-purple-500/5 to-cyan-500/10 border border-purple-500/15 p-4 sm:p-5">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600/10 via-purple-500/5 to-cyan-500/10 border border-purple-500/15 p-4 sm:p-5 blur-in">
         <div className="absolute inset-0 shimmer pointer-events-none" />
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-3">
