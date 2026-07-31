@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type {
   BusinessData,
   PulseScore,
@@ -127,105 +128,145 @@ interface AppStore {
   showAIContent: boolean;
   setShowAIContent: (show: boolean) => void;
 
+  // Global search
+  showSearch: boolean;
+  setShowSearch: (show: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+
+  // Notification state
+  showNotifications: boolean;
+  setShowNotifications: (show: boolean) => void;
+
   // Settings
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
 }
 
-export const useAppStore = create<AppStore>((set) => ({
-  // App mode
-  appMode: 'onboarding',
-  setAppMode: (mode) => set({ appMode: mode }),
+export const useAppStore = create<AppStore>()(
+  persist(
+    (set) => ({
+      // App mode
+      appMode: 'onboarding',
+      setAppMode: (mode) => set({ appMode: mode }),
 
-  // Owner views
-  ownerView: 'dashboard',
-  setOwnerView: (view) => set({ ownerView: view }),
+      // Owner views
+      ownerView: 'dashboard',
+      setOwnerView: (view) => set({ ownerView: view }),
 
-  // Client views
-  clientView: 'home',
-  setClientView: (view) => set({ clientView: view }),
+      // Client views
+      clientView: 'home',
+      setClientView: (view) => set({ clientView: view }),
 
-  // Admin views
-  adminView: 'dashboard',
-  setAdminView: (view) => set({ adminView: view }),
+      // Admin views
+      adminView: 'dashboard',
+      setAdminView: (view) => set({ adminView: view }),
 
-  // Onboarding
-  onboardingStep: 1,
-  setOnboardingStep: (step) => set({ onboardingStep: step }),
-  business: null,
-  setBusiness: (b) =>
-    set((state) => ({
-      business: { ...((state.business || {}) as BusinessData), ...b },
-    })),
+      // Onboarding
+      onboardingStep: 1,
+      setOnboardingStep: (step) => set({ onboardingStep: step }),
+      business: null,
+      setBusiness: (b) =>
+        set((state) => ({
+          business: { ...((state.business || {}) as BusinessData), ...b },
+        })),
 
-  // Business data
-  pulseScore: mockPulseScore,
-  setPulseScore: (s) => set({ pulseScore: s }),
+      // Business data
+      pulseScore: mockPulseScore,
+      setPulseScore: (s) => set({ pulseScore: s }),
 
-  // Insights
-  insights: mockInsights,
-  setInsights: (insights) => set({ insights }),
+      // Insights
+      insights: mockInsights,
+      setInsights: (insights) => set({ insights }),
 
-  // Today actions
-  todayActions: mockTodayActions,
-  setTodayActions: (actions) => set({ todayActions: actions }),
+      // Today actions
+      todayActions: mockTodayActions,
+      setTodayActions: (actions) => set({ todayActions: actions }),
 
-  // Promotions
-  promotions: mockPromotions,
-  setPromotions: (promotions) => set({ promotions }),
-  addPromotion: (p) =>
-    set((state) => ({ promotions: [...state.promotions, p] })),
+      // Promotions
+      promotions: mockPromotions,
+      setPromotions: (promotions) => set({ promotions }),
+      addPromotion: (p) =>
+        set((state) => ({ promotions: [...state.promotions, p] })),
 
-  // AI Chat
-  aiChatMessages: [],
-  addAIChatMessage: (msg) =>
-    set((state) => ({
-      aiChatMessages: [
-        ...state.aiChatMessages,
-        {
-          ...msg,
-          id: `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          timestamp: Date.now(),
-        },
-      ],
-    })),
-  clearAIChat: () => set({ aiChatMessages: [] }),
+      // AI Chat
+      aiChatMessages: [],
+      addAIChatMessage: (msg) =>
+        set((state) => ({
+          aiChatMessages: [
+            ...state.aiChatMessages,
+            {
+              ...msg,
+              id: `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+              timestamp: Date.now(),
+            },
+          ],
+        })),
+      clearAIChat: () => set({ aiChatMessages: [] }),
 
-  // Client coupons
-  clientCoupons: [],
-  addClientCoupon: (coupon) =>
-    set((state) => ({
-      clientCoupons: [...state.clientCoupons, { ...coupon, used: false }],
-    })),
-  useClientCoupon: (id) =>
-    set((state) => ({
-      clientCoupons: state.clientCoupons.map((c) =>
-        c.id === id ? { ...c, used: true } : c
-      ),
-    })),
+      // Client coupons
+      clientCoupons: [],
+      addClientCoupon: (coupon) =>
+        set((state) => ({
+          clientCoupons: [...state.clientCoupons, { ...coupon, used: false }],
+        })),
+      useClientCoupon: (id) =>
+        set((state) => ({
+          clientCoupons: state.clientCoupons.map((c) =>
+            c.id === id ? { ...c, used: true } : c
+          ),
+        })),
 
-  // Admin
-  isDemoAccount: true,
+      // Admin
+      isDemoAccount: true,
 
-  // Mobile sidebar
-  sidebarOpen: false,
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      // Mobile sidebar
+      sidebarOpen: false,
+      setSidebarOpen: (open) => set({ sidebarOpen: open }),
 
-  // Promotion creation
-  showCreatePromotion: false,
-  setShowCreatePromotion: (show) => set({ showCreatePromotion: show }),
-  promotionFromInsight: null,
-  setPromotionFromInsight: (insight) => set({ promotionFromInsight: insight }),
+      // Promotion creation
+      showCreatePromotion: false,
+      setShowCreatePromotion: (show) => set({ showCreatePromotion: show }),
+      promotionFromInsight: null,
+      setPromotionFromInsight: (insight) => set({ promotionFromInsight: insight }),
 
-  // Return clients
-  showReturnClients: false,
-  setShowReturnClients: (show) => set({ showReturnClients: show }),
+      // Return clients
+      showReturnClients: false,
+      setShowReturnClients: (show) => set({ showReturnClients: show }),
 
-  // AI Content
-  showAIContent: false,
-  setShowAIContent: (show) => set({ showAIContent: show }),
+      // AI Content
+      showAIContent: false,
+      setShowAIContent: (show) => set({ showAIContent: show }),
 
-  // Settings
-  theme: 'dark',
-  setTheme: (theme) => set({ theme }),
-}));
+      // Global search
+      showSearch: false,
+      setShowSearch: (show) => set({ showSearch: show }),
+      searchQuery: '',
+      setSearchQuery: (query) => set({ searchQuery: query }),
+
+      // Notification state
+      showNotifications: false,
+      setShowNotifications: (show) => set({ showNotifications: show }),
+
+      // Settings
+      theme: 'dark',
+      setTheme: (theme) => set({ theme }),
+    }),
+    {
+      name: 'pulse-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        appMode: state.appMode,
+        ownerView: state.ownerView,
+        clientView: state.clientView,
+        adminView: state.adminView,
+        business: state.business,
+        pulseScore: state.pulseScore,
+        insights: state.insights,
+        todayActions: state.todayActions,
+        promotions: state.promotions,
+        theme: state.theme,
+      }),
+    }
+  )
+);

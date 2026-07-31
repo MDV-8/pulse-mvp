@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ExportButton } from '@/components/pulse/shared/export-button';
 import {
   Table,
   TableHeader,
@@ -89,6 +90,19 @@ export default function ClientsList() {
           <Users className="w-5 h-5 text-purple-400" />
         </div>
         <h1 className="text-2xl font-bold">Клиенты</h1>
+        <div className="ml-auto">
+          <ExportButton
+            title="Клиенты"
+            headers={['Имя', 'Телефон', 'Покупки', 'Сумма', 'Сегмент']}
+            rows={filtered.map((c) => [
+              c.name,
+              c.phone,
+              String(c.totalPurchases),
+              `${c.totalSpent.toLocaleString('ru')} ₸`,
+              segmentLabels[c.segment],
+            ])}
+          />
+        </div>
       </motion.div>
 
       {/* Summary Cards */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,14 @@ import type { AIChatMessage } from '@/stores/app-store';
 
 function getAIResponse(message: string): string {
   const lower = message.toLowerCase();
+  if (lower.includes('помощь') || lower.includes('помоги') || lower.includes('что можешь'))
+    return aiChatResponses.help;
+  if (lower.includes('конкурент') || lower.includes('рынок'))
+    return aiChatResponses.competitors;
+  if (lower.includes('лояльност') || lower.includes('бонус') || lower.includes('программа'))
+    return aiChatResponses.loyalty;
+  if (lower.includes('спасибо') || lower.includes('благодар'))
+    return aiChatResponses.thanks;
   if (lower.includes('продаж')) return aiChatResponses.sales_down;
   if (lower.includes('прибыл')) return aiChatResponses.profit_down;
   if (lower.includes('чек') || lower.includes('средний')) return aiChatResponses.average_check;
@@ -21,6 +29,82 @@ function getAIResponse(message: string): string {
   if (lower.includes('аудитори') || lower.includes('кто')) return aiChatResponses.audience;
   return aiChatResponses.default;
 }
+
+/** Variable typing delay based on response length */
+function getTypingDelay(response: string): number {
+  const len = response.length;
+  if (len < 100) return 800 + Math.random() * 400;  // 0.8-1.2s
+  if (len < 300) return 1200 + Math.random() * 600; // 1.2-1.8s
+  return 1800 + Math.random() * 700;                 // 1.8-2.5s
+}
+
+/** Simple markdown-to-JSX renderer for AI responses */
+function renderMarkdown(text: string) {
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let key = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Empty line → paragraph break
+    if (!trimmed) {
+      elements.push(<div key={key++} className="h-2" />);
+      continue;
+    }
+
+    // Bullet point (•)
+    if (trimmed.startsWith('•') || trimmed.startsWith('- ')) {
+      const content = trimmed.startsWith('•') ? trimmed.slice(1).trim() : trimmed.slice(2).trim();
+      elements.push(
+        <div key={key++} className="flex items-start gap-2 ml-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+          <span>{renderInlineMarkdown(content)}</span>
+        </div>
+      );
+      continue;
+    }
+
+    // Numbered list (e.g. "1.")
+    const numMatch = trimmed.match(/^(\d+)\.\s(.+)/);
+    if (numMatch) {
+      elements.push(
+        <div key={key++} className="flex items-start gap-2 ml-1">
+          <span className="text-primary font-medium text-xs mt-0.5 shrink-0 w-4 text-right">{numMatch[1]}.</span>
+          <span>{renderInlineMarkdown(numMatch[2])}</span>
+        </div>
+      );
+      continue;
+    }
+
+    // Regular line
+    elements.push(
+      <p key={key++} className="leading-relaxed">
+        {renderInlineMarkdown(trimmed)}
+      </p>
+    );
+  }
+
+  return elements;
+}
+
+/** Render **bold** inline */
+function renderInlineMarkdown(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={i} className="font-semibold text-foreground">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
+
+/** Footer tip shown after AI responses */
+const RESPONSE_FOOTER = '💡 Совет: Вы можете применить рекомендации прямо из панели управления';
 
 function TypingIndicator() {
   return (
@@ -82,7 +166,16 @@ function ChatMessage({ message }: { message: AIChatMessage }) {
             : 'bg-card border border-border rounded-bl-sm'
         )}
       >
-        <div className="whitespace-pre-wrap">{message.content}</div>
+        {isUser ? (
+          <div className="whitespace-pre-wrap">{message.content}</div>
+        ) : (
+          <div>{renderMarkdown(message.content)}</div>
+        )}
+        {!isUser && (
+          <div className="mt-2.5 pt-2 border-t border-border/50">
+            <p className="text-[11px] text-muted-foreground/60 italic">{RESPONSE_FOOTER}</p>
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -124,11 +217,12 @@ export function AIAssistant() {
     setIsTyping(true);
 
     const response = getAIResponse(messageText);
+    const delay = getTypingDelay(response);
 
     setTimeout(() => {
       setIsTyping(false);
       addAIChatMessage({ role: 'assistant', content: response });
-    }, 1000);
+    }, delay);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -139,6 +233,12 @@ export function AIAssistant() {
   };
 
   const showWelcome = aiChatMessages.length === 0 && !isTyping;
+
+  const welcomeMessage = useMemo(
+    () =>
+      'Привет! Я AI-ассистент PULSE 💜\n\nЯ анализирую данные вашего бизнеса «Coffee & Co» и помогаю принимать решения.\n\nЧто вас интересует прямо сейчас?',
+    []
+  );
 
   return (
     <div className="flex h-full flex-col">
@@ -182,7 +282,7 @@ export function AIAssistant() {
                 <Sparkles className="h-4 w-4 text-primary" />
               </div>
               <div className="rounded-2xl rounded-bl-sm bg-card border border-border px-4 py-3 text-sm leading-relaxed max-w-[85%]">
-                Привет! Я AI-ассистент PULSE. Я анализирую данные вашего бизнеса и помогаю принимать решения. Что вас интересует?
+                {renderMarkdown(welcomeMessage)}
               </div>
             </motion.div>
           )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Wallet,
@@ -20,7 +20,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { StackedRevenueChart } from '@/components/pulse/shared/revenue-chart';
+import { ExportButton } from '@/components/pulse/shared/export-button';
 import { mockFinanceData } from '@/data/mock-data';
 import type { FinanceData } from '@/data/mock-data';
 
@@ -188,6 +190,19 @@ function MetricCard({
 
 export function FinanceDashboard() {
   const [activePeriod, setActivePeriod] = useState<Period>('7days');
+  const [isSwitching, setIsSwitching] = useState(false);
+  const [displayPeriod, setDisplayPeriod] = useState<Period>('7days');
+
+  const handlePeriodChange = useCallback((newPeriod: string) => {
+    const p = newPeriod as Period;
+    if (p === activePeriod || isSwitching) return;
+    setDisplayPeriod(p);
+    setIsSwitching(true);
+    setTimeout(() => {
+      setActivePeriod(p);
+      setIsSwitching(false);
+    }, 300);
+  }, [activePeriod, isSwitching]);
 
   const data = useMemo(() => {
     const base = mockFinanceData;
@@ -269,13 +284,25 @@ export function FinanceDashboard() {
             Демо-данные
           </Badge>
         </div>
+        <ExportButton
+          title="Финансы"
+          headers={['Метрика', 'Значение', 'Изменение']}
+          rows={[
+            ['Выручка', `${data.revenue.toLocaleString('ru-RU')} ₸`, `${data.revenueChange > 0 ? '+' : ''}${data.revenueChange}%`],
+            ['Расходы', `${data.expenses.toLocaleString('ru-RU')} ₸`, `${data.expensesChange > 0 ? '+' : ''}${data.expensesChange}%`],
+            ['Чистая прибыль', `${data.netProfit.toLocaleString('ru-RU')} ₸`, `${data.profitChange > 0 ? '+' : ''}${data.profitChange}%`],
+            ['Маржинальность', `${data.margin}%`, `${data.marginChange > 0 ? '+' : ''}${data.marginChange}%`],
+            ['Средний чек', `${data.averageCheck.toLocaleString('ru-RU')} ₸`, `${data.averageCheckChange > 0 ? '+' : ''}${data.averageCheckChange}%`],
+            ['Заказы', data.orders.toLocaleString('ru-RU'), `${data.ordersChange > 0 ? '+' : ''}${data.ordersChange}%`],
+          ]}
+        />
       </div>
 
       <ScrollArea className="flex-1 px-4 sm:px-6 py-4 space-y-5">
         {/* Period Selector */}
         <Tabs
-          value={activePeriod}
-          onValueChange={(v) => setActivePeriod(v as Period)}
+          value={displayPeriod}
+          onValueChange={handlePeriodChange}
         >
           <TabsList className="bg-muted/50 h-9 w-full">
             {(Object.entries(PERIOD_LABELS) as [Period, string][]).map(([key, label]) => (
@@ -291,11 +318,27 @@ export function FinanceDashboard() {
         </Tabs>
 
         {/* Key Metrics Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-          {metrics.map((m, i) => (
-            <MetricCard key={m.label} {...m} index={i} />
-          ))}
-        </div>
+        {isSwitching ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="bg-card border-border">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-3 w-10" />
+                  </div>
+                  <Skeleton className="h-5 w-24" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            {metrics.map((m, i) => (
+              <MetricCard key={m.label} {...m} index={i} />
+            ))}
+          </div>
+        )}
 
         {/* Revenue/Expenses Chart */}
         <Card className="bg-card border-border">
@@ -315,7 +358,11 @@ export function FinanceDashboard() {
                 <span>Расходы</span>
               </div>
             </div>
-            <StackedRevenueChart data={chartData} height={180} />
+            {isSwitching ? (
+              <Skeleton className="w-full h-[180px] rounded-lg" />
+            ) : (
+              <StackedRevenueChart data={chartData} height={180} />
+            )}
           </CardContent>
         </Card>
 

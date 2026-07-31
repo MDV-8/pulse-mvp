@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { ExportButton } from '@/components/pulse/shared/export-button';
 import { useAppStore } from '@/stores/app-store';
 import { PromotionResults } from './promotion-results';
 import type { Promotion } from '@/data/mock-data';
@@ -140,14 +141,26 @@ export function PromotionsList() {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-4">
         <h2 className="text-base font-semibold">Акции</h2>
-        <Button
-          size="sm"
-          className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5"
-          onClick={() => setShowCreatePromotion(true)}
-        >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Создать акцию</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ExportButton
+            title="Акции"
+            headers={['Название', 'Скидка', 'Продукт', 'Статус']}
+            rows={filteredPromotions.map((p) => [
+              p.name,
+              `-${p.discount}%`,
+              p.product,
+              STATUS_CONFIG[p.status].label,
+            ])}
+          />
+          <Button
+            size="sm"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5"
+            onClick={() => setShowCreatePromotion(true)}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Создать акцию</span>
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}

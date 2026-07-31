@@ -16,6 +16,9 @@ import {
   Settings,
   Smartphone,
   Shield,
+  Search,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAppStore, type OwnerView } from '@/stores/app-store';
 import {
@@ -49,6 +52,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const setOwnerView = useAppStore((s) => s.setOwnerView);
   const setAppMode = useAppStore((s) => s.setAppMode);
   const isDemoAccount = useAppStore((s) => s.isDemoAccount);
+  const setShowSearch = useAppStore((s) => s.setShowSearch);
+  const theme = useAppStore((s) => s.theme);
+  const setTheme = useAppStore((s) => s.setTheme);
 
   const handleNavClick = (view: OwnerView) => {
     setOwnerView(view);
@@ -79,6 +85,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <Separator className="bg-sidebar-border" />
+
+      {/* Search button */}
+      <div className="px-3 pt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => setShowSearch(true)}
+        >
+          <Search className="size-4" />
+          <span className="text-xs">Поиск...</span>
+          <kbd className="ml-auto h-5 items-center gap-1 rounded border border-white/10 bg-muted/50 px-1 font-mono text-[9px] text-muted-foreground/60 hidden sm:inline-flex">
+            ⌘K
+          </kbd>
+        </Button>
+      </div>
 
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2">
@@ -150,6 +172,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           >
             <Shield className="size-4" />
             <span className="text-xs">Админ-панель</span>
+          </Button>
+
+          {/* Theme toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          >
+            {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            <span className="text-xs">{theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}</span>
           </Button>
         </div>
       </div>

@@ -1,0 +1,833 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useRef } from 'react';
+     4→import { useAppStore } from '@/stores/app-store';
+     5→
+     6→// Layout
+     7→import { Sidebar } from '@/components/pulse/layout/sidebar';
+     8→import { MobileHeader } from '@/components/pulse/layout/mobile-header';
+     9→import { ClientNav } from '@/components/pulse/layout/client-nav';
+    10→import { AdminNav } from '@/components/pulse/layout/admin-nav';
+    11→
+    12→// Onboarding
+    13→import { OnboardingFlow } from '@/components/pulse/onboarding/onboarding-flow';
+    14→
+    15→// Dashboard
+    16→import { PulseScore } from '@/components/pulse/dashboard/pulse-score';
+    17→import { BusinessHealth } from '@/components/pulse/dashboard/business-health';
+    18→import { AIInsight } from '@/components/pulse/dashboard/ai-insight';
+    19→import { TodayActions } from '@/components/pulse/dashboard/today-actions';
+    20→import { MetricsOverview } from '@/components/pulse/dashboard/metrics-overview';
+    21→
+    22→// Shared
+    23→import { NotificationCenter } from '@/components/pulse/shared/notification-center';
+    24→
+    25→// AI
+    26→import { AIAssistant } from '@/components/pulse/ai/ai-assistant';
+    27→
+    28→// Promotions
+    29→import { PromotionsList } from '@/components/pulse/promotions/promotions-list';
+    30→import { CreatePromotion } from '@/components/pulse/promotions/create-promotion';
+    31→import { AISimulator } from '@/components/pulse/promotions/ai-simulator';
+    32→import { PromotionResults } from '@/components/pulse/promotions/promotion-results';
+    33→
+    34→// Finance
+    35→import { FinanceDashboard } from '@/components/pulse/finance/finance-dashboard';
+    36→
+    37→// Clients
+    38→import ClientsList from '@/components/pulse/clients/clients-list';
+    39→import Segments from '@/components/pulse/clients/segments';
+    40→
+    41→// Loyalty
+    42→import LoyaltyProgram from '@/components/pulse/loyalty/loyalty-program';
+    43→
+    44→// Client-facing
+    45→import ClientHome from '@/components/pulse/client-facing/client-home';
+    46→import ClientMap from '@/components/pulse/client-facing/client-map';
+    47→import ClientCoupons from '@/components/pulse/client-facing/client-coupons';
+    48→
+    49→// Admin
+    50→import AdminDashboard from '@/components/pulse/admin/admin-dashboard';
+    51→
+    52→// Goals & History
+    53→import Goals from '@/components/pulse/goals/goals';
+    54→import BusinessHistory from '@/components/pulse/goals/business-history';
+    55→
+    56→// Other
+    57→import AICalendar from '@/components/pulse/calendar/ai-calendar';
+    58→import Competitors from '@/components/pulse/competitors/competitors';
+    59→import AIContent from '@/components/pulse/smm/ai-content';
+    60→import AudienceInsights from '@/components/pulse/audience/audience-insights';
+    61→
+    62→import { Badge } from '@/components/ui/badge';
+    63→import { Button } from '@/components/ui/button';
+    64→import { Separator } from '@/components/ui/separator';
+    65→import { ScrollArea } from '@/components/ui/scroll-area';
+    66→import {
+    67→  Sparkles,
+    68→  Settings,
+    69→  Moon,
+    70→  Sun,
+    71→  Store,
+    72→  Bell,
+    73→  Target,
+    74→  UserPlus,
+    75→  PenLine,
+    76→  MessageSquare,
+    77→  Clock,
+    78→} from 'lucide-react';
+    79→
+    80→// ============================================================
+    81→// Owner Dashboard Router
+    82→// ============================================================
+    83→function OwnerDashboard() {
+    84→  const ownerView = useAppStore((s) => s.ownerView);
+    85→
+    86→  const renderView = () => {
+    87→    switch (ownerView) {
+    88→      case 'dashboard':
+    89→        return <DashboardView />;
+    90→      case 'today':
+    91→        return <TodayView />;
+    92→      case 'ai':
+    93→        return <AIAssistant />;
+    94→      case 'sales':
+    95→        return <SalesView />;
+    96→      case 'clients':
+    97→        return <ClientsView />;
+    98→      case 'promotions':
+    99→        return <PromotionsView />;
+   100→      case 'finance':
+   101→        return <FinanceDashboard />;
+   102→      case 'analytics':
+   103→        return <AnalyticsView />;
+   104→      case 'loyalty':
+   105→        return <LoyaltyProgram />;
+   106→      case 'goals':
+   107→        return <GoalsView />;
+   108→      case 'settings':
+   109→        return <SettingsView />;
+   110→      default:
+   111→        return <DashboardView />;
+   112→    }
+   113→  };
+   114→
+   115→  return (
+   116→    <div className="flex-1 overflow-hidden">
+   117→      <ScrollArea className="h-full">
+   118→        <div className="p-4 md:p-6 lg:p-8">{renderView()}</div>
+   119→      </ScrollArea>
+   120→    </div>
+   121→  );
+   122→}
+   123→
+   124→// ============================================================
+   125→// Owner Views
+   126→// ============================================================
+   127→function DashboardView() {
+   128→  const [showNotifications, setShowNotifications] = useState(false);
+   129→  const [currentTime, setCurrentTime] = useState(new Date());
+   130→  const notifBellRef = useRef<HTMLButtonElement>(null);
+   131→  const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
+   132→  const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
+   133→  const setShowAIContent = useAppStore((s) => s.setShowAIContent);
+   134→  const setOwnerView = useAppStore((s) => s.setOwnerView);
+   135→
+   136→  // Live clock — update every minute
+   137→  useEffect(() => {
+   138→    const interval = setInterval(() => {
+   139→      setCurrentTime(new Date());
+   140→    }, 60_000);
+   141→    return () => clearInterval(interval);
+   142→  }, []);
+   143→
+   144→  // Greeting based on time of day
+   145→  const hour = currentTime.getHours();
+   146→  const greeting =
+   147→    hour >= 5 && hour < 12
+   148→      ? 'Доброе утро'
+   149→      : hour >= 12 && hour < 17
+   150→        ? 'Добрый день'
+   151→        : hour >= 17 && hour < 22
+   152→          ? 'Добрый вечер'
+   153→          : 'Доброй ночи';
+   154→
+   155→  const timeString = currentTime.toLocaleTimeString('ru-RU', {
+   156→    hour: '2-digit',
+   157→    minute: '2-digit',
+   158→  });
+   159→
+   160→  const quickActions = [
+   161→    {
+   162→      icon: Target,
+   163→      label: 'Создать акцию',
+   164→      emoji: '🎯',
+   165→      action: () => setShowCreatePromotion(true),
+   166→    },
+   167→    {
+   168→      icon: UserPlus,
+   169→      label: 'Вернуть клиентов',
+   170→      emoji: '👥',
+   171→      action: () => setShowReturnClients(true),
+   172→    },
+   173→    {
+   174→      icon: PenLine,
+   175→      label: 'Создать контент',
+   176→      emoji: '✍️',
+   177→      action: () => setShowAIContent(true),
+   178→    },
+   179→    {
+   180→      icon: MessageSquare,
+   181→      label: 'Спросить AI',
+   182→      emoji: '💬',
+   183→      action: () => setOwnerView('ai'),
+   184→    },
+   185→  ];
+   186→
+   187→  return (
+   188→    <div className="space-y-6">
+   189→      {/* ====== Animated Pulse Line ====== */}
+   190→      <div className="h-[2px] w-full rounded-full bg-gradient-to-r from-transparent via-purple-500 to-transparent pulse-line" />
+   191→
+   192→      {/* ====== Feature 4: Status Banner ====== */}
+   193→      <div>
+   194→        <div className="h-[3px] rounded-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-500 gradient-sweep" />
+   195→        <p className="text-[11px] text-muted-foreground/50 mt-1.5 tracking-wider uppercase">
+   196→          PULSE • Online • Demo Account
+   197→        </p>
+   198→      </div>
+   199→
+   200→      {/* ====== Feature 2: Greeting Banner with Live Clock ====== */}
+   201→      <div className="rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+   202→        <div>
+   203→          <h1 className="text-2xl font-bold">
+   204→            {greeting}, владелец{' '}
+   205→            <span className="pulse-text-gradient">Coffee & Co</span>
+   206→          </h1>
+   207→          <p className="text-sm text-muted-foreground mt-1">
+   208→            Здесь обзор вашего бизнеса за сегодня
+   209→          </p>
+   210→        </div>
+   211→        <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+   212→          <Clock className="w-4 h-4" />
+   213→          <span className="text-2xl font-mono font-semibold tabular-nums">
+   214→            {timeString}
+   215→          </span>
+   216→        </div>
+   217→      </div>
+   218→
+   219→      {/* ====== Notification Bell (floating) ====== */}
+   220→      <div className="relative flex justify-end">
+   221→        <button
+   222→          ref={notifBellRef}
+   223→          className="relative w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-purple-400 transition-colors"
+   224→          onClick={() => setShowNotifications((v) => !v)}
+   225→          aria-label="Уведомления"
+   226→        >
+   227→          <Bell className="w-5 h-5" />
+   228→          <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-purple-500 ring-2 ring-background" />
+   229→        </button>
+   230→        <NotificationCenter
+   231→          open={showNotifications}
+   232→          onClose={() => setShowNotifications(false)}
+   233→          triggerRef={notifBellRef}
+   234→        />
+   235→      </div>
+   236→
+   237→      {/* ====== PULSE Score + Metrics ====== */}
+   238→      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+   239→        <div className="lg:col-span-1">
+   240→          <PulseScore />
+   241→        </div>
+   242→        <div className="lg:col-span-2 space-y-6">
+   243→          <AIInsight />
+   244→          <MetricsOverview />
+   245→        </div>
+   246→      </div>
+   247→
+   248→      {/* ====== Feature 3: Quick Actions ====== */}
+   249→      <div>
+   250→        <h2 className="text-sm font-medium text-muted-foreground mb-3">
+   251→          Быстрые действия
+   252→        </h2>
+   253→        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+   254→          {quickActions.map((item) => (
+   255→            <button
+   256→              key={item.label}
+   257→              onClick={item.action}
+   258→              className={
+   259→                'glass-card rounded-xl p-4 flex flex-col items-center gap-2.5 text-center cursor-pointer ' +
+   260→                'quick-action-glow pulse-border pulse-border-hover'
+   261→              }
+   262→            >
+   263→              <span className="text-2xl leading-none">{item.emoji}</span>
+   264→              <span className="text-xs font-medium text-muted-foreground">
+   265→                {item.label}
+   266→              </span>
+   267→            </button>
+   268→          ))}
+   269→        </div>
+   270→      </div>
+   271→
+   272→      {/* ====== Business Health ====== */}
+   273→      <BusinessHealth />
+   274→
+   275→      {/* ====== What to do today ====== */}
+   276→      <TodayActions />
+   277→
+   278→      {/* ====== AI Footer ====== */}
+   279→      <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+   280→        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
+   281→          <Sparkles className="w-5 h-5 text-purple-400" />
+   282→        </div>
+   283→        <div className="flex-1 min-w-0">
+   284→          <p className="text-sm text-muted-foreground">
+   285→            Нужен совет? Задайте вопрос{' '}
+   286→            <span className="text-purple-400 font-medium">AI ассистенту</span>
+   287→          </p>
+   288→        </div>
+   289→        <Button
+   290→          variant="outline"
+   291→          size="sm"
+   292→          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 shrink-0"
+   293→          onClick={() => useAppStore.getState().setOwnerView('ai')}
+   294→        >
+   295→          Открыть AI
+   296→        </Button>
+   297→      </div>
+   298→    </div>
+   299→  );
+   300→}
+   301→
+   302→function TodayView() {
+   303→  return (
+   304→    <div className="space-y-6">
+   305→      <div>
+   306→        <h1 className="text-2xl font-bold">Что делать сегодня</h1>
+   307→        <p className="text-muted-foreground mt-1">
+   308→          AI выбрал приоритетные действия для вашего бизнеса
+   309→        </p>
+   310→      </div>
+   311→      <TodayActions showHeader={false} />
+   312→    </div>
+   313→  );
+   314→}
+   315→
+   316→function SalesView() {
+   317→  return (
+   318→    <div className="space-y-6">
+   319→      <div>
+   320→        <h1 className="text-2xl font-bold">Продажи</h1>
+   321→        <p className="text-muted-foreground mt-1">
+   322→          Анализ продаж и выручки
+   323→        </p>
+   324→      </div>
+   325→      <MetricsOverview />
+   326→      <BusinessHealth />
+   327→    </div>
+   328→  );
+   329→}
+   330→
+   331→function ClientsView() {
+   332→  return (
+   333→    <div className="space-y-6">
+   334→      <ClientsList />
+   335→      <Segments />
+   336→    </div>
+   337→  );
+   338→}
+   339→
+   340→function PromotionsView() {
+   341→  return (
+   342→    <div className="space-y-6">
+   343→      <PromotionsList />
+   344→      <AISimulator />
+   345→    </div>
+   346→  );
+   347→}
+   348→
+   349→function AnalyticsView() {
+   350→  return (
+   351→    <div className="space-y-6">
+   352→      <div>
+   353→        <h1 className="text-2xl font-bold">Аналитика</h1>
+   354→        <p className="text-muted-foreground mt-1">
+   355→          Подробная аналитика вашего бизнеса
+   356→        </p>
+   357→      </div>
+   358→      <BusinessHistory />
+   359→      <AudienceInsights />
+   360→      <AICalendar />
+   361→      <Competitors />
+   362→    </div>
+   363→  );
+   364→}
+   365→
+   366→function GoalsView() {
+   367→  return (
+   368→    <div className="space-y-6">
+   369→      <Goals />
+   370→      <BusinessHistory />
+   371→    </div>
+   372→  );
+   373→}
+   374→
+   375→function SettingsView() {
+   376→  const theme = useAppStore((s) => s.theme);
+   377→  const setTheme = useAppStore((s) => s.setTheme);
+   378→
+   379→  return (
+   380→    <div className="space-y-6 max-w-2xl">
+   381→      <div>
+   382→        <h1 className="text-2xl font-bold">Настройки</h1>
+   383→        <p className="text-muted-foreground mt-1">
+   384→          Управление вашим профилем и бизнесом
+   385→        </p>
+   386→      </div>
+   387→
+   388→      {/* Business Info */}
+   389→      <div className="glass-card rounded-xl p-6 space-y-4">
+   390→        <h2 className="text-lg font-semibold flex items-center gap-2">
+   391→          <Store className="w-5 h-5 text-purple-400" />
+   392→          Бизнес
+   393→        </h2>
+   394→        <Separator />
+   395→        <div className="space-y-3">
+   396→          <div className="flex justify-between">
+   397→            <span className="text-muted-foreground">Название</span>
+   398→            <span className="font-medium">Coffee & Co</span>
+   399→          </div>
+   400→          <div className="flex justify-between">
+   401→            <span className="text-muted-foreground">Категория</span>
+   402→            <span className="font-medium">Кофейня</span>
+   403→          </div>
+   404→          <div className="flex justify-between">
+   405→            <span className="text-muted-foreground">Город</span>
+   406→            <span className="font-medium">Алматы</span>
+   407→          </div>
+   408→          <div className="flex justify-between">
+   409→            <span className="text-muted-foreground">Размер</span>
+   410→            <span className="font-medium">Малый (1-5 сотрудников)</span>
+   411→          </div>
+   412→        </div>
+   413→      </div>
+   414→
+   415→      {/* Theme */}
+   416→      <div className="glass-card rounded-xl p-6 space-y-4">
+   417→        <h2 className="text-lg font-semibold flex items-center gap-2">
+   418→          <Settings className="w-5 h-5 text-purple-400" />
+   419→          Внешний вид
+   420→        </h2>
+   421→        <Separator />
+   422→        <div className="flex items-center justify-between">
+   423→          <span>Тема оформления</span>
+   424→          <Button
+   425→            variant="outline"
+   426→            size="sm"
+   427→            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+   428→            className="gap-2"
+   429→          >
+   430→            {theme === 'dark' ? (
+   431→              <>
+   432→                <Sun className="w-4 h-4" /> Светлая тема
+   433→              </>
+   434→            ) : (
+   435→              <>
+   436→                <Moon className="w-4 h-4" /> Тёмная тема
+   437→              </>
+   438→            )}
+   439→          </Button>
+   440→        </div>
+   441→      </div>
+   442→
+   443→      {/* Account */}
+   444→      <div className="glass-card rounded-xl p-6 space-y-4">
+   445→        <h2 className="text-lg font-semibold">Аккаунт</h2>
+   446→        <Separator />
+   447→        <div className="space-y-3">
+   448→          <div className="flex justify-between">
+   449→            <span className="text-muted-foreground">Тип аккаунта</span>
+   450→            <Badge variant="secondary" className="bg-amber-500/10 text-amber-400 border-amber-500/20">
+   451→              Демо
+   452→            </Badge>
+   453→          </div>
+   454→          <div className="flex justify-between">
+   455→            <span className="text-muted-foreground">Версия</span>
+   456→            <span className="font-medium">PULSE MVP v1.0</span>
+   457→          </div>
+   458→        </div>
+   459→      </div>
+   460→
+   461→      {/* Danger Zone */}
+   462→      <div className="glass-card rounded-xl p-6 space-y-4 border-red-500/20">
+   463→        <h2 className="text-lg font-semibold text-red-400">Опасная зона</h2>
+   464→        <Separator />
+   465→        <div className="flex items-center justify-between">
+   466→          <div>
+   467→            <p className="font-medium">Сбросить данные</p>
+   468→            <p className="text-sm text-muted-foreground">
+   469→              Удалить все демо-данные и начать заново
+   470→            </p>
+   471→          </div>
+   472→          <Button
+   473→            variant="destructive"
+   474→            size="sm"
+   475→            onClick={() => {
+   476→              useAppStore.getState().setAppMode('onboarding');
+   477→            }}
+   478→          >
+   479→            Сбросить
+   480→          </Button>
+   481→        </div>
+   482→      </div>
+   483→    </div>
+   484→  );
+   485→}
+   486→
+   487→// ============================================================
+   488→// Client Dashboard Router
+   489→// ============================================================
+   490→function ClientDashboard() {
+   491→  const clientView = useAppStore((s) => s.clientView);
+   492→
+   493→  const renderView = () => {
+   494→    switch (clientView) {
+   495→      case 'home':
+   496→        return <ClientHome />;
+   497→      case 'map':
+   498→        return <ClientMap />;
+   499→      case 'promotions':
+   500→        return <ClientCoupons />;
+   501→      case 'bonuses':
+   502→        return <ClientBonuses />;
+   503→      case 'favorites':
+   504→        return <ClientFavorites />;
+   505→      case 'profile':
+   506→        return <ClientProfile />;
+   507→      default:
+   508→        return <ClientHome />;
+   509→    }
+   510→  };
+   511→
+   512→  return (
+   513→    <div className="flex-1 overflow-hidden pb-20 md:pb-0">
+   514→      <ScrollArea className="h-full">
+   515→        <div className="p-4 md:p-6 lg:p-8">{renderView()}</div>
+   516→      </ScrollArea>
+   517→      <ClientNav />
+   518→    </div>
+   519→  );
+   520→}
+   521→
+   522→function ClientBonuses() {
+   523→  return (
+   524→    <div className="space-y-6">
+   525→      <div>
+   526→        <h1 className="text-2xl font-bold">Мои бонусы</h1>
+   527→        <p className="text-muted-foreground mt-1">
+   528→          Накопленные баллы и уровень лояльности
+   529→        </p>
+   530→      </div>
+   531→      <div className="glass-card rounded-xl p-6 text-center space-y-4">
+   532→        <p className="text-sm text-muted-foreground uppercase tracking-wider">
+   533→          Ваш баланс
+   534→        </p>
+   535→        <p className="text-5xl font-bold pulse-text-gradient">2 480</p>
+   536→        <p className="text-muted-foreground">баллов</p>
+   537→        <Separator />
+   538→        <div className="flex justify-around">
+   539→          <div className="text-center">
+   540→            <p className="text-2xl font-bold text-purple-400">Серебро</p>
+   541→            <p className="text-xs text-muted-foreground">Уровень</p>
+   542→          </div>
+   543→          <div className="text-center">
+   544→            <p className="text-2xl font-bold">2 500</p>
+   545→            <p className="text-xs text-muted-foreground">до Золота</p>
+   546→          </div>
+   547→        </div>
+   548→      </div>
+   549→      <div className="glass-card rounded-xl p-6 space-y-4">
+   550→        <h3 className="font-semibold">Преимущества уровня Серебро</h3>
+   551→        <ul className="space-y-2 text-sm text-muted-foreground">
+   552→          <li className="flex items-center gap-2">
+   553→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   554→            Накопление 1.5₸ = 1 балл
+   555→          </li>
+   556→          <li className="flex items-center gap-2">
+   557→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   558→            Сюрприз на день рождения
+   559→          </li>
+   560→          <li className="flex items-center gap-2">
+   561→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   562→            Персональные предложения
+   563→          </li>
+   564→        </ul>
+   565→      </div>
+   566→      <div className="glass-card rounded-xl p-6 space-y-3">
+   567→        <h3 className="font-semibold">Реферальная программа</h3>
+   568→        <p className="text-sm text-muted-foreground">
+   569→          Пригласите друга и получите бонус после его первой покупки
+   570→        </p>
+   571→        <div className="bg-secondary rounded-lg p-4 text-center">
+   572→          <p className="text-xs text-muted-foreground mb-2">Ваш промокод</p>
+   573→          <p className="text-2xl font-mono font-bold text-purple-400 tracking-widest">
+   574→            PULSE-USER-4821
+   575→          </p>
+   576→        </div>
+   577→        <Button variant="outline" className="w-full">
+   578→          Скопировать код
+   579→        </Button>
+   580→      </div>
+   581→    </div>
+   582→  );
+   583→}
+   584→
+   585→function ClientFavorites() {
+   586→  return (
+   587→    <div className="space-y-6">
+   588→      <div>
+   589→        <h1 className="text-2xl font-bold">Избранное</h1>
+   590→        <p className="text-muted-foreground mt-1">
+   591→          Сохранённые заведения и акции
+   592→        </p>
+   593→      </div>
+   594→      <div className="glass-card rounded-xl p-12 text-center">
+   595→        <p className="text-muted-foreground">Пока нет избранных</p>
+   596→        <p className="text-sm text-muted-foreground mt-1">
+   597→          Нажмите ♡ на карточке заведения, чтобы сохранить
+   598→        </p>
+   599→      </div>
+   600→    </div>
+   601→  );
+   602→}
+   603→
+   604→function ClientProfile() {
+   605→  return (
+   606→    <div className="space-y-6 max-w-lg mx-auto">
+   607→      <div className="text-center space-y-4">
+   608→        <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto">
+   609→          <span className="text-3xl font-bold text-purple-400">А</span>
+   610→        </div>
+   611→        <div>
+   612→          <h2 className="text-xl font-bold">Айдана</h2>
+   613→          <p className="text-muted-foreground">+7 771 123 4567</p>
+   614→        </div>
+   615→      </div>
+   616→      <div className="glass-card rounded-xl p-6 space-y-4">
+   617→        <div className="flex justify-between">
+   618→          <span className="text-muted-foreground">Баллы</span>
+   619→          <span className="font-bold text-purple-400">2 480</span>
+   620→        </div>
+   621→        <Separator />
+   622→        <div className="flex justify-between">
+   623→          <span className="text-muted-foreground">Уровень</span>
+   624→          <span className="font-medium">Серебро</span>
+   625→        </div>
+   626→        <Separator />
+   627→        <div className="flex justify-between">
+   628→          <span className="text-muted-foreground">Покупки</span>
+   629→          <span className="font-medium">34</span>
+   630→        </div>
+   631→        <Separator />
+   632→        <div className="flex justify-between">
+   633→          <span className="text-muted-foreground">Купоны</span>
+   634→          <span className="font-medium">2</span>
+   635→        </div>
+   636→      </div>
+   637→      <Button
+   638→        variant="outline"
+   639→        className="w-full"
+   640→        onClick={() => useAppStore.getState().setAppMode('owner')}
+   641→      >
+   642→        Перейти в режим бизнеса
+   643→      </Button>
+   644→    </div>
+   645→  );
+   646→}
+   647→
+   648→// ============================================================
+   649→// Main Page Component
+   650→// ============================================================
+   651→export default function HomePage() {
+   652→  const appMode = useAppStore((s) => s.appMode);
+   653→  const showCreatePromotion = useAppStore((s) => s.showCreatePromotion);
+   654→  const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
+   655→  const promotionFromInsight = useAppStore((s) => s.promotionFromInsight);
+   656→  const showReturnClients = useAppStore((s) => s.showReturnClients);
+   657→  const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
+   658→  const showAIContent = useAppStore((s) => s.showAIContent);
+   659→  const setShowAIContent = useAppStore((s) => s.setShowAIContent);
+   660→  const theme = useAppStore((s) => s.theme);
+   661→
+   662→  return (
+   663→    <div className={theme === 'dark' ? 'dark' : ''}>
+   664→      <div className="min-h-screen flex bg-background">
+   665→        {/* Onboarding */}
+   666→        {appMode === 'onboarding' && (
+   667→          <div className="flex-1 flex items-center justify-center p-4">
+   668→            <OnboardingFlow />
+   669→          </div>
+   670→        )}
+   671→
+   672→        {/* Owner Mode */}
+   673→        {appMode === 'owner' && (
+   674→          <>
+   675→            <Sidebar />
+   676→            <MobileHeader />
+   677→            <OwnerDashboard />
+   678→          </>
+   679→        )}
+   680→
+   681→        {/* Client Mode */}
+   682→        {appMode === 'client' && (
+   683→          <>
+   684→            <div className="hidden md:flex md:w-64 md:flex-col md:border-r border-border bg-card pb-20">
+   685→              <div className="p-6">
+   686→                <h1 className="text-xl font-bold pulse-text-gradient">PULSE</h1>
+   687→                <p className="text-xs text-muted-foreground mt-1">Клиентская часть</p>
+   688→              </div>
+   689→              <div className="flex-1" />
+   690→              <div className="px-4 pb-4">
+   691→                <Button
+   692→                  variant="outline"
+   693→                  size="sm"
+   694→                  className="w-full"
+   695→                  onClick={() => useAppStore.getState().setAppMode('owner')}
+   696→                >
+   697→                  Режим бизнеса
+   698→                </Button>
+   699→              </div>
+   700→            </div>
+   701→            <div className="md:hidden">
+   702→              <MobileHeader />
+   703→            </div>
+   704→            <ClientDashboard />
+   705→          </>
+   706→        )}
+   707→
+   708→        {/* Admin Mode */}
+   709→        {appMode === 'admin' && (
+   710→          <>
+   711→            <AdminNav />
+   712→            <div className="hidden md:block">
+   713→              <MobileHeader />
+   714→            </div>
+   715→            <div className="flex-1 overflow-hidden">
+   716→              <ScrollArea className="h-full">
+   717→                <div className="p-4 md:p-6 lg:p-8">
+   718→                  <AdminDashboard />
+   719→                </div>
+   720→              </ScrollArea>
+   721→            </div>
+   722→          </>
+   723→        )}
+   724→
+   725→        {/* Dialogs */}
+   726→        {showCreatePromotion && (
+   727→          <CreatePromotion
+   728→            prefillDiscount={promotionFromInsight === 'happy-hour' ? 15 : undefined}
+   729→            prefillProduct={
+   730→              promotionFromInsight === 'happy-hour'
+   731→                ? 'Все кофейные напитки'
+   732→                : undefined
+   733→            }
+   734→            prefillName={
+   735→              promotionFromInsight === 'happy-hour' ? 'Happy Hour' : undefined
+   736→            }
+   737→          />
+   738→        )}
+   739→
+   740→        {showReturnClients && (
+   741→          <ReturnClientsDialog onClose={() => setShowReturnClients(false)} />
+   742→        )}
+   743→
+   744→        {showAIContent && (
+   745→          <AIContentDialog onClose={() => setShowAIContent(false)} />
+   746→        )}
+   747→      </div>
+   748→    </div>
+   749→  );
+   750→}
+   751→
+   752→// ============================================================
+   753→// Dialog Components
+   754→// ============================================================
+   755→function ReturnClientsDialog({ onClose }: { onClose: () => void }) {
+   756→  const addPromotion = useAppStore((s) => s.addPromotion);
+   757→
+   758→  const handleCreate = () => {
+   759→    addPromotion({
+   760→      id: `p-${Date.now()}`,
+   761→      name: 'Возвращение клиентов',
+   762→      discount: 15,
+   763→      product: 'Любой напиток',
+   764→      startTime: new Date().toISOString(),
+   765→      endTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+   766→      audience: 'Потерянные клиенты',
+   767→      status: 'active',
+   768→    });
+   769→    onClose();
+   770→  };
+   771→
+   772→  return (
+   773→    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+   774→      <div className="glass-card rounded-2xl p-6 w-full max-w-md space-y-4">
+   775→        <div>
+   776→          <h2 className="text-xl font-bold">Вернуть клиентов</h2>
+   777→          <p className="text-sm text-muted-foreground mt-1">
+   778→            AI создал персональное предложение для 18 потерянных клиентов
+   779→          </p>
+   780→        </div>
+   781→        <Separator />
+   782→        <div className="space-y-3 text-sm">
+   783→          <div className="flex items-center gap-2">
+   784→            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+   785→            <span className="text-muted-foreground">Бонус:</span>
+   786→            <span className="font-medium">500 ₸ на следующий визит</span>
+   787→          </div>
+   788→          <div className="flex items-center gap-2">
+   789→            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+   790→            <span className="text-muted-foreground">Аудитория:</span>
+   791→            <span className="font-medium">18 потерянных клиентов</span>
+   792→          </div>
+   793→          <div className="flex items-center gap-2">
+   794→            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+   795→            <span className="text-muted-foreground">Прогноз:</span>
+   796→            <span className="font-medium">Возврат 40–60% клиентов</span>
+   797→          </div>
+   798→        </div>
+   799→        <div className="bg-purple-500/10 rounded-lg p-3">
+   800→          <p className="text-xs text-purple-300">
+   801→            ⚠ AI прогноз на основе демо-данных
+   802→          </p>
+   803→        </div>
+   804→        <div className="flex gap-3">
+   805→          <Button variant="outline" className="flex-1" onClick={onClose}>
+   806→            Отмена
+   807→          </Button>
+   808→          <Button className="flex-1" onClick={handleCreate}>
+   809→            Создать акцию
+   810→          </Button>
+   811→        </div>
+   812→      </div>
+   813→    </div>
+   814→  );
+   815→}
+   816→
+   817→function AIContentDialog({ onClose }: { onClose: () => void }) {
+   818→  return (
+   819→    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+   820→      <div className="glass-card rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+   821→        <div className="p-6">
+   822→          <AIContent />
+   823→        </div>
+   824→        <div className="p-4 border-t border-border">
+   825→          <Button variant="outline" className="w-full" onClick={onClose}>
+   826→            Закрыть
+   827→          </Button>
+   828→        </div>
+   829→      </div>
+   830→    </div>
+   831→  );
+   832→}
+   833→

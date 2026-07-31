@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
 
 // Layout
@@ -21,6 +22,8 @@ import { MetricsOverview } from '@/components/pulse/dashboard/metrics-overview';
 
 // Shared
 import { NotificationCenter } from '@/components/pulse/shared/notification-center';
+import { GlobalSearch } from '@/components/pulse/shared/global-search';
+import { WelcomeTour } from '@/components/pulse/shared/welcome-tour';
 
 // AI
 import { AIAssistant } from '@/components/pulse/ai/ai-assistant';
@@ -73,18 +76,43 @@ import {
   Target,
   UserPlus,
   PenLine,
+  Pencil,
   MessageSquare,
   Clock,
+  Mail,
+  Shield,
+  Lock,
+  MapPin,
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 
 // ============================================================
 // Owner Dashboard Router
 // ============================================================
 function OwnerDashboard() {
   const ownerView = useAppStore((s) => s.ownerView);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentView, setCurrentView] = useState(ownerView);
 
-  const renderView = () => {
-    switch (ownerView) {
+  useEffect(() => {
+    if (ownerView !== currentView) {
+      const startTimer = requestAnimationFrame(() => {
+        setIsLoading(true);
+      });
+      const timer = setTimeout(() => {
+        setCurrentView(ownerView);
+        setIsLoading(false);
+      }, 200);
+      return () => {
+        cancelAnimationFrame(startTimer);
+        clearTimeout(timer);
+      };
+    }
+  }, [ownerView]);
+
+  const renderView = useCallback(() => {
+    switch (currentView) {
       case 'dashboard':
         return <DashboardView />;
       case 'today':
@@ -110,12 +138,46 @@ function OwnerDashboard() {
       default:
         return <DashboardView />;
     }
-  };
+  }, [currentView]);
 
   return (
     <div className="flex-1 overflow-hidden">
       <ScrollArea className="h-full">
-        <div className="p-4 md:p-6 lg:p-8">{renderView()}</div>
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="p-4 md:p-6 lg:p-8 space-y-6"
+            >
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-24 rounded-xl" />
+                ))}
+              </div>
+              <Skeleton className="h-48 rounded-xl" />
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-16 rounded-xl" />
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={currentView}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="p-4 md:p-6 lg:p-8"
+            >
+              {renderView()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </ScrollArea>
     </div>
   );
@@ -125,9 +187,10 @@ function OwnerDashboard() {
 // Owner Views
 // ============================================================
 function DashboardView() {
-  const [showNotifications, setShowNotifications] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const notifBellRef = useRef<HTMLButtonElement>(null);
+  const showNotifications = useAppStore((s) => s.showNotifications);
+  const setShowNotifications = useAppStore((s) => s.setShowNotifications);
   const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
   const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
   const setShowAIContent = useAppStore((s) => s.setShowAIContent);
@@ -186,6 +249,9 @@ function DashboardView() {
 
   return (
     <div className="space-y-6">
+      {/* Welcome Tour */}
+      <WelcomeTour />
+
       {/* ====== Animated Pulse Line ====== */}
       <div className="h-[2px] w-full rounded-full bg-gradient-to-r from-transparent via-purple-500 to-transparent pulse-line" />
 
@@ -216,12 +282,12 @@ function DashboardView() {
         </div>
       </div>
 
-      {/* ====== Notification Bell (floating) ====== */}
-      <div className="relative flex justify-end">
+      {/* ====== Notification Bell (desktop only) ====== */}
+      <div className="relative hidden md:flex justify-end">
         <button
           ref={notifBellRef}
           className="relative w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-purple-400 transition-colors"
-          onClick={() => setShowNotifications((v) => !v)}
+          onClick={() => setShowNotifications(!showNotifications)}
           aria-label="Уведомления"
         >
           <Bell className="w-5 h-5" />
@@ -375,6 +441,9 @@ function GoalsView() {
 function SettingsView() {
   const theme = useAppStore((s) => s.theme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifPush, setNotifPush] = useState(true);
+  const [notifWeekly, setNotifWeekly] = useState(false);
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -385,6 +454,26 @@ function SettingsView() {
         </p>
       </div>
 
+      {/* Profile Section */}
+      <div className="glass-card rounded-xl p-6 space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/30 to-violet-500/20 flex items-center justify-center border-2 border-purple-500/30">
+            <span className="text-2xl font-bold pulse-text-gradient">CC</span>
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">Coffee & Co</h2>
+            <p className="text-sm text-muted-foreground">owner@coffee-co.kz</p>
+            <Badge variant="secondary" className="mt-1 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
+              Демо аккаунт
+            </Badge>
+          </div>
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Pencil className="w-3.5 h-3.5" />
+            Редактировать
+          </Button>
+        </div>
+      </div>
+
       {/* Business Info */}
       <div className="glass-card rounded-xl p-6 space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -393,20 +482,32 @@ function SettingsView() {
         </h2>
         <Separator />
         <div className="space-y-3">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Название</span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground flex items-center gap-2">
+              <Store className="w-4 h-4 text-muted-foreground/50" />
+              Название
+            </span>
             <span className="font-medium">Coffee & Co</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Категория</span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-muted-foreground/50" />
+              Категория
+            </span>
             <span className="font-medium">Кофейня</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Город</span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-muted-foreground/50" />
+              Город
+            </span>
             <span className="font-medium">Алматы</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Размер</span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground flex items-center gap-2">
+              <UserPlus className="w-4 h-4 text-muted-foreground/50" />
+              Размер
+            </span>
             <span className="font-medium">Малый (1-5 сотрудников)</span>
           </div>
         </div>
@@ -440,17 +541,90 @@ function SettingsView() {
         </div>
       </div>
 
+      {/* Notifications */}
+      <div className="glass-card rounded-xl p-6 space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Bell className="w-5 h-5 text-purple-400" />
+          Уведомления
+        </h2>
+        <Separator />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium flex items-center gap-2">
+                <Mail className="w-4 h-4 text-muted-foreground/50" />
+                Email уведомления
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Получайте важные обновления на почту</p>
+            </div>
+            <Switch checked={notifEmail} onCheckedChange={setNotifEmail} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium flex items-center gap-2">
+                <Bell className="w-4 h-4 text-muted-foreground/50" />
+                Push-уведомления
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Мгновенные уведомления в браузере</p>
+            </div>
+            <Switch checked={notifPush} onCheckedChange={setNotifPush} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium flex items-center gap-2">
+                <Clock className="w-4 h-4 text-muted-foreground/50" />
+                Еженедельный отчёт
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Сводка за неделю каждую пятницу</p>
+            </div>
+            <Switch checked={notifWeekly} onCheckedChange={setNotifWeekly} />
+          </div>
+        </div>
+      </div>
+
+      {/* Security */}
+      <div className="glass-card rounded-xl p-6 space-y-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Shield className="w-5 h-5 text-purple-400" />
+          Безопасность
+        </h2>
+        <Separator />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium flex items-center gap-2">
+                <Lock className="w-4 h-4 text-muted-foreground/50" />
+                Смена пароля
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Последняя смена: 30 дней назад</p>
+            </div>
+            <Button variant="outline" size="sm">
+              Изменить
+            </Button>
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium flex items-center gap-2">
+                <Shield className="w-4 h-4 text-muted-foreground/50" />
+                Двухфакторная аутентификация
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Дополнительная защита аккаунта</p>
+            </div>
+            <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
+              Выкл
+            </Badge>
+          </div>
+        </div>
+      </div>
+
       {/* Account */}
       <div className="glass-card rounded-xl p-6 space-y-4">
         <h2 className="text-lg font-semibold">Аккаунт</h2>
         <Separator />
         <div className="space-y-3">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Тип аккаунта</span>
-            <Badge variant="secondary" className="bg-amber-500/10 text-amber-400 border-amber-500/20">
-              Демо
-            </Badge>
-          </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Версия</span>
             <span className="font-medium">PULSE MVP v1.0</span>
@@ -459,7 +633,7 @@ function SettingsView() {
       </div>
 
       {/* Danger Zone */}
-      <div className="glass-card rounded-xl p-6 space-y-4 border-red-500/20">
+      <div className="glass-card rounded-xl p-6 space-y-4 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.08)]">
         <h2 className="text-lg font-semibold text-red-400">Опасная зона</h2>
         <Separator />
         <div className="flex items-center justify-between">
@@ -512,7 +686,18 @@ function ClientDashboard() {
   return (
     <div className="flex-1 overflow-hidden pb-20 md:pb-0">
       <ScrollArea className="h-full">
-        <div className="p-4 md:p-6 lg:p-8">{renderView()}</div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={clientView}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="p-4 md:p-6 lg:p-8"
+          >
+            {renderView()}
+          </motion.div>
+        </AnimatePresence>
       </ScrollArea>
       <ClientNav />
     </div>
@@ -662,6 +847,9 @@ export default function HomePage() {
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
       <div className="min-h-screen flex bg-background">
+        {/* Global Search (always rendered) */}
+        <GlobalSearch />
+
         {/* Onboarding */}
         {appMode === 'onboarding' && (
           <div className="flex-1 flex items-center justify-center p-4">
@@ -714,9 +902,18 @@ export default function HomePage() {
             </div>
             <div className="flex-1 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="p-4 md:p-6 lg:p-8">
-                  <AdminDashboard />
-                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key="admin"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    className="p-4 md:p-6 lg:p-8"
+                  >
+                    <AdminDashboard />
+                  </motion.div>
+                </AnimatePresence>
               </ScrollArea>
             </div>
           </>

@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Wrench, FileText, Users, Pen,
   Plus, Pencil, Trash2, Search, Activity, Building2, Sparkles, MessageSquare,
   Brain, Lightbulb, UserPlus, Heart, TrendingUp, Eye, Calendar, PenTool, Check,
+  ArrowUpRight, ArrowDownRight, Minus, Instagram, Mail, Megaphone, Bell, Zap,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,8 @@ import {
 import {
   mockAdminTools, mockAdminTemplates,
 } from '@/data/mock-data';
+import { useAppStore } from '@/stores/app-store';
+import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Brain, Sparkles, Users: UserPlus, Heart, Pen: PenTool, TrendingUp, Eye, Calendar,
@@ -38,13 +41,33 @@ const adminTabs: { key: AdminTab; label: string; icon: React.ComponentType<{ cla
   { key: 'content', label: 'Контент', icon: Pen },
 ];
 
+const statColors = [
+  'from-purple-500 to-violet-500',
+  'from-green-500 to-emerald-500',
+  'from-cyan-500 to-blue-500',
+  'from-pink-500 to-rose-500',
+];
+
+const toolColors: Record<string, string> = {
+  'Brain': 'bg-purple-500/15 text-purple-400',
+  'Sparkles': 'bg-amber-500/15 text-amber-400',
+  'Users': 'bg-green-500/15 text-green-400',
+  'Heart': 'bg-pink-500/15 text-pink-400',
+  'Pen': 'bg-cyan-500/15 text-cyan-400',
+  'TrendingUp': 'bg-emerald-500/15 text-emerald-400',
+  'Eye': 'bg-blue-500/15 text-blue-400',
+  'Calendar': 'bg-orange-500/15 text-orange-400',
+  'Lightbulb': 'bg-yellow-500/15 text-yellow-400',
+  'MessageSquare': 'bg-teal-500/15 text-teal-400',
+};
+
 // ---- Dashboard Tab ----
 function DashboardTab() {
   const stats = [
-    { label: 'Всего пользователей', value: '2 847', icon: Users, color: 'text-purple-400' },
-    { label: 'Активных бизнесов', value: '342', icon: Building2, color: 'text-green-400' },
-    { label: 'Акций создано', value: '1 204', icon: Sparkles, color: 'text-blue-400' },
-    { label: 'AI-запросов', value: '18 942', icon: Brain, color: 'text-pink-400' },
+    { label: 'Всего пользователей', value: '2 847', icon: Users, trend: '+12%', trendDir: 'up' as const },
+    { label: 'Активных бизнесов', value: '342', icon: Building2, trend: '+8%', trendDir: 'up' as const },
+    { label: 'Акций создано', value: '1 204', icon: Sparkles, trend: '-3%', trendDir: 'down' as const },
+    { label: 'AI-запросов', value: '18 942', icon: Brain, trend: '+24%', trendDir: 'up' as const },
   ];
 
   const recentActivity = [
@@ -66,15 +89,30 @@ function DashboardTab() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="py-4 px-4">
+            <Card className="py-4 px-4 overflow-hidden relative">
+              {/* Gradient left border accent */}
+              <div className={cn('absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-gradient-to-b', statColors[i])} />
               <CardContent className="p-0">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg bg-muted ${s.color}`}>
+                <div className="flex items-center gap-3 pl-2">
+                  <div className="p-2 rounded-lg bg-muted">
                     <s.icon className="w-4 h-4" />
                   </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{s.label}</p>
-                    <p className="text-xl font-bold">{s.value}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground truncate">{s.label}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xl font-bold">{s.value}</p>
+                    </div>
+                  </div>
+                  <div className={cn(
+                    'flex items-center gap-0.5 text-xs font-medium shrink-0',
+                    s.trendDir === 'up' ? 'text-green-400' : 'text-red-400'
+                  )}>
+                    {s.trendDir === 'up' ? (
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    ) : (
+                      <ArrowDownRight className="w-3.5 h-3.5" />
+                    )}
+                    {s.trend}
                   </div>
                 </div>
               </CardContent>
@@ -171,7 +209,7 @@ function ToolsTab() {
         <h2 className="text-lg font-semibold">Инструменты</h2>
         <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={addTool}>
           <Plus className="w-4 h-4 mr-1" />
-          Добавить инструмент
+          Добавить
         </Button>
       </div>
 
@@ -179,6 +217,7 @@ function ToolsTab() {
         {tools.map((tool, i) => {
           const IconComponent = iconMap[tool.icon] || Lightbulb;
           const isEditing = editingId === tool.id;
+          const colorClass = toolColors[tool.icon] || toolColors['Lightbulb'];
 
           return (
             <motion.div
@@ -187,12 +226,13 @@ function ToolsTab() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
             >
-              <Card className={`p-0 ${!tool.enabled ? 'opacity-60' : ''}`}>
+              <Card className={cn('p-0 transition-opacity', !tool.enabled && 'opacity-60')}>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-purple-500/10">
-                        <IconComponent className="w-5 h-5 text-purple-400" />
+                      {/* Circular colored icon container */}
+                      <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', colorClass)}>
+                        <IconComponent className="w-5 h-5" />
                       </div>
                       {isEditing ? (
                         <div className="space-y-1 flex-1">
@@ -229,9 +269,12 @@ function ToolsTab() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="text-[10px]">
-                      {tool.enabled ? 'Включён' : 'Выключен'}
-                    </Badge>
+                    <span className={cn(
+                      'text-xs font-medium',
+                      tool.enabled ? 'text-green-400' : 'text-red-400/70'
+                    )}>
+                      {tool.enabled ? '● Включён' : '○ Выключен'}
+                    </span>
                     <Switch checked={tool.enabled} onCheckedChange={() => toggleTool(tool.id)} />
                   </div>
                 </CardContent>
@@ -252,6 +295,14 @@ interface Template {
   discount: number;
   category: string;
 }
+
+const templateGradients = [
+  'from-purple-500/10 to-violet-500/5',
+  'from-green-500/10 to-emerald-500/5',
+  'from-cyan-500/10 to-blue-500/5',
+  'from-pink-500/10 to-rose-500/5',
+  'from-amber-500/10 to-orange-500/5',
+];
 
 function TemplatesTab() {
   const [templates, setTemplates] = useState<Template[]>(mockAdminTemplates);
@@ -294,8 +345,8 @@ function TemplatesTab() {
         </Button>
       </div>
 
-      <ScrollArea className="max-h-[500px]">
-        <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ScrollArea className="max-h-[500px] md:contents">
           {templates.map((tpl, i) => (
             <motion.div
               key={tpl.id}
@@ -303,33 +354,35 @@ function TemplatesTab() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
             >
-              <Card className="p-0">
+              <Card className={cn('p-0 overflow-hidden hover:border-purple-500/30 transition-colors')}>
+                {/* Top gradient strip */}
+                <div className={cn('h-1.5 bg-gradient-to-r', templateGradients[i % templateGradients.length])} />
                 <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-sm">{tpl.name}</h3>
-                        <Badge variant="outline" className="text-xs">
-                          {tpl.category}
-                        </Badge>
-                        {tpl.discount > 0 && (
-                          <Badge className="text-xs bg-green-500/20 text-green-400 border-green-500/30">
-                            −{tpl.discount}%
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <h3 className="font-semibold text-sm">{tpl.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {tpl.description}
                       </p>
                     </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
+                    {tpl.discount > 0 && (
+                      <div className="shrink-0 w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex flex-col items-center justify-center">
+                        <span className="text-lg font-bold text-green-400">-{tpl.discount}%</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="text-xs">
+                      {tpl.category}
+                    </Badge>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground h-7 w-7 p-0">
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-muted-foreground hover:text-red-400"
+                        className="text-muted-foreground hover:text-red-400 h-7 w-7 p-0"
                         onClick={() => deleteTemplate(tpl.id)}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -340,8 +393,8 @@ function TemplatesTab() {
               </Card>
             </motion.div>
           ))}
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      </div>
 
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
         <DialogContent className="bg-card border-border">
@@ -390,6 +443,19 @@ const mockUsers = [
   { id: 'u6', name: 'Сауле М.', email: 'saul@citymart.kz', business: 'CityMart', plan: 'Про', status: 'inactive', joined: '2024-04-02' },
 ];
 
+const avatarColors = [
+  'bg-purple-500/20 text-purple-400',
+  'bg-green-500/20 text-green-400',
+  'bg-cyan-500/20 text-cyan-400',
+  'bg-pink-500/20 text-pink-400',
+  'bg-amber-500/20 text-amber-400',
+  'bg-blue-500/20 text-blue-400',
+];
+
+function getInitials(name: string): string {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
 function UsersTab() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -406,7 +472,7 @@ function UsersTab() {
   const statusBadge = (status: string) => {
     switch (status) {
       case 'active': return <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">Активен</Badge>;
-      case 'trial': return <Badge className="text-[10px] bg-blue-500/20 text-blue-400 border-blue-500/30">Триал</Badge>;
+      case 'trial': return <Badge className="text-[10px] bg-purple-500/20 text-purple-400 border-purple-500/30">Триал</Badge>;
       case 'inactive': return <Badge className="text-[10px] bg-red-500/20 text-red-400 border-red-500/30">Неактивен</Badge>;
       default: return null;
     }
@@ -444,7 +510,7 @@ function UsersTab() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border/50">
-                <TableHead>Имя</TableHead>
+                <TableHead>Пользователь</TableHead>
                 <TableHead className="hidden md:table-cell">Email</TableHead>
                 <TableHead>Бизнес</TableHead>
                 <TableHead className="hidden sm:table-cell">План</TableHead>
@@ -453,9 +519,16 @@ function UsersTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((user) => (
+              {filtered.map((user, idx) => (
                 <TableRow key={user.id} className="border-b border-border/30">
-                  <TableCell className="font-medium text-sm">{user.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0', avatarColors[idx % avatarColors.length])}>
+                        {getInitials(user.name)}
+                      </div>
+                      <span className="font-medium text-sm">{user.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground text-sm">{user.email}</TableCell>
                   <TableCell className="text-sm">{user.business}</TableCell>
                   <TableCell className="hidden sm:table-cell">
@@ -475,12 +548,21 @@ function UsersTab() {
 
 // ---- Content Tab ----
 const contentBlocks = [
-  { id: 'cb1', name: 'Instagram посты', description: 'Автоматическая генерация постов', enabled: true },
-  { id: 'cb2', name: 'Stories', description: 'Короткий контент для Stories', enabled: true },
-  { id: 'cb3', name: 'Reels сценарии', description: 'Сценарии для коротких видео', enabled: false },
-  { id: 'cb4', name: 'Email-рассылки', description: 'Недельные новости и предложения', enabled: true },
-  { id: 'cb5', name: 'Push-уведомления', description: 'Уведомления для клиентов', enabled: false },
-  { id: 'cb6', name: 'AI рекомендации', description: 'Персонализированные предложения', enabled: true },
+  { id: 'cb1', name: 'Instagram посты', description: 'Автоматическая генерация постов', enabled: true, icon: Instagram },
+  { id: 'cb2', name: 'Stories', description: 'Короткий контент для Stories', enabled: true, icon: Sparkles },
+  { id: 'cb3', name: 'Reels сценарии', description: 'Сценарии для коротких видео', enabled: false, icon: Megaphone },
+  { id: 'cb4', name: 'Email-рассылки', description: 'Недельные новости и предложения', enabled: true, icon: Mail },
+  { id: 'cb5', name: 'Push-уведомления', description: 'Уведомления для клиентов', enabled: false, icon: Bell },
+  { id: 'cb6', name: 'AI рекомендации', description: 'Персонализированные предложения', enabled: true, icon: Zap },
+];
+
+const contentColors = [
+  'bg-pink-500/15 text-pink-400',
+  'bg-purple-500/15 text-purple-400',
+  'bg-amber-500/15 text-amber-400',
+  'bg-cyan-500/15 text-cyan-400',
+  'bg-orange-500/15 text-orange-400',
+  'bg-yellow-500/15 text-yellow-400',
 ];
 
 function ContentTab() {
@@ -507,26 +589,34 @@ function ContentTab() {
       <Separator />
 
       <div className="space-y-3">
-        {blocks.map((block, i) => (
-          <motion.div
-            key={block.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.04 }}
-          >
-            <Card className="p-0">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm">{block.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{block.description}</p>
+        {blocks.map((block, i) => {
+          const BlockIcon = block.icon;
+          return (
+            <motion.div
+              key={block.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.04 }}
+            >
+              <Card className={cn('p-0 transition-opacity', !block.enabled && 'opacity-60')}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={cn('w-9 h-9 rounded-full flex items-center justify-center shrink-0', contentColors[i])}>
+                        <BlockIcon className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm">{block.name}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{block.description}</p>
+                      </div>
+                    </div>
+                    <Switch checked={block.enabled} onCheckedChange={() => toggleBlock(block.id)} />
                   </div>
-                  <Switch checked={block.enabled} onCheckedChange={() => toggleBlock(block.id)} />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
@@ -534,56 +624,44 @@ function ContentTab() {
 
 // ---- Main Component ----
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const adminView = useAppStore((s) => s.adminView);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600/15 via-purple-500/5 to-transparent border border-purple-500/10 p-5"
       >
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
-          <LayoutDashboard className="w-5 h-5 text-purple-400" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/5 rounded-full blur-[80px]" />
+        <div className="relative flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
+            <LayoutDashboard className="w-5 h-5 text-purple-400" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Добро пожаловать в панель управления</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              <span className="pulse-text-gradient font-medium">PULSE</span> • Admin Dashboard
+            </p>
+          </div>
         </div>
-        <h1 className="text-2xl font-bold">Админ-панель</h1>
       </motion.div>
 
-      {/* Internal Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {adminTabs.map((tab) => (
-          <Button
-            key={tab.key}
-            variant={activeTab === tab.key ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab(tab.key)}
-            className={
-              activeTab === tab.key
-                ? 'bg-purple-600 hover:bg-purple-700 text-white whitespace-nowrap'
-                : 'whitespace-nowrap'
-            }
-          >
-            <tab.icon className="w-4 h-4 mr-1.5" />
-            {tab.label}
-          </Button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
+      {/* Tab Content — driven by sidebar (adminView from store) */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={activeTab}
+          key={adminView}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.15 }}
         >
-          {activeTab === 'dashboard' && <DashboardTab />}
-          {activeTab === 'tools' && <ToolsTab />}
-          {activeTab === 'templates' && <TemplatesTab />}
-          {activeTab === 'users' && <UsersTab />}
-          {activeTab === 'content' && <ContentTab />}
+          {adminView === 'dashboard' && <DashboardTab />}
+          {adminView === 'tools' && <ToolsTab />}
+          {adminView === 'templates' && <TemplatesTab />}
+          {adminView === 'users' && <UsersTab />}
+          {adminView === 'content' && <ContentTab />}
         </motion.div>
       </AnimatePresence>
     </div>

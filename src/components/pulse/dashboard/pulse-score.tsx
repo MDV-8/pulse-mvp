@@ -3,6 +3,27 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+
+const METRIC_INFO: Record<string, { delta: string }> = {
+  sales: { delta: 'на 2 больше чем на прошлой неделе' },
+  clients: { delta: 'на 1 больше чем на прошлой неделе' },
+  loyalty: { delta: 'без изменений' },
+  marketing: { delta: 'на 3 меньше чем на прошлой неделе' },
+  profit: { delta: 'на 2 больше чем на прошлой неделе' },
+};
+
+const METRIC_LABELS: Record<string, string> = {
+  sales: 'Продажи',
+  clients: 'Клиенты',
+  loyalty: 'Лояльность',
+  marketing: 'Маркетинг',
+  profit: 'Прибыль',
+};
 
 function getScoreColor(score: number): string {
   if (score >= 80) return '#10b981';
@@ -17,6 +38,32 @@ function getStatusText(score: number): string {
   return 'Требуется внимание';
 }
 
+function MetricTooltip({
+  metricKey,
+  score,
+}: {
+  metricKey: string;
+  score: number;
+}) {
+  const info = METRIC_INFO[metricKey];
+  const label = METRIC_LABELS[metricKey];
+  if (!info || !label) return <>{score}</>;
+
+  return (
+    <HoverCard openDelay={300} closeDelay={100}>
+      <HoverCardTrigger asChild>
+        <span className="cursor-default font-semibold tabular-nums" style={{ color: getScoreColor(score) }}>
+          {score}
+        </span>
+      </HoverCardTrigger>
+      <HoverCardContent className="w-64 text-sm">
+        <p className="font-medium">{label}: {score}/100</p>
+        <p className="text-xs text-muted-foreground mt-1">{info.delta}</p>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
 export function PulseScore() {
   const pulseScore = useAppStore((s) => s.pulseScore);
   const [animatedScore, setAnimatedScore] = useState(0);
@@ -24,6 +71,7 @@ export function PulseScore() {
   const score = pulseScore.total;
   const color = getScoreColor(score);
   const statusText = getStatusText(score);
+  const breakdown = pulseScore.breakdown;
 
   // SVG circle params
   const radius = 80;
@@ -92,14 +140,22 @@ export function PulseScore() {
 
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <motion.span
-            className="text-5xl font-bold tracking-tighter pulse-text-gradient"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            {animatedScore}
-          </motion.span>
+          <HoverCard openDelay={400} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <motion.span
+                className="text-5xl font-bold tracking-tighter pulse-text-gradient cursor-default"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                {animatedScore}
+              </motion.span>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-64 text-sm">
+              <p className="font-medium">{score} из 100 баллов</p>
+              <p className="text-xs text-muted-foreground mt-1">+3 за неделю</p>
+            </HoverCardContent>
+          </HoverCard>
           <span className="text-xs text-muted-foreground mt-0.5">
             из 100
           </span>
@@ -121,6 +177,16 @@ export function PulseScore() {
       >
         {statusText}
       </motion.p>
+
+      {/* Mini metric breakdown with tooltips */}
+      <div className="mt-4 space-y-1.5 w-full max-w-[200px]">
+        {(Object.entries(breakdown) as [string, number][]).map(([key, val]) => (
+          <div key={key} className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">{METRIC_LABELS[key] ?? key}</span>
+            <MetricTooltip metricKey={key} score={val} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

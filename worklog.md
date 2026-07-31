@@ -235,3 +235,176 @@ PULSE MVP is fully functional and polished. All 30+ components work correctly. T
 4. **Add data persistence** — Use Zustand persist middleware or localStorage so onboarding isn't repeated on refresh
 5. **Enhance AI chat** — Add more response scenarios, typing speed variation, response formatting
 6. **Add animations/polish** — Page transition animations, loading skeletons, empty state illustrations
+
+---
+Task ID: 8
+Agent: Main Orchestrator
+Task: Add 6 new features (Global Search, Welcome Tour, Export, Tooltips, Business Name, Theme Toggle)
+
+Work Log:
+
+**Feature 1: Global Search (Cmd+K)**
+- Added `showSearch`, `setShowSearch`, `searchQuery`, `setSearchQuery` to app store
+- Created `global-search.tsx` — Command palette dialog with Ctrl+K/Cmd+K shortcut, search input, 6 quick action buttons (Главная, AI, Финансы, Клиенты, Акции, Настройки), mock search results, keyboard hints
+- Added search ghost button in sidebar between logo and nav items (with ⌘K kbd hint)
+- Rendered GlobalSearch in main layout (always available)
+
+**Feature 2: Dashboard Welcome Tour**
+- Created `welcome-tour.tsx` — One-time overlay tour with semi-transparent backdrop, animated floating card, 3 highlighted areas (PULSE SCORE, AI INSIGHT, Что делать), "Понятно!" dismiss button
+- Uses localStorage flag `pulse-tour-completed` to show only once
+- Smooth fade-in/fade-out with framer-motion AnimatePresence
+- Integrated into DashboardView
+
+**Feature 3: Data Export Feature**
+- Created `export-button.tsx` — DropdownMenu with 3 export options: Скачать Excel (generates CSV with BOM), Скопировать данные (clipboard + toast), Распечатать (window.print)
+- Added ExportButton to Finance Dashboard (6 financial metrics)
+- Added ExportButton to Clients list (filtered client data)
+- Added ExportButton to Promotions list (promotion data)
+
+**Feature 4: Quick Stats Tooltip on Hover**
+- Enhanced pulse-score.tsx with HoverCard from shadcn/ui
+- Hover over score number shows: "X из 100 баллов. +3 за неделю"
+- Hover over individual breakdown metrics shows: "Продажи: 92/100 — на 2 больше чем на прошлой неделе"
+- Added mini metric breakdown list below the score ring
+
+**Feature 5: Business Name in Mobile Header**
+- Added "Coffee & Co" text below PULSE logo in mobile header
+- Only visible in owner mode (not client/admin)
+- Smaller, muted text styling
+
+**Feature 6: Dark Mode Toggle in Sidebar**
+- Added Sun/Moon icon toggle button at the bottom of sidebar (below admin/client buttons)
+- Reads from `useAppStore(s => s.theme)` and calls `setTheme`
+- Small, subtle ghost button
+
+**Other Fixes:**
+- Fixed pre-existing lint error in page.tsx (setState in effect → wrapped in requestAnimationFrame)
+
+Stage Summary:
+- 3 new files: global-search.tsx, welcome-tour.tsx, export-button.tsx
+- 6 files modified: app-store.ts, sidebar.tsx, page.tsx, pulse-score.tsx, mobile-header.tsx, finance-dashboard.tsx, clients-list.tsx, promotions-list.tsx
+- ESLint: 0 errors ✅
+- Dev server compiles successfully ✅
+
+---
+Task ID: 9
+Agent: Main Orchestrator
+Task: 6 bug fixes and enhancements (store persistence, notifications, admin tabs, AI chat, finance switching)
+
+Work Log:
+
+**Task 1+6: localStorage Persistence + Notification State in Store**
+- Added `persist` middleware from `zustand/middleware` with `createJSONStorage(() => localStorage)`
+- Wrapped entire store with `create<AppStore>()(persist(...))` pattern
+- Added `partialize` to only persist non-transient state: appMode, ownerView, clientView, adminView, business, pulseScore, insights, todayActions, promotions, theme
+- Added `showNotifications` and `setShowNotifications` to store interface and implementation
+- App no longer resets to onboarding on page refresh
+
+**Task 2: Fix Duplicate Notification Buttons**
+- Made MobileHeader bell functional: added `showNotifications`/`setShowNotifications` from store, `useRef` for button, click handler toggles NotificationCenter
+- Changed DashboardView notification section from `flex` to `hidden md:flex` — desktop-only
+- Removed local `useState(false)` for showNotifications in DashboardView, replaced with store state
+- Fixed toggle from `(v) => !v` (function updater) to `!showNotifications` (boolean)
+- Mobile: bell in MobileHeader controls notifications. Desktop: bell in DashboardView controls notifications.
+
+**Task 3: Fix Admin Duplicate Tabs**
+- Removed `useState<AdminTab>('dashboard')` from AdminDashboard component
+- Imported `useAppStore` and `AdminView` type
+- Changed tab content rendering from `activeTab` to `adminView` from store
+- Removed internal tab buttons JSX (div with adminTabs.map)
+- AdminNav sidebar remains the sole navigation for admin mode
+
+**Task 4: Enhance AI Chat**
+- Added 4 new response keywords in ai-assistant.tsx:
+  - «помощь»/«помоги»/«что можешь» → help response (capability overview)
+  - «конкурент»/«рынок» → competitors response (3 competitors analysis)
+  - «лояльност»/«бонус»/«программа» → loyalty response (program details + improvements)
+  - «спасибо»/«благодар» → thanks response (polite acknowledgment)
+- Added corresponding responses in mock-data.ts (help, competitors, loyalty, thanks keys)
+- Implemented markdown rendering: `renderMarkdown()` converts newlines to paragraphs, `•` to bullet points with purple dots, numbered lists (`1.`), and `**bold**` via `renderInlineMarkdown()`
+- Variable typing speed: `getTypingDelay()` returns 0.8-1.2s for short (<100 chars), 1.2-1.8s for medium, 1.8-2.5s for long responses
+- Updated welcome message to include 💜 emoji and business name
+- Added response footer: «💡 Совет: Вы можете применить рекомендации прямо из панели управления» after every AI response
+
+**Task 5: Fix Finance Period Switching (Loading Skeleton)**
+- Added `isSwitching` state and `displayPeriod` state for smooth tab transition
+- Added `handlePeriodChange` callback with 300ms setTimeout delay
+- When switching: tab updates immediately (displayPeriod), skeleton shows for 300ms, then real data appears
+- Added Skeleton import from shadcn/ui
+- Metrics grid shows 6 skeleton cards during transition
+- Chart area shows skeleton placeholder during transition
+
+Stage Summary:
+- 6 files modified: app-store.ts, page.tsx, mobile-header.tsx, admin-dashboard.tsx, ai-assistant.tsx, mock-data.ts, finance-dashboard.tsx
+- ESLint: 0 errors ✅
+- Dev server compiles successfully ✅
+- All 6 tasks completed successfully
+
+---
+Task ID: 10
+Agent: Main Orchestrator
+Task: UI Polish — Page transitions, Onboarding redesign, Client home, Admin polish, Loading skeletons, Settings enhancement
+
+Work Log:
+
+**Task 1: Page Transition Animations (page.tsx)**
+- Added `framer-motion` imports: `AnimatePresence`, `motion`
+- Wrapped OwnerDashboard view content with `AnimatePresence mode="wait"` + `motion.div` using `ownerView` as key
+- Added fade/slide transitions: initial opacity:0 y:8 → animate opacity:1 y:0 → exit opacity:0 y:-8 (200ms easeInOut)
+- Applied same AnimatePresence pattern to ClientDashboard with `clientView` key
+- Applied AnimatePresence to admin mode section in main page
+
+**Task 2: Onboarding Card Design (onboarding-flow.tsx)**
+- Added animated gradient background (radial gradient + pulsing purple blur circle)
+- Added subtle grid pattern overlay (CSS background-image with 40px grid)
+- Added PULSE logo at top with `pulse-text-gradient` class and "AI Operating System" subtitle
+- Redesigned progress dots: purple dots with active one larger (w-6 h-6) with glow shadow, connecting lines between dots
+- Category cards now have colored icon containers with per-category gradients and purple border glow on hover/selection
+- "PULSE готов" button has gradient background (purple→violet) with glow shadow effect
+- Added completion success animation: overlay with animated checkmark (spring animation), "PULSE готов" text, loading message
+- Removed unused Checkbox import
+
+**Task 3: Client-Facing Home Page (client-home.tsx)**
+- Added hero section with gradient background: "Что хотите сегодня?" with pulse-text-gradient
+- Added icons to category filter pills (Coffee, UtensilsCrossed, Scissors, Dumbbell, ShoppingBag, Wrench)
+- Improved place cards with gradient image placeholder (per-category gradient + centered icon)
+- Added colored status badge overlay on card images (green "Открыто" / red "Закрыто")
+- Added distance with MapPin icon
+- Enhanced star rating display with support for half stars
+- Added highlighted promo tag with purple styling
+- Made "Открыто сейчас" toggle more prominent with card design, icon container, and count text
+- Added empty state with SearchX icon, message, and "Сбросить фильтры" button
+- Added AnimatePresence for smooth filter transitions
+
+**Task 4: Admin Dashboard Polish (admin-dashboard.tsx)**
+- Added welcome header: "Добро пожаловать в панель управления" with gradient background and purple branding
+- Stat cards now have gradient left border accents (different color per stat: purple, green, cyan, pink)
+- Added trend arrows with colored indicators (green ArrowUpRight, red ArrowDownRight)
+- Tool cards have circular colored icon containers instead of square muted boxes
+- Tool status shows colored text: "● Включён" (green) / "○ Выключен" (red)
+- Templates redesigned as card grid with gradient top strips and discount percentage badges
+- Users table now shows avatar circles with initials (colored per-row) next to names
+- Content tab has actual content sections with colored circular icon containers and toggle switches
+- Tab buttons have purple glow shadow when active
+
+**Task 5: Loading Skeletons (page.tsx)**
+- Added `isLoading` and `currentView` state to OwnerDashboard
+- useEffect triggers 200ms loading state when view changes
+- When loading: shows 4 skeleton metric cards, 1 skeleton rectangle (score area), 3 skeleton bars (actions)
+- Uses AnimatePresence for smooth skeleton fade in/out
+- Added `Skeleton` import from shadcn/ui
+
+**Task 6: Settings Page Polish (page.tsx)**
+- Added profile section at top with circular avatar ("CC" initials in pulse-text-gradient), business name, email, demo badge, and "Редактировать" button
+- Business info cards now have icons next to each label (Store, Sparkles, MapPin, UserPlus)
+- Added "Уведомления" section with 3 toggle switches: Email (on), Push (on), Weekly report (off)
+- Each notification item has icon, title, description, and Switch
+- Added "Безопасность" section: Password change button, 2FA status badge (Выкл)
+- Each security item has icon, title, description
+- Danger zone card now has red border glow shadow effect
+- Added imports: Pencil, MapPin, Mail, Shield, Lock, Switch
+
+Stage Summary:
+- 4 files modified: page.tsx, onboarding-flow.tsx, client-home.tsx, admin-dashboard.tsx
+- ESLint: 0 errors ✅
+- Dev server compiles successfully ✅
