@@ -14,11 +14,13 @@ import { AIInsightsFeed } from '@/components/pulse/dashboard/ai-insights-feed';
 import { RealtimeBanner } from '@/components/pulse/dashboard/realtime-banner';
 import { LiveOrders } from '@/components/pulse/dashboard/live-orders';
 import { PerformanceRadar } from '@/components/pulse/dashboard/performance-radar';
+import { PeakHours } from '@/components/pulse/dashboard/peak-hours';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 // Shared
 import { NotificationCenter } from '@/components/pulse/shared/notification-center';
 import { WelcomeTour } from '@/components/pulse/shared/welcome-tour';
+import { FeedbackPopup } from '@/components/pulse/shared/feedback-popup';
 
 // Clients
 import ClientsList from '@/components/pulse/clients/clients-list';
@@ -68,6 +70,7 @@ import { Switch } from '@/components/ui/switch';
 // ============================================================
 export function DashboardView() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showFeedback, setShowFeedback] = useState(false);
   const notifBellRef = useRef<HTMLButtonElement>(null);
   const showNotifications = useAppStore((s) => s.showNotifications);
   const setShowNotifications = useAppStore((s) => s.setShowNotifications);
@@ -153,9 +156,9 @@ export function DashboardView() {
       <LiveOrders />
 
       {/* ====== Feature 2: Greeting Banner with Live Clock ====== */}
-      <div className="rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="rounded-xl glass-card-gradient border border-purple-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold glow-text-primary">
             {greeting}, владелец{' '}
             <span className="pulse-text-gradient">Coffee & Co</span>
           </h1>
@@ -187,6 +190,11 @@ export function DashboardView() {
           onClose={() => setShowNotifications(false)}
           triggerRef={notifBellRef}
         />
+      </div>
+
+      {/* ====== Section Divider: Greeting → Score ====== */}
+      <div className="section-divider" aria-hidden="true">
+        <span className="divider-dot" />
       </div>
 
       {/* ====== PULSE Score + Metrics ====== */}
@@ -231,8 +239,18 @@ export function DashboardView() {
       {/* ====== AI Insights Feed ====== */}
       <AIInsightsFeed />
 
+      {/* ====== Section Divider: AI Feed → Weekly Report ====== */}
+      <div className="section-divider" aria-hidden="true">
+        <span className="divider-dot" />
+      </div>
+
       {/* ====== Weekly Report ====== */}
       <WeeklyReport />
+
+      {/* ====== Section Divider: Weekly Report → Radar ====== */}
+      <div className="section-divider" aria-hidden="true">
+        <span className="divider-dot" />
+      </div>
 
       {/* ====== Performance Radar ====== */}
       <PerformanceRadar />
@@ -240,8 +258,16 @@ export function DashboardView() {
       {/* ====== Sales by Product ====== */}
       <ProductSales />
 
+      {/* ====== Peak Hours Heatmap ====== */}
+      <PeakHours />
+
       {/* ====== What to do today ====== */}
       <TodayActions />
+
+      {/* ====== Section Divider: Today Actions → AI Footer ====== */}
+      <div className="section-divider" aria-hidden="true">
+        <span className="divider-dot" />
+      </div>
 
       {/* ====== AI Footer ====== */}
       <div className="glass-card rounded-xl p-4 flex items-center gap-3">
@@ -257,12 +283,15 @@ export function DashboardView() {
         <Button
           variant="outline"
           size="sm"
-          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 shrink-0"
+          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 shrink-0 hover-glow"
           onClick={() => useAppStore.getState().setOwnerView('ai')}
         >
           Открыть AI
         </Button>
       </div>
+
+      {/* ====== Feedback Popup ====== */}
+      <FeedbackPopup open={showFeedback} onClose={() => setShowFeedback(false)} />
     </div>
   );
 }

@@ -16,6 +16,9 @@ import { OnboardingFlow } from '@/components/pulse/onboarding/onboarding-flow';
 import { GlobalSearch } from '@/components/pulse/shared/global-search';
 import { ToastNotifications } from '@/components/pulse/shared/toast-notifications';
 
+// Dashboard ambient background
+import { DashboardBackground } from '@/components/pulse/dashboard/dashboard-background';
+
 // Promotions (dialog)
 import { CreatePromotion } from '@/components/pulse/promotions/create-promotion';
 
@@ -99,6 +102,9 @@ export default function HomePage() {
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
       <div className="min-h-screen flex bg-background">
+        {/* Dashboard Ambient Background (owner mode, dark theme only) */}
+        {appMode === 'owner' && <DashboardBackground />}
+
         {/* Global Search (always rendered) */}
         <GlobalSearch />
 

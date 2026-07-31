@@ -27,6 +27,7 @@ import { StaffOverview } from '@/components/pulse/staff/staff-overview';
 import AIContent from '@/components/pulse/smm/ai-content';
 import { InventoryList } from '@/components/pulse/inventory/inventory-list';
 import { ReservationsView } from '@/components/pulse/reservations/reservations-view';
+import { ScheduleView } from '@/components/pulse/staff/schedule-view';
 
 // ============================================================
 // Owner Dashboard Router
@@ -80,6 +81,8 @@ export function OwnerDashboard() {
         return <ReviewsManager />;
       case 'team':
         return <StaffOverview />;
+      case 'schedule':
+        return <ScheduleView />;
       case 'smm':
         return <AIContent />;
       case 'inventory':

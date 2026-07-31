@@ -1086,3 +1086,234 @@ PULSE MVP is now at **v1.2** — a production-quality AI Operating System demo w
 6. **Accessibility audit** — Full keyboard navigation, ARIA labels, focus management
 7. **Light theme refinements** — Ensure all new components look good in both themes
 8. **Performance optimization** — Lazy load non-critical components, reduce bundle size
+
+---
+Task ID: 15-c
+Agent: full-stack-developer
+Task: Dashboard ambient background, CSS utilities, layout enhancements, light theme refinements
+
+Work Log:
+- Created `/src/components/pulse/dashboard/dashboard-background.tsx` — named export `DashboardBackground`, `use client`, renders 2 fixed gradient blobs (purple + cyan) with CSS-only animations, pointer-events-none, only in dark theme
+- Appended to globals.css:
+  - `@keyframes blob-float-1` (25s figure-8 pattern with translate + scale)
+  - `@keyframes blob-float-2` (20s opposite pattern)
+  - `.dashboard-blob-1` (600px, purple-500/6, blur-3xl)
+  - `.dashboard-blob-2` (500px, cyan-500/4, blur-3xl)
+  - `.glass-card-gradient` (subtle purple gradient glass card)
+  - `.section-divider` (elegant flexbox divider with dot and gradient lines)
+  - `@keyframes tooltip-fade` + `.tooltip-fade`
+  - `.icon-badge` (20px circular badge, 10px text)
+  - `.glow-text-primary` (subtle primary text-shadow)
+  - `.hover-glow` (primary box-shadow on hover, 0.3s transition)
+- Light theme overrides appended:
+  - `.light .glass-card-gradient` — lighter borders, subtle shadow
+  - `.light .pulse-text-gradient` — darker purple tones for readability
+  - `.light .neon-line` — softer glow with dedicated `neon-pulse-light` keyframes
+  - `.light .aurora-border::before` — reduced opacity (0.35)
+  - All `.light .stat-glow-*` classes — reduced opacity
+  - `.light .number-glow`, `.light .hover-glow`, `.light .section-divider` — softer variants
+- Modified `page.tsx` — imported DashboardBackground, renders as first child when `appMode === owner`
+- Modified `owner-views.tsx`:
+  - Greeting banner: `glass-card-gradient` class + `glow-text-primary` on h1
+  - 4 `section-divider` elements between major dashboard sections
+  - `hover-glow` on "Открыть AI" button
+
+Stage Summary:
+- 1 new file: `dashboard-background.tsx`
+- 2 modified files: `globals.css` (+210 lines), `page.tsx`, `owner-views.tsx`
+- Lint: 0 errors
+- Dark theme gains ambient depth via floating gradient blobs
+- Dashboard layout gains elegant section dividers and enhanced visual hierarchy
+- Light theme fully refined with softer glows and readable gradients
+
+---
+Task ID: 15-b
+Agent: full-stack-developer
+Task: Create Employee Schedule, Feedback Popup, and Peak Hours components
+
+Work Log:
+- Created `src/components/pulse/staff/schedule-view.tsx`
+  - Named export `ScheduleView` with 'use client' directive
+  - Header with Calendar icon, title "График сотрудников", subtitle "Расписание на неделю"
+  - Week navigator with ChevronLeft/ChevronRight buttons showing "27 января — 2 февраля"
+  - 7×5 schedule grid (5 employees × 7 days) with responsive horizontal scroll
+  - Employees: Айдана (Бариста), Дима (Кассир), Мария (Менеджер), Нурлан (Повар), Саша (Курьер)
+  - Color-coded shifts: morning (purple-500/15), afternoon (amber-500/15), day off (muted)
+  - Current day (Чт) highlighted with aurora-border
+  - Stats row: total 196 ч, average 39.2 ч, 1 overtime alert (Мария — 42 ч)
+  - AI suggestion box with overtime recommendation about Мария and Саша substitution
+  - "Добавить смену" button with Plus icon
+  - Imports: Calendar, Clock, ChevronLeft, ChevronRight, Plus, UserCircle, Edit3 from lucide-react; Button from shadcn/ui
+
+- Created `src/components/pulse/shared/feedback-popup.tsx`
+  - Named export `FeedbackPopup` with 'use client' directive
+  - Props: `open: boolean`, `onClose: () => void`
+  - Glass-card-premium modal with rounded-2xl
+  - Header: "Как вам PULSE?" with pulse-text-gradient
+  - 5-star clickable rating with Star icon, hover fill effect, micro-interaction animations
+  - Emoji quick feedback: 😍 Отлично, 😊 Хорошо, 😐 Нормально, 😕 Можно лучше
+  - Optional textarea "Расскажите подробнее..." with glass-card styling
+  - "Отправить" gradient purple button (disabled until rating selected), "Пропустить" outline button
+  - On submit: spring-animated checkmark success state, auto-close after 2s
+  - Full framer-motion AnimatePresence for enter/exit transitions
+
+- Created `src/components/pulse/dashboard/peak-hours.tsx`
+  - Named export `PeakHours` with 'use client' directive
+  - Header with Flame icon, title "Часы пик"
+  - 7×8 heatmap grid (7 days × 8 time slots: 9-21 in 2h intervals)
+  - Traffic values 0-100% with color intensity mapping (purple-500/8 → purple-500/80)
+  - Peak cells (≥90%) have purple glow shadow effect
+  - Weekend pattern: lower morning, higher afternoon
+  - Animated entrance with framer-motion staggered cell fade-in (15ms delay per cell)
+  - Hover info bar shows day, time range, percentage, and estimated orders
+  - Color scale legend: Мало → Средне → Много → Пик
+  - AI summary: recommends Happy Hour in Пн 15:00 to balance Пт 17:00-19:00 peak (95%)
+
+Stage Summary:
+- 3 new files created
+- Lint: 0 errors
+- Dev server: compiles successfully, no runtime errors
+
+---
+Task ID: 15-a
+Agent: AI Integration Agent
+Task: Create AI Chat API Route + Enhance AI Assistant
+
+Work Log:
+- Created `/src/app/api/ai-chat/route.ts` — POST endpoint using z-ai-web-dev-sdk
+  - System prompt: PULSE AI assistant for Kazakh coffee shops, Russian language, ₸ currency
+  - Accepts `{ messages: { role, content }[] }` body
+  - Uses `ZAI.create()` then `zai.chat.completions.create()` with thinking disabled
+  - Rate limiting: max 20 requests/minute per IP (in-memory counter with sliding window)
+ - Enhanced `/src/components/pulse/ai/ai-assistant.tsx`
+  - Added `AIMode` type ('keywords' | 'neural'), default 'neural'
+  - Added mode toggle in header: "Ключевые слова" vs "Нейросеть" (with Zap icon and BETA badge)
+  - Neural mode: sends chat history to `/api/ai-chat`, falls back to keyword matching on API failure
+  - Keywords mode: unchanged original keyword matching logic
+  - Added `NeuralTypingIndicator` component (shows "AI думает" with pulsing dots)
+  - Added disclaimer text: "AI ответы могут быть неточными. Демо режим." at bottom (neural mode only)
+  - All existing functionality preserved (welcome message, suggested questions, markdown rendering, scroll behavior)
+- Created `/src/app/api/ai-analysis/route.ts` — POST endpoint for data analysis
+  - Accepts `{ type: 'sales'|'marketing'|'staff'|'inventory', data: any }`
+  - Type-specific system prompts for each analysis category
+  - Returns `{ success: true, analysis: string }`
+
+Stage Summary:
+- 2 new API routes, 1 enhanced component
+- Lint: 0 errors
+- Neural mode with graceful fallback to keywords
+- Rate limiting on chat endpoint
+---
+Task ID: 15-a
+Agent: Backend Integration Agent
+Task: AI Chat API routes + LLM integration
+
+Work Log:
+- Created `/src/app/api/ai-chat/route.ts` — POST endpoint with ZAI SDK, Russian system prompt, 20 req/min rate limit
+- Created `/src/app/api/ai-analysis/route.ts` — POST endpoint for sales/marketing/staff/inventory analysis
+- Enhanced `/src/components/pulse/ai/ai-assistant.tsx`:
+  - Added "Режим AI" toggle: "Ключевые слова" vs "Нейросеть" (with BETA badge)
+  - Neural mode sends chat history to /api/ai-chat, shows "AI думает" typing indicator
+  - Falls back to keyword matching on API failure
+  - Added disclaimer text
+
+Stage Summary:
+- 2 API routes + 1 component enhanced
+- ESLint: 0 errors ✅
+
+---
+Task ID: 15-b
+Agent: Feature Agent
+Task: Employee Schedule, Feedback Popup, Peak Hours Heatmap
+
+Work Log:
+- Created `schedule-view.tsx` — 7×5 schedule grid, week navigator, overtime alerts, AI suggestions
+- Created `feedback-popup.tsx` — 5-star rating, emoji feedback, textarea, success animation
+- Created `peak-hours.tsx` — 7×7 heatmap with 5 intensity levels, staggered animations, hover tooltips
+
+Stage Summary:
+- 3 new component files
+- ESLint: 0 errors ✅
+
+---
+Task ID: 15-c
+Agent: Styling Agent
+Task: Dashboard ambient background, CSS animations, light theme
+
+Work Log:
+- Created `dashboard-background.tsx` — 2 animated gradient blobs (purple + cyan), dark theme only
+- Added 10+ new CSS classes: blob-float keyframes, glass-card-gradient, section-divider, tooltip-fade, icon-badge, glow-text-primary, hover-glow, dashboard-blob-*
+- Added 4 section dividers to DashboardView between major sections
+- Enhanced greeting banner with glass-card-gradient and glow-text-primary
+- Added hover-glow to "Открыть AI" button
+- Added comprehensive light theme overrides for glass-card, pulse-text-gradient, neon-line, aurora-border, stat-glow-*
+
+Stage Summary:
+- 1 new file + 2 files modified (globals.css, owner-views.tsx)
+- ESLint: 0 errors ✅
+
+---
+Task ID: 15-d
+Agent: Main Orchestrator (Integration)
+Task: Integrate all new features
+
+Work Log:
+- Added 'schedule' to OwnerView type in app-store.ts
+- Added CalendarRange icon + 'График' nav item to sidebar.tsx (now 19 nav items)
+- Added ScheduleView import and switch case in owner-dashboard-router.tsx
+- Added PeakHours + FeedbackPopup imports to owner-views.tsx
+- Integrated PeakHours into dashboard (after ProductSales)
+- Integrated FeedbackPopup into DashboardView (with open/close state)
+- ESLint: 0 errors ✅
+- Dev server: 200 OK ✅
+
+Stage Summary:
+- 4 files modified: app-store.ts, sidebar.tsx, owner-dashboard-router.tsx, owner-views.tsx
+- Total owner views: 18
+
+---
+## Current Project Status
+
+### Assessment:
+PULSE MVP is now at **v1.3** — a comprehensive AI Operating System demo with **54 component files**, **3 API routes**, **5 custom hooks**, and **40+ CSS animation classes**. This round introduces real AI capabilities via z-ai-web-dev-sdk backend integration, advanced visual features (ambient background, heatmap, schedule), and comprehensive light theme support.
+
+### Completed in This Phase (Task 15):
+- ✅ Real AI Chat API route with z-ai-web-dev-sdk (Russian system prompt, rate limiting)
+- ✅ AI Analysis API route (sales/marketing/staff/inventory)
+- ✅ AI Assistant enhanced with "Нейросеть" mode toggle (real LLM with fallback)
+- ✅ Employee Schedule view (7×5 grid, week navigator, overtime alerts)
+- ✅ Feedback Popup (5-star rating, emoji picks, success animation)
+- ✅ Peak Hours Heatmap (7×7 grid, 5 intensity levels, hover tooltips)
+- ✅ Dashboard Ambient Background (animated gradient blobs, dark theme only)
+- ✅ 10+ new CSS classes (blob-float, glass-card-gradient, section-divider, etc.)
+- ✅ 4 section dividers on dashboard
+- ✅ Light theme comprehensive refinements
+- ✅ All features integrated into routing (19 sidebar nav items)
+- ✅ ESLint: 0 errors
+- ✅ Dev server: 200 OK
+
+### Total Project Inventory:
+- **Owner views (18):** Главная, Что делать, AI, Продажи, Клиенты, Акции, Финансы, Аналитика, Лояльность, Цели, Настройки, Отзывы, Команда, График, SMM, Инвентарь, Бронирования
+- **Client views (6):** Главная, Карта, Акции, Бонусы, Избранное, Профиль
+- **Admin views (5):** Dashboard, Инструменты, Шаблоны, Пользователи, Контент
+- **API Routes (3):** ai-chat, ai-analysis, route
+- **Special features:** Global Search (⌘K), Welcome Tour, Notification Center, Toast Notifications, Export Data, Theme Toggle, Onboarding Flow, localStorage Persistence, Animated Counters, Real-time Simulation, Live Orders, Keyboard Shortcuts, Performance Radar, Reservations, Employee Schedule, Feedback Popup, Peak Hours Heatmap, Dashboard Ambient Background
+- **Components:** 54 React component files + 5 custom hooks + 1021 lines CSS
+- **Total codebase:** ~20,583 lines across all TypeScript files
+- **page.tsx:** 208 lines (clean orchestrator)
+
+### Unresolved Issues / Risks:
+1. **OOM in sandbox:** Dev server occasionally OOMs during heavy compilation
+2. **Agent-browser testing:** Cannot test via agent-browser due to sandbox network isolation
+3. **AI API rate limits:** z-ai-web-dev-sdk may have inherent rate limits not yet tested at scale
+4. **Feedback popup trigger:** Currently manual state only, should auto-trigger after promotion flow
+
+### Priority Recommendations for Next Phase:
+1. **Auto-trigger feedback popup** after completing AI Insight → Promotion flow
+2. **Prisma database** — Persist promotions, reservations, orders to SQLite
+3. **WebSocket mini-service** — Real-time multi-user updates
+4. **Drag & drop dashboard widgets** — Reorder dashboard sections
+5. **Print-ready PDF reports** — Weekly/monthly business reports
+6. **Mobile bottom sheet menus** — Swipe-up actions on mobile
+7. **Accessibility audit** — Full keyboard nav, ARIA labels, focus management
+8. **Performance optimization** — Code splitting, lazy loading views

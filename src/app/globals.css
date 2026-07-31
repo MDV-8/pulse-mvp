@@ -810,3 +810,212 @@
   animation: particle-float var(--duration, 8s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
 }
+
+/* ============================================================
+   Task 15-c: Dashboard Ambient Background & Utility Classes
+   ============================================================ */
+
+/* Blob float keyframes — figure-8 pattern */
+@keyframes blob-float-1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(80px, -60px) scale(1.08);
+  }
+  50% {
+    transform: translate(0, -100px) scale(1.04);
+  }
+  75% {
+    transform: translate(-80px, -60px) scale(0.96);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes blob-float-2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(-70px, 50px) scale(0.95);
+  }
+  50% {
+    transform: translate(0, 90px) scale(1.06);
+  }
+  75% {
+    transform: translate(70px, 50px) scale(1.02);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* Dashboard ambient blobs */
+.dashboard-blob-1 {
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.06);
+  filter: blur(64px);
+  animation: blob-float-1 25s ease-in-out infinite;
+}
+
+.dashboard-blob-2 {
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: rgba(6, 182, 212, 0.04);
+  filter: blur(64px);
+  animation: blob-float-2 20s ease-in-out infinite;
+}
+
+/* Glass card with subtle gradient background */
+.glass-card-gradient {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), transparent, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Elegant section divider with centered dot and lines */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
+}
+
+.section-divider .divider-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.4);
+  flex-shrink: 0;
+}
+
+/* Tooltip fade animation */
+@keyframes tooltip-fade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tooltip-fade {
+  animation: tooltip-fade 0.2s ease-out forwards;
+}
+
+/* Small circular badge for icons */
+.icon-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Text with primary color text-shadow glow (subtle) */
+.glow-text-primary {
+  text-shadow: 0 0 2px var(--primary);
+}
+
+/* Hover glow — adds box-shadow glow in primary color on hover */
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+}
+
+/* ============================================================
+   Task 15-c: Light Theme Refinements
+   ============================================================ */
+
+.light .glass-card-gradient {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.04), transparent, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.light .pulse-text-gradient {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light .neon-line {
+  background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.35), rgba(124, 58, 237, 0.45), rgba(124, 58, 237, 0.35), transparent);
+}
+
+@keyframes neon-pulse-light {
+  0%, 100% {
+    box-shadow: 0 0 3px rgba(124, 58, 237, 0.15), 0 0 6px rgba(124, 58, 237, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 6px rgba(124, 58, 237, 0.25), 0 0 14px rgba(124, 58, 237, 0.1);
+  }
+}
+
+.light .neon-line {
+  animation: neon-pulse-light 3s ease-in-out infinite;
+}
+
+.light .aurora-border::before {
+  opacity: 0.35;
+}
+
+.light .stat-glow-purple {
+  text-shadow: 0 0 8px rgba(124, 58, 237, 0.2), 0 0 16px rgba(124, 58, 237, 0.08);
+}
+
+.light .stat-glow-green {
+  text-shadow: 0 0 8px rgba(5, 150, 105, 0.2), 0 0 16px rgba(5, 150, 105, 0.08);
+}
+
+.light .stat-glow-amber {
+  text-shadow: 0 0 8px rgba(217, 119, 6, 0.2), 0 0 16px rgba(217, 119, 6, 0.08);
+}
+
+.light .stat-glow-cyan {
+  text-shadow: 0 0 8px rgba(8, 145, 178, 0.2), 0 0 16px rgba(8, 145, 178, 0.08);
+}
+
+.light .stat-glow-red {
+  text-shadow: 0 0 8px rgba(220, 38, 38, 0.2), 0 0 16px rgba(220, 38, 38, 0.08);
+}
+
+.light .number-glow {
+  text-shadow: 0 0 12px rgba(124, 58, 237, 0.12);
+}
+
+.light .hover-glow:hover {
+  box-shadow: 0 0 14px rgba(124, 58, 237, 0.15), 0 0 28px rgba(124, 58, 237, 0.05);
+}
+
+.light .section-divider::before,
+.light .section-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.12), transparent);
+}
+
+.light .section-divider .divider-dot {
+  background: rgba(124, 58, 237, 0.25);
+}
+

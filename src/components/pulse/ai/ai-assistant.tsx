@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Send, Sparkles } from 'lucide-react';
+import { Brain, Send, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,6 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/stores/app-store';
 import { aiChatResponses } from '@/data/mock-data';
 import type { AIChatMessage } from '@/stores/app-store';
+
+type AIMode = 'keywords' | 'neural';
 
 const DEFAULT_GREETINGS = [
   'Хороший вопрос! Давайте посмотрим на данные "Coffee & Co". Попробуйте спросить про продажи, акции, клиентов или конкурентов — у меня есть точные данные по вашему бизнесу.',
@@ -358,6 +360,49 @@ function TypingIndicator() {
   );
 }
 
+function NeuralTypingIndicator() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      className="flex items-end gap-3"
+    >
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20">
+        <Sparkles className="h-3.5 w-3.5 text-primary" />
+      </div>
+      <div className="rounded-2xl rounded-bl-sm bg-card border border-primary/30 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <motion.span
+            className="text-primary text-sm font-medium"
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            AI думает
+          </motion.span>
+          <div className="flex gap-0.5">
+            <motion.span
+              className="h-1.5 w-1.5 rounded-full bg-primary"
+              animate={{ scale: [1, 1.4, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: 0 }}
+            />
+            <motion.span
+              className="h-1.5 w-1.5 rounded-full bg-primary"
+              animate={{ scale: [1, 1.4, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: 0.15 }}
+            />
+            <motion.span
+              className="h-1.5 w-1.5 rounded-full bg-primary"
+              animate={{ scale: [1, 1.4, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: 0.3 }}
+            />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function ChatMessage({ message }: { message: AIChatMessage }) {
   const isUser = message.role === 'user';
 
@@ -414,6 +459,7 @@ export function AIAssistant() {
   const { aiChatMessages, addAIChatMessage, clearAIChat } = useAppStore();
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [aiMode, setAiMode] = useState<AIMode>('neural');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -426,7 +472,7 @@ export function AIAssistant() {
     }
   }, [aiChatMessages, isTyping]);
 
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const messageText = text || inputValue.trim();
     if (!messageText || isTyping) return;
 
@@ -434,6 +480,35 @@ export function AIAssistant() {
     setInputValue('');
     setIsTyping(true);
 
+    if (aiMode === 'neural') {
+      try {
+        const history = aiChatMessages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+
+        const res = await fetch('/api/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history }),
+        });
+
+        const data = await res.json();
+
+        if (data.success && data.response) {
+          setIsTyping(false);
+          addAIChatMessage({ role: 'assistant', content: data.response });
+          return;
+        }
+        // If API returns unsuccessful, fall through to keyword matching
+        console.warn('AI API returned unsuccessful, falling back to keywords');
+      } catch (err) {
+        // Network error or other issue — fall back to keyword matching
+        console.warn('AI API failed, falling back to keywords:', err);
+      }
+    }
+
+    // Keyword matching (default mode or fallback)
     const response = getAIResponse(messageText);
     const delay = getTypingDelay(response);
 
@@ -473,16 +548,52 @@ export function AIAssistant() {
             </p>
           </div>
         </div>
-        {aiChatMessages.length > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs text-muted-foreground hover:text-foreground"
-            onClick={clearAIChat}
-          >
-            Очистить
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* AI Mode Toggle */}
+          <div className="flex items-center gap-1.5 rounded-lg bg-card border border-border p-0.5">
+            <button
+              onClick={() => setAiMode('keywords')}
+              className={cn(
+                'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
+                aiMode === 'keywords'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Ключевые слова
+            </button>
+            <button
+              onClick={() => setAiMode('neural')}
+              className={cn(
+                'px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
+                aiMode === 'neural'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Zap className="h-3 w-3" />
+              Нейросеть
+              <span className={cn(
+                'text-[9px] font-bold px-1 py-0.5 rounded leading-none',
+                aiMode === 'neural'
+                  ? 'bg-primary-foreground/20 text-primary-foreground'
+                  : 'bg-primary/15 text-primary'
+              )}>
+                BETA
+              </span>
+            </button>
+          </div>
+          {aiChatMessages.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground hover:text-foreground"
+              onClick={clearAIChat}
+            >
+              Очистить
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -512,7 +623,7 @@ export function AIAssistant() {
 
           {/* Typing Indicator */}
           <AnimatePresence>
-            {isTyping && <TypingIndicator />}
+            {isTyping && (aiMode === 'neural' ? <NeuralTypingIndicator /> : <TypingIndicator />)}
           </AnimatePresence>
         </div>
       </ScrollArea>
@@ -533,6 +644,15 @@ export function AIAssistant() {
               </motion.button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Disclaimer for Neural mode */}
+      {aiMode === 'neural' && (
+        <div className="px-4 sm:px-6">
+          <p className="text-[10px] text-muted-foreground/50 text-center">
+            AI ответы могут быть неточными. Демо режим.
+          </p>
         </div>
       )}
 
