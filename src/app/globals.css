@@ -1,0 +1,281 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-radius-sm: calc(var(--radius) - 4px);
+  --color-radius-md: calc(var(--radius) - 2px);
+  --color-radius-lg: var(--radius);
+  --color-radius-xl: calc(var(--radius) + 4px);
+  --color-pulse-purple: var(--pulse-purple);
+  --color-pulse-purple-foreground: var(--pulse-purple-foreground);
+  --color-pulse-glow: var(--pulse-glow);
+  --color-pulse-success: var(--pulse-success);
+  --color-pulse-warning: var(--pulse-warning);
+  --color-pulse-danger: var(--pulse-danger);
+}
+
+/* ============================================================
+   PULSE Premium Dark Theme (default)
+   Inspired by Linear, Stripe, Apple
+   ============================================================ */
+
+:root {
+  --radius: 0.75rem;
+
+  /* Dark background with slight purple undertone */
+  --background: #0a0a0f;
+  --foreground: #f0eff4;
+
+  /* Cards are slightly lighter */
+  --card: #12121a;
+  --card-foreground: #f0eff4;
+
+  --popover: #16161f;
+  --popover-foreground: #f0eff4;
+
+  /* PULSE Purple as primary */
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+
+  /* Secondary - muted dark */
+  --secondary: #1a1a26;
+  --secondary-foreground: #f0eff4;
+
+  --muted: #1a1a26;
+  --muted-foreground: #8888a0;
+
+  --accent: #1e1e2e;
+  --accent-foreground: #f0eff4;
+
+  /* Destructive - red */
+  --destructive: #ef4444;
+
+  /* Borders - very subtle */
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #8b5cf6;
+
+  /* Charts */
+  --chart-1: #8b5cf6;
+  --chart-2: #06b6d4;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
+  --chart-5: #ef4444;
+
+  /* Sidebar */
+  --sidebar: #0e0e16;
+  --sidebar-foreground: #f0eff4;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a1a26;
+  --sidebar-accent-foreground: #f0eff4;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #8b5cf6;
+
+  /* PULSE custom colors */
+  --pulse-purple: #8b5cf6;
+  --pulse-purple-foreground: #ffffff;
+  --pulse-glow: rgba(139, 92, 246, 0.15);
+  --pulse-success: #10b981;
+  --pulse-warning: #f59e0b;
+  --pulse-danger: #ef4444;
+}
+
+/* ============================================================
+   Light theme
+   ============================================================ */
+
+.light {
+  --background: #fafafa;
+  --foreground: #18181b;
+
+  --card: #ffffff;
+  --card-foreground: #18181b;
+
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+
+  --destructive: #ef4444;
+
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.06);
+  --ring: #7c3aed;
+
+  --chart-1: #7c3aed;
+  --chart-2: #0891b2;
+  --chart-3: #059669;
+  --chart-4: #d97706;
+  --chart-5: #dc2626;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #18181b;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: #7c3aed;
+
+  --pulse-purple: #7c3aed;
+  --pulse-purple-foreground: #ffffff;
+  --pulse-glow: rgba(124, 58, 237, 0.1);
+  --pulse-success: #059669;
+  --pulse-warning: #d97706;
+  --pulse-danger: #dc2626;
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01", "ss03";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================================
+   PULSE Custom Utility Classes
+   ============================================================ */
+
+/* Pulse glow effect */
+.pulse-glow {
+  box-shadow: 0 0 40px var(--pulse-glow), 0 0 80px rgba(139, 92, 246, 0.05);
+}
+
+.pulse-glow-sm {
+  box-shadow: 0 0 20px var(--pulse-glow);
+}
+
+/* Pulse border glow */
+.pulse-border {
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.pulse-border-hover:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* Pulse gradient text */
+.pulse-text-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated pulse line */
+@keyframes pulse-line {
+  0% { transform: scaleX(0); opacity: 0; }
+  50% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+
+.pulse-line {
+  animation: pulse-line 2s ease-in-out infinite;
+  transform-origin: left;
+}
+
+/* Subtle card hover */
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+.score-ring {
+  animation: score-fill 1.5s ease-out forwards;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.4);
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(18, 18, 26, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}

@@ -1,0 +1,936 @@
+     1→     1→// ============================================================
+     2→     2→// PULSE — Complete Mock Data for MVP
+     3→     3→// Currency: ₸ (Kazakh Tenge)
+     4→     4→// Language: Russian
+     5→     5→// ============================================================
+     6→     6→
+     7→     7→export interface BusinessData {
+     8→     8→  name: string;
+     9→     9→  category: string;
+    10→    10→  city: string;
+    11→    11→  size: string;
+    12→    12→  goals: string[];
+    13→    13→  createdAt: string;
+    14→    14→}
+    15→    15→
+    16→    16→export interface PulseScore {
+    17→    17→  total: number;
+    18→    18→  breakdown: {
+    19→    19→    sales: number;
+    20→    20→    clients: number;
+    21→    21→    loyalty: number;
+    22→    22→    marketing: number;
+    23→    23→    profit: number;
+    24→    24→  };
+    25→    25→}
+    26→    26→
+    27→    27→export interface MetricCard {
+    28→    28→  label: string;
+    29→    29→  value: string;
+    30→    30→  change: number;
+    31→    31→  trend: 'up' | 'down' | 'stable';
+    32→    32→}
+    33→    33→
+    34→    34→export interface AIInsight {
+    35→    35→  id: string;
+    36→    36→  type: 'warning' | 'opportunity' | 'info' | 'success';
+    37→    37→  title: string;
+    38→    38→  description: string;
+    39→    39→  recommendation: string;
+    40→    40→  action: string;
+    41→    41→  actionLabel: string;
+    42→    42→  expectedEffect?: string;
+    43→    43→  priority: number;
+    44→    44→}
+    45→    45→
+    46→    46→export interface TodayAction {
+    47→    47→  id: string;
+    48→    48→  title: string;
+    49→    49→  reason: string;
+    50→    50→  expectedEffect: string;
+    51→    51→  actionLabel: string;
+    52→    52→  actionType: 'promotion' | 'clients' | 'content' | 'reviews' | 'other';
+    53→    53→  priority: number;
+    54→    54→}
+    55→    55→
+    56→    56→export interface Promotion {
+    57→    57→  id: string;
+    58→    58→  name: string;
+    59→    59→  discount: number;
+    60→    60→  product: string;
+    61→    61→  startTime: string;
+    62→    62→  endTime: string;
+    63→    63→  audience: string;
+    64→    64→  status: 'active' | 'completed' | 'draft' | 'planned';
+    65→    65→  results?: PromotionResults;
+    66→    66→}
+    67→    67→
+    68→    68→export interface PromotionResults {
+    69→    69→  newClients: number;
+    70→    70→  repeatPurchases: number;
+    71→    71→  averageCheck: number;
+    72→    72→  revenue: number;
+    73→    73→  profit: number;
+    74→    74→  newClientsChange: number;
+    75→    75→  repeatPurchasesChange: number;
+    76→    76→  averageCheckChange: number;
+    77→    77→  revenueChange: number;
+    78→    78→  profitChange: number;
+    79→    79→}
+    80→    80→
+    81→    81→export interface FinanceData {
+    82→    82→  revenue: number;
+    83→    83→  expenses: number;
+    84→    84→  netProfit: number;
+    85→    85→  margin: number;
+    86→    86→  averageCheck: number;
+    87→    87→  orders: number;
+    88→    88→  revenueChange: number;
+    89→    89→  expensesChange: number;
+    90→    90→  profitChange: number;
+    91→    91→  marginChange: number;
+    92→    92→  averageCheckChange: number;
+    93→    93→  ordersChange: number;
+    94→    94→  chartData: { date: string; revenue: number; expenses: number; profit: number }[];
+    95→    95→}
+    96→    96→
+    97→    97→export interface Client {
+    98→    98→  id: string;
+    99→    99→  name: string;
+   100→   100→  phone: string;
+   101→   101→  totalPurchases: number;
+   102→   102→  totalSpent: number;
+   103→   103→  lastVisit: string;
+   104→   104→  frequency: string;
+   105→   105→  segment: 'new' | 'regular' | 'vip' | 'lost';
+   106→   106→  age?: string;
+   107→   107→  favoriteProducts?: string[];
+   108→   108→}
+   109→   109→
+   110→   110→export interface ClientSegments {
+   111→   111→  total: number;
+   112→   112→  new: number;
+   113→   113→  regular: number;
+   114→   114→  lost: number;
+   115→   115→  vip: number;
+   116→   116→  lostClientsList: Client[];
+   117→   117→}
+   118→   118→
+   119→   119→export interface LoyaltyData {
+   120→   120→  totalPointsIssued: number;
+   121→   121→  totalPointsUsed: number;
+   122→   122→  activeMembers: number;
+   123→   123→  levels: { name: string; minPoints: number; benefits: string; count: number }[];
+   124→   124→}
+   125→   125→
+   126→   126→export interface AudienceInsight {
+   127→   127→  ageGroups: { group: string; percent: number }[];
+   128→   128→  peakHours: { hour: string; visits: number }[];
+   129→   129→  popularProducts: { name: string; percent: number }[];
+   130→   130→  visitFrequency: { label: string; percent: number }[];
+   131→   131→  averageCheckBySegment: { segment: string; check: number }[];
+   132→   132→  aiSummary: string;
+   133→   133→}
+   134→   134→
+   135→   135→export interface BusinessGoal {
+   136→   136→  id: string;
+   137→   137→  title: string;
+   138→   138→  targetValue: number;
+   139→   139→  currentValue: number;
+   140→   140→  unit: string;
+   141→   141→  deadline: string;
+   142→   142→  plan: { month: number; target: number; actual?: number }[];
+   143→   143→  status: 'on_track' | 'behind' | 'ahead';
+   144→   144→}
+   145→   145→
+   146→   146→export interface BusinessEvent {
+   147→   147→  id: string;
+   148→   148→  date: string;
+   149→   149→  title: string;
+   150→   150→  description: string;
+   151→   151→  result: string;
+   152→   152→  type: 'loyalty' | 'promotion' | 'marketing' | 'other';
+   153→   153→}
+   154→   154→
+   155→   155→export interface SimulationResult {
+   156→   156→  expectedClients: number;
+   157→   157→  expectedRevenue: number;
+   158→   158→  expectedProfit: number;
+   159→   159→  risk: 'low' | 'medium' | 'high';
+   160→   160→  explanation: string;
+   161→   161→}
+   162→   162→
+   163→   163→export interface CompetitorData {
+   164→   164→  name: string;
+   165→   165→  category: string;
+   166→   166→  avgCheck: number;
+   167→   167→  popularOffers: string[];
+   168→   168→  promotions: string[];
+   169→   169→}
+   170→   170→
+   171→   171→export interface SMMContent {
+   172→   172→  postText: string;
+   173→   173→  storiesText: string;
+   174→   174→  reelsScript: string;
+   175→   175→  headline: string;
+   176→   176→  cta: string;
+   177→   177→  audienceNote: string;
+   178→   178→}
+   179→   179→
+   180→   180→// ============================================================
+   181→   181→// Mock Data Instances
+   182→   182→// ============================================================
+   183→   183→
+   184→   184→export const mockBusiness: BusinessData = {
+   185→   185→  name: 'Coffee & Co',
+   186→   186→  category: 'Кофейня',
+   187→   187→  city: 'Алматы',
+   188→   188→  size: 'малый (1-5 сотрудников)',
+   189→   189→  goals: ['Больше клиентов', 'Увеличить прибыль'],
+   190→   190→  createdAt: '2024-03-15',
+   191→   191→};
+   192→   192→
+   193→   193→export const mockPulseScore: PulseScore = {
+   194→   194→  total: 91,
+   195→   195→  breakdown: {
+   196→   196→    sales: 92,
+   197→   197→    clients: 78,
+   198→   198→    loyalty: 88,
+   199→   199→    marketing: 71,
+   200→   200→    profit: 94,
+   201→   201→  },
+   202→   202→};
+   203→   203→
+   204→   204→export const mockMetrics: MetricCard[] = [
+   205→   205→  {
+   206→   206→    label: 'Выручка',
+   207→   207→    value: '1 284 000 ₸',
+   208→   208→    change: 12,
+   209→   209→    trend: 'up',
+   210→   210→  },
+   211→   211→  {
+   212→   212→    label: 'Клиенты',
+   213→   213→    value: '1 248',
+   214→   214→    change: 8,
+   215→   215→    trend: 'up',
+   216→   216→  },
+   217→   217→  {
+   218→   218→    label: 'Средний чек',
+   219→   219→    value: '5 420 ₸',
+   220→   220→    change: -3,
+   221→   221→    trend: 'down',
+   222→   222→  },
+   223→   223→  {
+   224→   224→    label: 'Прибыль',
+   225→   225→    value: '386 000 ₸',
+   226→   226→    change: 9,
+   227→   227→    trend: 'up',
+   228→   228→  },
+   229→   229→];
+   230→   230→
+   231→   231→export const mockInsights: AIInsight[] = [
+   232→   232→  {
+   233→   233→    id: '1',
+   234→   234→    type: 'warning',
+   235→   235→    title: 'Поток клиентов после 18:00 снизился',
+   236→   236→    description:
+   237→   237→      'Количество клиентов в вечернее время (после 18:00) уменьшилось на 31% по сравнению с прошлой неделей. Это основная причина снижения общей выручки.',
+   238→   238→    recommendation:
+   239→   239→      'Рекомендуем запустить Happy Hour с 18:00 до 20:00 со скидкой 15% на все кофейные напитки. Это привлечёт вечернюю аудиторию и повысит поток.',
+   240→   240→    action: 'create_promotion',
+   241→   241→    actionLabel: 'Запустить Happy Hour',
+   242→   242→    expectedEffect: 'Ожидаемый рост клиентов: +18%, эффект на выручку: +9%',
+   243→   243→    priority: 1,
+   244→   244→  },
+   245→   245→  {
+   246→   246→    id: '2',
+   247→   247→    type: 'opportunity',
+   248→   248→    title: 'Утренний поток растёт',
+   249→   249→    description:
+   250→   250→      'Количество утренних клиентов (7:00–10:00) выросло на 14%. Растёт спрос на завтраки и капучино.',
+   251→   251→    recommendation:
+   252→   252→      'Добавьте утренний комбо-набор: кофе + выпечка со скидкой 10%. Это закрепит рост и повысит средний чек.',
+   253→   253→    action: 'create_promotion',
+   254→   254→    actionLabel: 'Создать комбо',
+   255→   255→    expectedEffect: 'Ожидаемый рост чека: +22%',
+   256→   256→    priority: 2,
+   257→   257→  },
+   258→   258→  {
+   259→   259→    id: '3',
+   260→   260→    type: 'info',
+   261→   261→    title: '18 клиентов не были более 30 дней',
+   262→   262→    description:
+   263→   263→      'Обнаружена группа из 18 клиентов, которые не совершали покупку более 30 дней. Часть из них — регулярные клиенты.',
+   264→   264→    recommendation:
+   265→   265→      'Отправьте персональное предложение с бонусом 500₸ на следующий визит. Это эффективнее массовой рассылки.',
+   266→   266→    action: 'return_clients',
+   267→   267→    actionLabel: 'Вернуть клиентов',
+   268→   268→    expectedEffect: 'Ожидаемый возврат: 40-60% клиентов',
+   269→   269→    priority: 3,
+   270→   270→  },
+   271→   271→];
+   272→   272→
+   273→   273→export const mockTodayActions: TodayAction[] = [
+   274→   274→  {
+   275→   275→    id: '1',
+   276→   276→    title: 'Запустить Happy Hour',
+   277→   277→    reason: 'Низкий поток клиентов после 18:00 (снижение 31%)',
+   278→   278→    expectedEffect: '+18% клиентов, +9% выручки',
+   279→   279→    actionLabel: 'ЗАПУСТИТЬ',
+   280→   280→    actionType: 'promotion',
+   281→   281→    priority: 1,
+   282→   282→  },
+   283→   283→  {
+   284→   284→    id: '2',
+   285→   285→    title: 'Вернуть 18 потерянных клиентов',
+   286→   286→    reason: 'Не совершали покупку более 30 дней',
+   287→   287→    expectedEffect: 'Возврат 40–60% клиентов',
+   288→   288→    actionLabel: 'СОЗДАТЬ',
+   289→   289→    actionType: 'clients',
+   290→   290→    priority: 2,
+   291→   291→  },
+   292→   292→  {
+   293→   293→    id: '3',
+   294→   294→    title: 'Опубликовать Stories',
+   295→   295→    reason: 'Ожидается высокий спрос вечером (прогноз AI)',
+   296→   296→    expectedEffect: '+12% вовлечённости',
+   297→   297→    actionLabel: 'СОЗДАТЬ',
+   298→   298→    actionType: 'content',
+   299→   299→    priority: 3,
+   300→   300→  },
+   301→   301→  {
+   302→   302→    id: '4',
+   303→   303→    title: 'Ответить на 3 отзыва',
+   304→   304→    reason: 'Новые отзывы от клиентов ждут ответа',
+   305→   305→    expectedEffect: 'Улучшение рейтинга и доверия',
+   306→   306→    actionLabel: 'ПОСМОТРЕТЬ',
+   307→   307→    actionType: 'reviews',
+   308→   308→    priority: 4,
+   309→   309→  },
+   310→   310→  {
+   311→   311→    id: '5',
+   312→   312→    title: 'Пополнить запас кофе',
+   313→   313→    reason: 'Остаток арабики — 2 дня при текущем расходе',
+   314→   314→    expectedEffect: 'Избежание упущенных продаж',
+   315→   315→    actionLabel: 'ЗАПИСАТЬ',
+   316→   316→    actionType: 'other',
+   317→   317→    priority: 5,
+   318→   318→  },
+   319→   319→];
+   320→   320→
+   321→   321→export const mockPromotions: Promotion[] = [
+   322→   322→  {
+   323→   323→    id: 'p1',
+   324→   324→    name: 'Happy Hour',
+   325→   325→    discount: 15,
+   326→   326→    product: 'Все кофейные напитки',
+   327→   327→    startTime: '2025-01-20 18:00',
+   328→   328→    endTime: '2025-01-25 20:00',
+   329→   329→    audience: 'Все клиенты',
+   330→   330→    status: 'completed',
+   331→   331→    results: {
+   332→   332→      newClients: 47,
+   333→   333→      repeatPurchases: 89,
+   334→   334→      averageCheck: 4870,
+   335→   335→      revenue: 412000,
+   336→   336→      profit: 128000,
+   337→   337→      newClientsChange: 18,
+   338→   338→      repeatPurchasesChange: 12,
+   339→   339→      averageCheckChange: -5,
+   340→   340→      revenueChange: 11,
+   341→   341→      profitChange: 7,
+   342→   342→    },
+   343→   343→  },
+   344→   344→  {
+   345→   345→    id: 'p2',
+   346→   346→    name: 'Утренний комбо',
+   347→   347→    discount: 10,
+   348→   348→    product: 'Кофе + выпечка',
+   349→   349→    startTime: '2025-01-27 07:00',
+   350→   350→    endTime: '2025-02-10 10:00',
+   351→   351→    audience: 'Все клиенты',
+   352→   352→    status: 'active',
+   353→   353→  },
+   354→   354→  {
+   355→   355→    id: 'p3',
+   356→   356→    name: 'Приветственный бонус',
+   357→   357→    discount: 20,
+   358→   358→    product: 'Первый заказ',
+   359→   359→    startTime: '2025-02-01 00:00',
+   360→   360→    endTime: '2025-03-01 23:59',
+   361→   361→    audience: 'Новые клиенты',
+   362→   362→    status: 'planned',
+   363→   363→  },
+   364→   364→];
+   365→   365→
+   366→   366→export const mockFinanceData: FinanceData = {
+   367→   367→  revenue: 1284000,
+   368→   368→  expenses: 898000,
+   369→   369→  netProfit: 386000,
+   370→   370→  margin: 30.1,
+   371→   371→  averageCheck: 5420,
+   372→   372→  orders: 237,
+   373→   373→  revenueChange: 12,
+   374→   374→  expensesChange: 8,
+   375→   375→  profitChange: 9,
+   376→   376→  marginChange: 0.5,
+   377→   377→  averageCheckChange: -3,
+   378→   378→  ordersChange: 15,
+   379→   379→  chartData: [
+   380→   380→    { date: '01.01', revenue: 142000, expenses: 98000, profit: 44000 },
+   381→   381→    { date: '01.05', revenue: 158000, expenses: 105000, profit: 53000 },
+   382→   382→    { date: '01.10', revenue: 135000, expenses: 92000, profit: 43000 },
+   383→   383→    { date: '01.15', revenue: 168000, expenses: 118000, profit: 50000 },
+   384→   384→    { date: '01.20', revenue: 192000, expenses: 134000, profit: 58000 },
+   385→   385→    { date: '01.25', revenue: 178000, expenses: 126000, profit: 52000 },
+   386→   386→    { date: '01.30', revenue: 211000, expenses: 145000, profit: 66000 },
+   387→   387→  ],
+   388→   388→};
+   389→   389→
+   390→   390→export const mockClients: Client[] = [
+   391→   391→  {
+   392→   392→    id: 'c1',
+   393→   393→    name: 'Айдана К.',
+   394→   394→    phone: '+7 771 123 4567',
+   395→   395→    totalPurchases: 34,
+   396→   396→    totalSpent: 184280,
+   397→   397→    lastVisit: '2025-01-29',
+   398→   398→    frequency: '3-4 раза в неделю',
+   399→   399→    segment: 'vip',
+   400→   400→    age: '25-34',
+   401→   401→    favoriteProducts: ['Капучино', 'Чизкейк'],
+   402→   402→  },
+   403→   403→  {
+   404→   404→    id: 'c2',
+   405→   405→    name: 'Дмитрий С.',
+   406→   406→    phone: '+7 702 234 5678',
+   407→   407→    totalPurchases: 21,
+   408→   408→    totalSpent: 105420,
+   409→   409→    lastVisit: '2025-01-28',
+   410→   410→    frequency: '1-2 раза в неделю',
+   411→   411→    segment: 'regular',
+   412→   412→    age: '25-34',
+   413→   413→    favoriteProducts: ['Латте', 'Круассан'],
+   414→   414→  },
+   415→   415→  {
+   416→   416→    id: 'c3',
+   417→   417→    name: 'Мария Л.',
+   418→   418→    phone: '+7 777 345 6789',
+   419→   419→    totalPurchases: 2,
+   420→   420→    totalSpent: 12800,
+   421→   421→    lastVisit: '2025-01-10',
+   422→   422→    frequency: 'редко',
+   423→   423→    segment: 'lost',
+   424→   424→    age: '18-24',
+   425→   425→    favoriteProducts: ['Американо'],
+   426→   426→  },
+   427→   427→  {
+   428→   428→    id: 'c4',
+   429→   429→    name: 'Арман Б.',
+   430→   430→    phone: '+7 701 456 7890',
+   431→   431→    totalPurchases: 1,
+   432→   432→    totalSpent: 4200,
+   433→   433→    lastVisit: '2025-01-05',
+   434→   434→    frequency: 'однократно',
+   435→   435→    segment: 'new',
+   436→   436→    age: '35-44',
+   437→   437→    favoriteProducts: ['Эспрессо'],
+   438→   438→  },
+   439→   439→  {
+   440→   440→    id: 'c5',
+   441→   441→    name: 'Нурлан Т.',
+   442→   442→    phone: '+7 775 567 8901',
+   443→   443→    totalPurchases: 56,
+   444→   444→    totalSpent: 312400,
+   445→   445→    lastVisit: '2025-01-30',
+   446→   446→    frequency: '5-6 раз в неделю',
+   447→   447→    segment: 'vip',
+   448→   448→    age: '25-34',
+   449→   449→    favoriteProducts: ['Капучино', 'Раф', 'Тирамису'],
+   450→   450→  },
+   451→   451→  {
+   452→   452→    id: 'c6',
+   453→   453→    name: 'Сауле М.',
+   454→   454→    phone: '+7 708 678 9012',
+   455→   455→    totalPurchases: 15,
+   456→   456→    totalSpent: 72100,
+   457→   457→    lastVisit: '2025-01-27',
+   458→   458→    frequency: '1 раз в неделю',
+   459→   459→    segment: 'regular',
+   460→   460→    age: '45+',
+   461→   461→    favoriteProducts: ['Латте', 'Брауни'],
+   462→   462→  },
+   463→   463→  {
+   464→   464→    id: 'c7',
+   465→   465→    name: 'Тимур К.',
+   466→   466→    phone: '+7 773 789 0123',
+   467→   467→    totalPurchases: 3,
+   468→   468→    totalSpent: 15600,
+   469→   469→    lastVisit: '2025-01-20',
+   470→   470→    frequency: 'редко',
+   471→   471→    segment: 'lost',
+   472→   472→    age: '18-24',
+   473→   473→    favoriteProducts: ['Айс-латте'],
+   474→   474→  },
+   475→   475→  {
+   476→   476→    id: 'c8',
+   477→   477→    name: 'Елена В.',
+   478→   478→    phone: '+7 707 890 1234',
+   479→   479→    totalPurchases: 28,
+   480→   480→    totalSpent: 156800,
+   481→   481→    lastVisit: '2025-01-29',
+   482→   482→    frequency: '3-4 раза в неделю',
+   483→   483→    segment: 'vip',
+   484→   484→    age: '25-34',
+   485→   485→    favoriteProducts: ['Капучино', 'Маффины'],
+   486→   486→  },
+   487→   487→  {
+   488→   488→    id: 'c9',
+   489→   489→    name: 'Бекзат О.',
+   490→   490→    phone: '+7 776 901 2345',
+   491→   491→    totalPurchases: 1,
+   492→   492→    totalSpent: 3800,
+   493→   493→    lastVisit: '2025-01-25',
+   494→   494→    frequency: 'однократно',
+   495→   495→    segment: 'new',
+   496→   496→    age: '35-44',
+   497→   497→    favoriteProducts: ['Двойной эспрессо'],
+   498→   498→  },
+   499→   499→  {
+   500→   500→    id: 'c10',
+   501→   501→    name: 'Динара А.',
+   502→   502→    phone: '+7 770 012 3456',
+   503→   503→    totalPurchases: 19,
+   504→   504→    totalSpent: 98700,
+   505→   505→    lastVisit: '2025-01-28',
+   506→   506→    frequency: '2-3 раза в неделю',
+   507→   507→    segment: 'regular',
+   508→   508→    age: '18-24',
+   509→   509→    favoriteProducts: ['Раф', 'Чизкейк'],
+   510→   510→  },
+   511→   511→];
+   512→   512→
+   513→   513→export const mockClientSegments: ClientSegments = {
+   514→   514→  total: 1248,
+   515→   515→  new: 156,
+   516→   516→  regular: 724,
+   517→   517→  lost: 198,
+   518→   518→  vip: 170,
+   519→   519→  lostClientsList: mockClients.filter((c) => c.segment === 'lost'),
+   520→   520→};
+   521→   521→
+   522→   522→export const mockLoyaltyData: LoyaltyData = {
+   523→   523→  totalPointsIssued: 485200,
+   524→   524→  totalPointsUsed: 312400,
+   525→   525→  activeMembers: 894,
+   526→   526→  levels: [
+   527→   527→    {
+   528→   528→      name: 'Бронза',
+   529→   529→      minPoints: 0,
+   530→   530→      benefits: 'Накопление бонусов 1₸ = 1 балл',
+   531→   531→      count: 420,
+   532→   532→    },
+   533→   533→    {
+   534→   534→      name: 'Серебро',
+   535→   535→      minPoints: 5000,
+   536→   536→      benefits: 'Накопление 1.5₸ = 1 балл, день рождения — сюрприз',
+   537→   537→      count: 312,
+   538→   538→    },
+   539→   539→    {
+   540→   540→      name: 'Золото',
+   541→   541→      minPoints: 15000,
+   542→   542→      benefits: 'Накопление 2₸ = 1 балл, персональные предложения',
+   543→   543→      count: 132,
+   544→   544→    },
+   545→   545→    {
+   546→   546→      name: 'Платина',
+   547→   547→      minPoints: 30000,
+   548→   548→      benefits: 'Приоритетное обслуживание, эксклюзивные акции',
+   549→   549→      count: 30,
+   550→   550→    },
+   551→   551→  ],
+   552→   552→};
+   553→   553→
+   554→   554→export const mockAudienceInsight: AudienceInsight = {
+   555→   555→  ageGroups: [
+   556→   556→    { group: '18–24', percent: 42 },
+   557→   557→    { group: '25–34', percent: 31 },
+   558→   558→    { group: '35–44', percent: 18 },
+   559→   559→    { group: '45+', percent: 9 },
+   560→   560→  ],
+   561→   561→  peakHours: [
+   562→   562→    { hour: '07:00', visits: 45 },
+   563→   563→    { hour: '08:00', visits: 78 },
+   564→   564→    { hour: '09:00', visits: 92 },
+   565→   565→    { hour: '10:00', visits: 65 },
+   566→   566→    { hour: '11:00', visits: 42 },
+   567→   567→    { hour: '12:00', visits: 58 },
+   568→   568→    { hour: '13:00', visits: 72 },
+   569→   569→    { hour: '14:00', visits: 48 },
+   570→   570→    { hour: '15:00', visits: 38 },
+   571→   571→    { hour: '16:00', visits: 32 },
+   572→   572→    { hour: '17:00', visits: 41 },
+   573→   573→    { hour: '18:00', visits: 28 },
+   574→   574→    { hour: '19:00', visits: 22 },
+   575→   575→    { hour: '20:00', visits: 18 },
+   576→   576→  ],
+   577→   577→  popularProducts: [
+   578→   578→    { name: 'Капучино', percent: 34 },
+   579→   579→    { name: 'Латте', percent: 22 },
+   580→   580→    { name: 'Раф', percent: 15 },
+   581→   581→    { name: 'Американо', percent: 12 },
+   582→   582→    { name: 'Эспрессо', percent: 9 },
+   583→   583→    { name: 'Айс-латте', percent: 8 },
+   584→   584→  ],
+   585→   585→  visitFrequency: [
+   586→   586→    { label: 'Ежедневно', percent: 12 },
+   587→   587→    { label: '3-4 раза в неделю', percent: 28 },
+   588→   588→    { label: '1-2 раза в неделю', percent: 35 },
+   589→   589→    { label: '1-2 раза в месяц', percent: 18 },
+   590→   590→    { label: 'Реже', percent: 7 },
+   591→   591→  ],
+   592→   592→  averageCheckBySegment: [
+   593→   593→    { segment: 'VIP', check: 6800 },
+   594→   594→    { segment: 'Постоянные', check: 5100 },
+   595→   595→    { segment: 'Новые', check: 4200 },
+   596→   596→  ],
+   597→   597→  aiSummary:
+   598→   598→    'Основная аудитория — 18–34 года (73%). Рекомендуем делать акцент на вечерние акции и короткий видеоконтент. Пиковая нагрузка — утро (8:00–10:00). Наибольший потенциал роста — вечерний сегмент (18:00–20:00).',
+   599→   599→};
+   600→   600→
+   601→   601→export const mockGoals: BusinessGoal[] = [
+   602→   602→  {
+   603→   603→    id: 'g1',
+   604→   604→    title: 'Увеличить месячную прибыль на 20%',
+   605→   605→    targetValue: 20,
+   606→   606→    currentValue: 9,
+   607→   607→    unit: '%',
+   608→   608→    deadline: '2025-04-15',
+   609→   609→    status: 'on_track',
+   610→   610→    plan: [
+   611→   611→      { month: 1, target: 5, actual: 9 },
+   612→   612→      { month: 2, target: 12, actual: 9 },
+   613→   613→      { month: 3, target: 17 },
+   614→   614→      { month: 4, target: 20 },
+   615→   615→    ],
+   616→   616→  },
+   617→   617→  {
+   618→   618→    id: 'g2',
+   619→   619→    title: 'Привлечь 200 новых клиентов',
+   620→   620→    targetValue: 200,
+   621→   621→    currentValue: 156,
+   622→   622→    unit: 'человек',
+   623→   623→    deadline: '2025-03-31',
+   624→   624→    status: 'on_track',
+   625→   625→    plan: [
+   626→   626→      { month: 1, target: 50, actual: 48 },
+   627→   627→      { month: 2, target: 100, actual: 108 },
+   628→   628→      { month: 3, target: 200 },
+   629→   629→    ],
+   630→   630→  },
+   631→   631→  {
+   632→   632→    id: 'g3',
+   633→   633→    title: 'Снизить отток клиентов до 10%',
+   634→   634→    targetValue: 10,
+   635→   635→    currentValue: 15.8,
+   636→   636→    unit: '%',
+   637→   637→    deadline: '2025-06-30',
+   638→   638→    status: 'behind',
+   639→   639→    plan: [
+   640→   640→      { month: 1, target: 14, actual: 15.8 },
+   641→   641→      { month: 2, target: 12 },
+   642→   642→      { month: 3, target: 10 },
+   643→   643→    ],
+   644→   644→  },
+   645→   645→];
+   646→   646→
+   647→   647→export const mockBusinessHistory: BusinessEvent[] = [
+   648→   648→  {
+   649→   649→    id: 'e1',
+   650→   650→    date: '2024-11-01',
+   651→   651→    title: 'Запуск программы лояльности',
+   652→   652→    description: 'Запущена бонусная система с 4 уровнями',
+   653→   653→    result: 'Повторные покупки +18%',
+   654→   654→    type: 'loyalty',
+   655→   655→  },
+   656→   656→  {
+   657→   657→    id: 'e2',
+   658→   658→    date: '2024-12-01',
+   659→   659→    title: 'Запуск Happy Hour',
+   660→   660→    description: 'Скидка 15% на все напитки с 18:00 до 20:00',
+   661→   661→    result: 'Вечерний поток +21%',
+   662→   662→    type: 'promotion',
+   663→   663→  },
+   664→   664→  {
+   665→   665→    id: 'e3',
+   666→   666→    date: '2025-01-15',
+   667→   667→    title: 'Акция «Приведи друга»',
+   668→   668→    description: 'Бонус 500₸ за каждого приглашённого друга',
+   669→   669→    result: 'Новых клиентов +32',
+   670→   670→    type: 'marketing',
+   671→   671→  },
+   672→   672→];
+   673→   673→
+   674→   674→export const mockCompetitors: CompetitorData[] = [
+   675→   675→  {
+   676→   676→    name: 'Coffee Lab',
+   677→   677→    category: 'Кофейня',
+   678→   678→    avgCheck: 4800,
+   679→   679→    popularOffers: ['Сезонный кофе', 'Комбо бизнес-ланч'],
+   680→   680→    promotions: ['Скидка 20% на первый заказ', 'Кэшбэк 5%'],
+   681→   681→  },
+   682→   682→  {
+   683→   683→    name: 'Bean & Brew',
+   684→   684→    category: 'Кофейня',
+   685→   685→    avgCheck: 5200,
+   686→   686→    popularOffers: ['Спешелти кофе', 'Веган десерты'],
+   687→   687→    promotions: ['Карта постоянного гостя', 'Happy Hour 17:00–19:00'],
+   688→   688→  },
+   689→   689→  {
+   690→   690→    name: 'StarCoffee',
+   691→   691→    category: 'Сеть кофеен',
+   692→   692→    avgCheck: 6100,
+   693→   693→    popularOffers: ['Фирменные напитки', 'Сувениры'],
+   694→   694→    promotions: ['Программа «Звёзды»', 'Скидка 10% по коду'],
+   695→   695→  },
+   696→   696→];
+   697→   697→
+   698→   698→export const mockClientPromotions = [
+   699→   699→  {
+   700→   700→    id: 'cp1',
+   701→   701→    title: '−20% на кофе после 18:00',
+   702→   702→    description: 'Happy Hour в Coffee & Co',
+   703→   703→    businessName: 'Coffee & Co',
+   704→   704→    distance: '0.8 км',
+   705→   705→    rating: 4.8,
+   706→   706→    expiresAt: '2025-02-10',
+   707→   707→    isOpen: true,
+   708→   708→    category: 'Кофейня',
+   709→   709→  },
+   710→   710→  {
+   711→   711→    id: 'cp2',
+   712→   712→    title: '−15% на всё меню',
+   713→   713→    description: 'День рождения заведения',
+   714→   714→    businessName: 'Bean & Brew',
+   715→   715→    distance: '1.2 км',
+   716→   716→    rating: 4.6,
+   717→   717→    expiresAt: '2025-02-05',
+   718→   718→    isOpen: true,
+   719→   719→    category: 'Кофейня',
+   720→   720→  },
+   721→   721→  {
+   722→   722→    id: 'cp3',
+   723→   723→    title: 'Бесплатный десерт при заказе от 3000₸',
+   724→   724→    description: 'Новые гости',
+   725→   725→    businessName: 'Sweet Corner',
+   726→   726→    distance: '2.1 км',
+   727→   727→    rating: 4.3,
+   728→   728→    expiresAt: '2025-02-15',
+   729→   729→    isOpen: false,
+   730→   730→    category: 'Еда',
+   731→   731→  },
+   732→   732→  {
+   733→   733→    id: 'cp4',
+   734→   734→    title: '−10% на стрижку',
+   735→   735→    description: 'Первое посещение',
+   736→   736→    businessName: 'Style Studio',
+   737→   737→    distance: '1.5 км',
+   738→   738→    rating: 4.7,
+   739→   739→    expiresAt: '2025-03-01',
+   740→   740→    isOpen: true,
+   741→   741→    category: 'Красота',
+   742→   742→  },
+   743→   743→  {
+   744→   744→    id: 'cp5',
+   745→   745→    title: 'Тренировка в подарок',
+   746→   746→    description: 'Пробный день',
+   747→   747→    businessName: 'FitZone',
+   748→   748→    distance: '3.0 км',
+   749→   749→    rating: 4.5,
+   750→   750→    expiresAt: '2025-02-20',
+   751→   751→    isOpen: true,
+   752→   752→    category: 'Фитнес',
+   753→   753→  },
+   754→   754→];
+   755→   755→
+   756→   756→export const mockNearbyPlaces = [
+   757→   757→  {
+   758→   758→    id: 'np1',
+   759→   759→    name: 'Coffee & Co',
+   760→   760→    category: 'Кофейня',
+   761→   761→    distance: '0.0 км',
+   762→   762→    rating: 4.8,
+   763→   763→    isOpen: true,
+   764→   764→    promo: 'Happy Hour −20%',
+   765→   765→  },
+   766→   766→  {
+   767→   767→    id: 'np2',
+   768→   768→    name: 'Bean & Brew',
+   769→   769→    category: 'Кофейня',
+   770→   770→    distance: '1.2 км',
+   771→   771→    rating: 4.6,
+   772→   772→    isOpen: true,
+   773→   773→    promo: '−15% на всё',
+   774→   774→  },
+   775→   775→  {
+   776→   776→    id: 'np3',
+   777→   777→    name: 'Pizza Milano',
+   778→   778→    category: 'Еда',
+   779→   779→    distance: '1.8 км',
+   780→   780→    rating: 4.4,
+   781→   781→    isOpen: true,
+   782→   782→    promo: '',
+   783→   783→  },
+   784→   784→  {
+   785→   785→    id: 'np4',
+   786→   786→    name: 'Style Studio',
+   787→   787→    category: 'Красота',
+   788→   788→    distance: '1.5 км',
+   789→   789→    rating: 4.7,
+   790→   790→    isOpen: false,
+   791→   791→    promo: '−10% на стрижку',
+   792→   792→  },
+   793→   793→  {
+   794→   794→    id: 'np5',
+   795→   795→    name: 'FitZone',
+   796→   796→    category: 'Фитнес',
+   797→   797→    distance: '3.0 км',
+   798→   798→    rating: 4.5,
+   799→   799→    isOpen: true,
+   800→   800→    promo: 'Тренировка в подарок',
+   801→   801→  },
+   802→   802→  {
+   803→   803→    id: 'np6',
+   804→   804→    name: 'CityMart',
+   805→   805→    category: 'Магазины',
+   806→   806→    distance: '0.5 км',
+   807→   807→    rating: 4.2,
+   808→   808→    isOpen: true,
+   809→   809→    promo: '',
+   810→   810→  },
+   811→   811→  {
+   812→   812→    id: 'np7',
+   813→   813→    name: 'DryClean Pro',
+   814→   814→    category: 'Услуги',
+   815→   815→    distance: '2.3 км',
+   816→   816→    rating: 4.1,
+   817→   817→    isOpen: false,
+   818→   818→    promo: '',
+   819→   819→  },
+   820→   820→];
+   821→   821→
+   822→   822→// AI Chat pre-built responses
+   823→   823→export const aiChatResponses: Record<string, string> = {
+   824→   824→  default:
+   825→   825→    'Я могу помочь с анализом вашего бизнеса. Попробуйте спросить:\n\n• «Почему упали продажи?»\n• «Как увеличить средний чек?»\n• «Кого стоит вернуть из клиентов?»\n• «Какая акция будет выгоднее?»\n• «Почему упала прибыль?»',
+   826→   826→  sales_down:
+   827→   827→    'Продажи снизились на 8% за последнюю неделю.\n\nОсновная причина:\n−14% новых клиентов.\n\nПри этом повторные покупки выросли на 5% — постоянные клиенты остаются лояльны.\n\nПроблема в привлечении новой аудитории.\n\nРекомендация: запустить локальную акцию для привлечения новых клиентов — например, «Первый кофе за 1₸» или скидка 20% на первый заказ.',
+   828→   828→  profit_down:
+   829→   829→    'Прибыль снизилась на 5%, несмотря на рост выручки на 3%.\n\nПричина: увеличились расходы на продвижение (+18%).\n\nROI маркетинговых активностей:\n— Сocial media: 2.4₸ на каждый вложенный 1₸\n— Реферальная программа: 4.1₸ на каждый вложенный 1₸\n\nРекомендация: перераспределить бюджет в пользу реферальной программы — она эффективнее в 1.7 раза.',
+   830→   830→  average_check:
+   831→   831→    'Средний чек: 5 420 ₸ (−3% к прошлой неделе).\n\nПо сегментам:\n— VIP клиенты: 6 800 ₸ (стабильно)\n— Постоянные: 5 100 ₸ (−4%)\n— Новые: 4 200 ₸ (−8%)\n\nСнижение чека у новых клиентов связано с акцией «Первый заказ −20%».\n\nРекомендации:\n1. Добавить upsell: «Добавьте десерт за 800₸ (вместо 1200₸)»\n2. Создать комбо-наборы для повышения чека на 15–20%',
+   832→   832→  clients_return:
+   833→   833→    'Найдено 18 клиентов, которые не совершали покупку более 30 дней.\n\nИз них:\n— 7 были VIP (частота 3+ раза в неделю)\n— 8 — постоянные (1-2 раза в неделю)\n— 3 — новые (совершили 1-2 покупки)\n\nНаиболее ценные для возврата — VIP-клиенты.\n\nРекомендация:\n1. VIP: персональное предложение +500₸ бонус\n2. Постоянные: промокод на −15%\n3. Новые: «Мы скучаем!» — бонус на следующий заказ',
+   834→   834→  best_promotion:
+   835→   835→    'Анализ истории акций за последние 3 месяца:\n\n1. Happy Hour (18:00–20:00, −15%)\n   ROI: +11% выручки, +7% прибыли\n   Лучший результат по привлечению новых клиентов\n\n2. Утренний комбо (кофе + выпечка, −10%)\n   ROI: +8% выручки, +12% прибыли\n   Лучший результат по маржинальности\n\n3. Приветственный бонус (−20% первый заказ)\n   ROI: +15% новых клиентов\n   Но маржинальность −18% на этих заказах\n\nРекомендация: комбинируйте Happy Hour + утренний комбо для максимального эффекта.',
+   836→   836→  audience:
+   837→   837→    'Ваша основная аудитория:\n\nВозраст:\n18–24 — 42% (студенты, молодые специалисты)\n25–34 — 31% (офисные работники)\n35–44 — 18%\n45+ — 9%\n\nПоведения:\n— Пик посещений: 8:00–10:00 (утро)\n— Самый популярный продукт: Капучино (34%)\n— Частота: 63% посещают 1+ раз в неделю\n\nРекомендации:\n1. Вечерние акции для молодёжи (18–24)\n2. Комбо-наборы для офисных (25–34)\n3. Короткий видеоконтент для соцсетей',
+   838→   838→};
+   839→   839→
+   840→   840→export const mockAdminTools = [
+   841→   841→  {
+   842→   842→    id: 'at1',
+   843→   843→    name: 'AI Аналитика',
+   844→   844→    description: 'Автоматический анализ данных бизнеса и рекомендации',
+   845→   845→    icon: 'Brain',
+   846→   846→    enabled: true,
+   847→   847→  },
+   848→   848→  {
+   849→   849→    id: 'at2',
+   850→   850→    name: 'Умные акции',
+   851→   851→    description: 'Создание акций с AI-прогнозированием результатов',
+   852→   852→    icon: 'Sparkles',
+   853→   853→    enabled: true,
+   854→   854→  },
+   855→   855→  {
+   856→   856→    id: 'at3',
+   857→   857→    name: 'CRM Lite',
+   858→   858→    description: 'Управление клиентами и сегментация',
+   859→   859→    icon: 'Users',
+   860→   860→    enabled: true,
+   861→   861→  },
+   862→   862→  {
+   863→   863→    id: 'at4',
+   864→   864→    name: 'Программа лояльности',
+   865→   865→    description: 'Бонусная система с уровнями',
+   866→   866→    icon: 'Heart',
+   867→   867→    enabled: true,
+   868→   868→  },
+   869→   869→  {
+   870→   870→    id: 'at5',
+   871→   871→    name: 'AI Контент',
+   872→   872→    description: 'Генерация контента для соцсетей',
+   873→   873→    icon: 'Pen',
+   874→   874→    enabled: true,
+   875→   875→  },
+   876→   876→  {
+   877→   877→    id: 'at6',
+   878→   878→    name: 'AI Финансист',
+   879→   879→    description: 'Финансовая аналитика и прогнозирование',
+   880→   880→    icon: 'TrendingUp',
+   881→   881→    enabled: false,
+   882→   882→  },
+   883→   883→  {
+   884→   884→    id: 'at7',
+   885→   885→    name: 'Конкуренты',
+   886→   886→    description: 'Мониторинг рынка рядом',
+   887→   887→    icon: 'Eye',
+   888→   888→    enabled: false,
+   889→   889→  },
+   890→   890→  {
+   891→   891→    id: 'at8',
+   892→   892→    name: 'AI Календарь',
+   893→   893→    description: 'Предиктивные рекомендации по сезонности',
+   894→   894→    icon: 'Calendar',
+   895→   895→    enabled: false,
+   896→   896→  },
+   897→   897→];
+   898→   898→
+   899→   899→export const mockAdminTemplates = [
+   900→   900→  {
+   901→   901→    id: 'tpl1',
+   902→   902→    name: 'Happy Hour',
+   903→   903→    description: 'Скидка на вечерние часы для увеличения потока',
+   904→   904→    discount: 15,
+   905→   905→    category: 'Кофейня',
+   906→   906→  },
+   907→   907→  {
+   908→   908→    id: 'tpl2',
+   909→   909→    name: 'Приветственный бонус',
+   910→   910→    description: 'Скидка для новых клиентов',
+   911→   911→    discount: 20,
+   912→   912→    category: 'Все',
+   913→   913→  },
+   914→   914→  {
+   915→   915→    id: 'tpl3',
+   916→   916→    name: 'Комбо-набор',
+   917→   917→    description: 'Комбинация товаров со скидкой',
+   918→   918→    discount: 10,
+   919→   919→    category: 'Все',
+   920→   920→  },
+   921→   921→  {
+   922→   922→    id: 'tpl4',
+   923→   923→    name: 'День рождения',
+   924→   924→    description: 'Специальное предложение на день рождения клиента',
+   925→   925→    discount: 25,
+   926→   926→    category: 'Все',
+   927→   927→  },
+   928→   928→  {
+   929→   929→    id: 'tpl5',
+   930→   930→    name: 'Верни друга',
+   931→   931→    description: 'Бонус за привлечение нового клиента',
+   932→   932→    discount: 0,
+   933→   933→    category: 'Все',
+   934→   934→  },
+   935→   935→];
+   936→   936→
