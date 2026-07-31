@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Sparkles, Users, PenLine, MessageSquare, ClipboardList } from 'lucide-react';
 import { useAppStore } from '@/stores/app-store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,36 @@ function getActionColor(type: string): string {
   }
 }
 
+function getActionBorderColor(type: string): string {
+  switch (type) {
+    case 'promotion':
+      return 'border-l-purple-500';
+    case 'clients':
+      return 'border-l-cyan-500';
+    case 'content':
+      return 'border-l-pink-500';
+    case 'reviews':
+      return 'border-l-orange-500';
+    default:
+      return 'border-l-muted-foreground/30';
+  }
+}
+
+function getActionIcon(type: string) {
+  switch (type) {
+    case 'promotion':
+      return <Sparkles className="size-3.5 text-purple-400" />;
+    case 'clients':
+      return <Users className="size-3.5 text-cyan-400" />;
+    case 'content':
+      return <PenLine className="size-3.5 text-pink-400" />;
+    case 'reviews':
+      return <MessageSquare className="size-3.5 text-orange-400" />;
+    default:
+      return <ClipboardList className="size-3.5 text-muted-foreground" />;
+  }
+}
+
 const container = {
   hidden: { opacity: 0 },
   show: {
@@ -34,7 +65,7 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-export function TodayActions() {
+export function TodayActions({ showHeader = true }: { showHeader?: boolean }) {
   const todayActions = useAppStore((s) => s.todayActions);
   const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
   const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
@@ -56,6 +87,7 @@ export function TodayActions() {
 
   return (
     <div className="space-y-4">
+      {showHeader && (
       <div>
         <h2 className="text-lg font-semibold text-foreground">
           Что делать сегодня
@@ -64,6 +96,7 @@ export function TodayActions() {
           AI выбрал приоритетные действия для вас
         </p>
       </div>
+      )}
 
       <motion.div
         className="space-y-2"
@@ -75,18 +108,24 @@ export function TodayActions() {
           <motion.div
             key={action.id}
             variants={item}
-            className="flex items-start gap-3 rounded-xl border border-border bg-card p-4 transition-colors duration-200 hover:border-primary/10"
+            className={cn(
+              'flex items-start gap-3 rounded-xl border border-border border-l-[3px] bg-card p-4 transition-colors duration-200 hover:border-primary/10',
+              getActionBorderColor(action.actionType)
+            )}
           >
-            {/* Number */}
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-bold text-muted-foreground">
+            {/* Number badge with gradient */}
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-500/5 text-xs font-bold text-purple-300">
               {index + 1}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-foreground">
-                {action.title}
-              </h3>
+              <div className="flex items-center gap-2">
+                {getActionIcon(action.actionType)}
+                <h3 className="text-sm font-medium text-foreground">
+                  {action.title}
+                </h3>
+              </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {action.reason}
               </p>

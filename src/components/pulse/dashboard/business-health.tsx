@@ -3,7 +3,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
-import { cn } from '@/lib/utils';
 
 function getHealthColor(score: number): string {
   if (score >= 80) return '#10b981';
@@ -32,15 +31,58 @@ const item = {
   show: { opacity: 1, x: 0 },
 };
 
+function MiniDonut({ score, size = 32 }: { score: number; size?: number }) {
+  const strokeWidth = 3;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (score / 100) * circumference;
+  const color = getHealthColor(score);
+
+  return (
+    <svg width={size} height={size} className="-rotate-90">
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="rgba(255,255,255,0.05)"
+        strokeWidth={strokeWidth}
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        className="transition-all duration-1000 ease-out"
+      />
+    </svg>
+  );
+}
+
 export function BusinessHealth() {
   const pulseScore = useAppStore((s) => s.pulseScore);
   const breakdown = pulseScore.breakdown;
 
+  const overallColor = getHealthColor(pulseScore.total);
+
   return (
     <div className="space-y-4">
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-        Business Health
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          BUSINESS HEALTH
+        </h3>
+        <div className="flex items-center gap-2">
+          <MiniDonut score={pulseScore.total} size={28} />
+          <span className="text-sm font-bold tabular-nums" style={{ color: overallColor }}>
+            {pulseScore.total}
+          </span>
+        </div>
+      </div>
 
       <motion.div
         className="space-y-3"
@@ -52,7 +94,7 @@ export function BusinessHealth() {
           const score = breakdown[metric.key];
           const color = getHealthColor(score);
           return (
-            <motion.div key={metric.key} variants={item} className="space-y-1.5">
+            <motion.div key={metric.key} variants={item} className="space-y-1.5 group cursor-default">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground">{metric.label}</span>
                 <span
@@ -70,6 +112,10 @@ export function BusinessHealth() {
                   animate={{ width: `${score}%` }}
                   transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
                 />
+              </div>
+              {/* Tooltip on hover */}
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-muted-foreground/60 -mt-1">
+                Оценка: {score}/100
               </div>
             </motion.div>
           );

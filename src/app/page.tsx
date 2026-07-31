@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '@/stores/app-store';
 
 // Layout
@@ -17,6 +18,9 @@ import { BusinessHealth } from '@/components/pulse/dashboard/business-health';
 import { AIInsight } from '@/components/pulse/dashboard/ai-insight';
 import { TodayActions } from '@/components/pulse/dashboard/today-actions';
 import { MetricsOverview } from '@/components/pulse/dashboard/metrics-overview';
+
+// Shared
+import { NotificationCenter } from '@/components/pulse/shared/notification-center';
 
 // AI
 import { AIAssistant } from '@/components/pulse/ai/ai-assistant';
@@ -65,6 +69,12 @@ import {
   Moon,
   Sun,
   Store,
+  Bell,
+  Target,
+  UserPlus,
+  PenLine,
+  MessageSquare,
+  Clock,
 } from 'lucide-react';
 
 // ============================================================
@@ -115,9 +125,116 @@ function OwnerDashboard() {
 // Owner Views
 // ============================================================
 function DashboardView() {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const notifBellRef = useRef<HTMLButtonElement>(null);
+  const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
+  const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
+  const setShowAIContent = useAppStore((s) => s.setShowAIContent);
+  const setOwnerView = useAppStore((s) => s.setOwnerView);
+
+  // Live clock — update every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Greeting based on time of day
+  const hour = currentTime.getHours();
+  const greeting =
+    hour >= 5 && hour < 12
+      ? 'Доброе утро'
+      : hour >= 12 && hour < 17
+        ? 'Добрый день'
+        : hour >= 17 && hour < 22
+          ? 'Добрый вечер'
+          : 'Доброй ночи';
+
+  const timeString = currentTime.toLocaleTimeString('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  const quickActions = [
+    {
+      icon: Target,
+      label: 'Создать акцию',
+      emoji: '🎯',
+      action: () => setShowCreatePromotion(true),
+    },
+    {
+      icon: UserPlus,
+      label: 'Вернуть клиентов',
+      emoji: '👥',
+      action: () => setShowReturnClients(true),
+    },
+    {
+      icon: PenLine,
+      label: 'Создать контент',
+      emoji: '✍️',
+      action: () => setShowAIContent(true),
+    },
+    {
+      icon: MessageSquare,
+      label: 'Спросить AI',
+      emoji: '💬',
+      action: () => setOwnerView('ai'),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* PULSE Score + Metrics */}
+      {/* ====== Animated Pulse Line ====== */}
+      <div className="h-[2px] w-full rounded-full bg-gradient-to-r from-transparent via-purple-500 to-transparent pulse-line" />
+
+      {/* ====== Feature 4: Status Banner ====== */}
+      <div>
+        <div className="h-[3px] rounded-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-500 gradient-sweep" />
+        <p className="text-[11px] text-muted-foreground/50 mt-1.5 tracking-wider uppercase">
+          PULSE • Online • Demo Account
+        </p>
+      </div>
+
+      {/* ====== Feature 2: Greeting Banner with Live Clock ====== */}
+      <div className="rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">
+            {greeting}, владелец{' '}
+            <span className="pulse-text-gradient">Coffee & Co</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Здесь обзор вашего бизнеса за сегодня
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+          <Clock className="w-4 h-4" />
+          <span className="text-2xl font-mono font-semibold tabular-nums">
+            {timeString}
+          </span>
+        </div>
+      </div>
+
+      {/* ====== Notification Bell (floating) ====== */}
+      <div className="relative flex justify-end">
+        <button
+          ref={notifBellRef}
+          className="relative w-10 h-10 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-purple-400 transition-colors"
+          onClick={() => setShowNotifications((v) => !v)}
+          aria-label="Уведомления"
+        >
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-purple-500 ring-2 ring-background" />
+        </button>
+        <NotificationCenter
+          open={showNotifications}
+          onClose={() => setShowNotifications(false)}
+          triggerRef={notifBellRef}
+        />
+      </div>
+
+      {/* ====== PULSE Score + Metrics ====== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <PulseScore />
@@ -128,13 +245,37 @@ function DashboardView() {
         </div>
       </div>
 
-      {/* Business Health */}
+      {/* ====== Feature 3: Quick Actions ====== */}
+      <div>
+        <h2 className="text-sm font-medium text-muted-foreground mb-3">
+          Быстрые действия
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {quickActions.map((item) => (
+            <button
+              key={item.label}
+              onClick={item.action}
+              className={
+                'glass-card rounded-xl p-4 flex flex-col items-center gap-2.5 text-center cursor-pointer ' +
+                'quick-action-glow pulse-border pulse-border-hover'
+              }
+            >
+              <span className="text-2xl leading-none">{item.emoji}</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ====== Business Health ====== */}
       <BusinessHealth />
 
-      {/* What to do today */}
+      {/* ====== What to do today ====== */}
       <TodayActions />
 
-      {/* AI Footer */}
+      {/* ====== AI Footer ====== */}
       <div className="glass-card rounded-xl p-4 flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
           <Sparkles className="w-5 h-5 text-purple-400" />
@@ -167,7 +308,7 @@ function TodayView() {
           AI выбрал приоритетные действия для вашего бизнеса
         </p>
       </div>
-      <TodayActions />
+      <TodayActions showHeader={false} />
     </div>
   );
 }
@@ -540,13 +681,13 @@ export default function HomePage() {
         {/* Client Mode */}
         {appMode === 'client' && (
           <>
-            <div className="hidden md:flex md:w-64 md:flex-col md:border-r border-border bg-card">
+            <div className="hidden md:flex md:w-64 md:flex-col md:border-r border-border bg-card pb-20">
               <div className="p-6">
                 <h1 className="text-xl font-bold pulse-text-gradient">PULSE</h1>
                 <p className="text-xs text-muted-foreground mt-1">Клиентская часть</p>
               </div>
               <div className="flex-1" />
-              <div className="p-4">
+              <div className="px-4 pb-4">
                 <Button
                   variant="outline"
                   size="sm"

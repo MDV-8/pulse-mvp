@@ -67,11 +67,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar">
-      {/* Logo */}
-      <div className="flex h-16 items-center px-5">
-        <span className="text-2xl font-bold tracking-tight pulse-text-gradient">
-          PULSE
-        </span>
+      {/* Logo with animated gradient line */}
+      <div className="flex flex-col">
+        <div className="flex h-16 items-center px-5">
+          <span className="text-2xl font-bold tracking-tight pulse-text-gradient">
+            PULSE
+          </span>
+        </div>
+        {/* Animated gradient line below logo */}
+        <div className="mx-5 h-[2px] rounded-full bg-gradient-to-r from-purple-500/80 via-violet-400/60 to-transparent sidebar-gradient-line" />
       </div>
 
       <Separator className="bg-sidebar-border" />
@@ -87,21 +91,26 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 key={item.view}
                 onClick={() => handleNavClick(item.view)}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer',
+                  'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer',
                   isActive
                     ? 'bg-primary/15 text-primary'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
-                <Icon className={cn('size-4 shrink-0', isActive && 'text-primary')} />
-                <span>{item.label}</span>
+                {/* Active indicator bar on the left */}
                 {isActive && (
                   <motion.div
-                    layoutId="sidebar-active"
-                    className="absolute left-0 h-7 w-[3px] rounded-r-full bg-primary"
+                    layoutId="sidebar-active-indicator"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-primary"
                     transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                   />
                 )}
+                {/* Subtle background glow for active item */}
+                {isActive && (
+                  <div className="absolute inset-0 rounded-lg bg-primary/5 pointer-events-none" />
+                )}
+                <Icon className={cn('size-4 shrink-0', isActive && 'text-primary')} />
+                <span>{item.label}</span>
               </button>
             );
           })}
@@ -114,8 +123,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <div className="mb-3 flex justify-center">
             <Badge
               variant="outline"
-              className="border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs"
+              className="border-amber-500/20 bg-amber-500/5 text-amber-400/80 text-[10px] font-medium tracking-wider uppercase px-2.5 py-0.5"
             >
+              <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-400/60" />
               Demo аккаунт
             </Badge>
           </div>

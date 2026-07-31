@@ -229,6 +229,58 @@
   transform-origin: left;
 }
 
+/* AI card glow animation */
+@keyframes ai-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.1), inset 0 0 0 1px rgba(139, 92, 246, 0.15); }
+  50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.3); }
+}
+
+.ai-glow-card {
+  animation: ai-glow 3s ease-in-out infinite;
+}
+
+/* Score ring pulsing glow */
+@keyframes score-glow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.2)); }
+  50% { filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.4)); }
+}
+
+.score-glow {
+  animation: score-glow 2.5s ease-in-out infinite;
+}
+
+/* Sidebar gradient line animation */
+@keyframes sidebar-gradient {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.sidebar-gradient-line {
+  animation: sidebar-gradient 3s ease-in-out infinite;
+}
+
+/* Animated gradient sweep for status banner */
+@keyframes gradient-sweep {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-sweep {
+  background-size: 200% 100%;
+  animation: gradient-sweep 3s ease-in-out infinite;
+}
+
+/* Quick action glow hover */
+.quick-action-glow {
+  transition: all 0.25s ease;
+}
+
+.quick-action-glow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.25), 0 0 40px rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
 /* Subtle card hover */
 .card-hover {
   transition: all 0.2s ease;

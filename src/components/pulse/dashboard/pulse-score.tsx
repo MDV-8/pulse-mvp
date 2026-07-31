@@ -60,13 +60,14 @@ export function PulseScore() {
         <svg
           width={radius * 2}
           height={radius * 2}
-          className="relative transform -rotate-90"
+          className="relative transform -rotate-90 score-glow"
         >
           {/* Background circle */}
           <circle
             stroke="rgba(255,255,255,0.05)"
             fill="transparent"
             strokeWidth={strokeWidth}
+            strokeLinecap="round"
             r={normalizedRadius}
             cx={radius}
             cy={radius}
@@ -92,8 +93,7 @@ export function PulseScore() {
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="text-5xl font-bold tracking-tighter"
-            style={{ color }}
+            className="text-5xl font-bold tracking-tighter pulse-text-gradient"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -106,9 +106,15 @@ export function PulseScore() {
         </div>
       </div>
 
-      {/* Status text */}
+      {/* PULSE SCORE label */}
+      <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/60">
+        PULSE SCORE
+      </p>
+
+      {/* Status text - improved styling */}
       <motion.p
-        className="mt-4 text-sm font-medium text-muted-foreground text-center"
+        className="mt-1 text-sm font-medium text-center max-w-[180px]"
+        style={{ color }}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}

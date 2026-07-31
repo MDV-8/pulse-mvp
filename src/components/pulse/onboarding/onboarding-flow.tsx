@@ -170,7 +170,7 @@ export function OnboardingFlow() {
                 <div className="space-y-6">
                   <div>
                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-                      Добро пожаловать в{' '}
+                      Добро пожаловать в&nbsp;
                       <span className="pulse-text-gradient">PULSE</span>
                     </h1>
                     <p className="mt-2 text-sm text-muted-foreground">

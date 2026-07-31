@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ChevronRight, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { AlertTriangle, ChevronRight, Sparkles, TrendingUp, Users, Brain } from 'lucide-react';
 import { useAppStore } from '@/stores/app-store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,7 @@ export function AIInsight() {
     <div className="space-y-3">
       {/* Main insight card */}
       <motion.div
-        className="relative rounded-xl border border-primary/20 bg-card p-4 sm:p-5 overflow-hidden"
+        className="relative rounded-xl border border-primary/20 bg-card p-4 sm:p-5 overflow-hidden ai-glow-card"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -52,12 +52,12 @@ export function AIInsight() {
         {/* Subtle purple glow */}
         <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
 
-        {/* Badge */}
+        {/* Badge with AI brain icon */}
         <Badge
           variant="outline"
           className="mb-3 border-primary/30 bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wider"
         >
-          <Sparkles className="mr-1 size-3" />
+          <Brain className="mr-1 size-3" />
           AI Insight
         </Badge>
 
@@ -97,15 +97,15 @@ export function AIInsight() {
           </p>
         )}
 
-        {/* Action button */}
+        {/* Action button - more prominent with glow */}
         <div className="mt-4 ml-8">
           <Button
             size="sm"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-xs"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs h-9 px-5 shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-shadow"
             onClick={handleApplyInsight}
           >
             ПРИМЕНИТЬ
-            <ChevronRight className="ml-1 size-3.5" />
+            <ChevronRight className="ml-1 size-4" />
           </Button>
         </div>
       </motion.div>
