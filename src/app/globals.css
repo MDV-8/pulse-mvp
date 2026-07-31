@@ -331,3 +331,110 @@
   backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
+
+/* ============================================================
+   Shimmer effect for AI cards
+   ============================================================ */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(139, 92, 246, 0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* ============================================================
+   Animated gradient border
+   ============================================================ */
+
+@keyframes gradient-border {
+  0% { border-image-source: linear-gradient(0deg, #8b5cf6, #06b6d4, #8b5cf6); }
+  25% { border-image-source: linear-gradient(90deg, #8b5cf6, #06b6d4, #8b5cf6); }
+  50% { border-image-source: linear-gradient(180deg, #8b5cf6, #06b6d4, #8b5cf6); }
+  75% { border-image-source: linear-gradient(270deg, #8b5cf6, #06b6d4, #8b5cf6); }
+  100% { border-image-source: linear-gradient(360deg, #8b5cf6, #06b6d4, #8b5cf6); }
+}
+
+/* ============================================================
+   Floating animation for badges
+   ============================================================ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.float-animation {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   Pulse dot for live indicators
+   ============================================================ */
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   Improved glass card with depth
+   ============================================================ */
+
+.glass-card-deep {
+  background: rgba(18, 18, 26, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(139, 92, 246, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.light .glass-card-deep {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(124, 58, 237, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================================
+   Slide-in toast animation (CSS fallback / reference)
+   ============================================================ */
+
+@keyframes toast-slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes toast-slide-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+.toast-enter {
+  animation: toast-slide-in 0.3s ease-out forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out 0.3s ease-in forwards;
+}
+
+/* ============================================================
+   Number counter glow
+   ============================================================ */
+
+.number-glow {
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}

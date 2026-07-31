@@ -62,6 +62,17 @@ import Competitors from '@/components/pulse/competitors/competitors';
 import AIContent from '@/components/pulse/smm/ai-content';
 import AudienceInsights from '@/components/pulse/audience/audience-insights';
 
+// Reviews
+import { ReviewsManager } from '@/components/pulse/reviews/reviews-manager';
+// Staff
+import { StaffOverview } from '@/components/pulse/staff/staff-overview';
+// Product Sales
+import { ProductSales } from '@/components/pulse/sales/product-sales';
+// Toast Notifications
+import { ToastNotifications } from '@/components/pulse/shared/toast-notifications';
+// Animated Counter
+import { useAnimatedCounter } from '@/hooks/use-animated-counter';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -135,6 +146,12 @@ function OwnerDashboard() {
         return <GoalsView />;
       case 'settings':
         return <SettingsView />;
+      case 'reviews':
+        return <ReviewsManager />;
+      case 'team':
+        return <StaffOverview />;
+      case 'smm':
+        return <AIContent />;
       default:
         return <DashboardView />;
     }
@@ -263,6 +280,18 @@ function DashboardView() {
         </p>
       </div>
 
+      {/* ====== Live Activity Ticker ====== */}
+      <div className="glass-card rounded-xl p-3 flex items-center gap-3 overflow-hidden">
+        <div className="w-2 h-2 rounded-full bg-green-500 pulse-dot shrink-0" />
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Live</span>
+        <div className="h-[1px] w-px bg-border shrink-0" />
+        <p className="text-xs text-muted-foreground truncate">
+          <span className="text-purple-400">+15%</span> выручки за последний час •{' '}
+          <span className="text-green-400">3 новых клиента</span> сегодня •{' '}
+          <span className="text-amber-400">Happy Hour</span> активен
+        </p>
+      </div>
+
       {/* ====== Feature 2: Greeting Banner with Live Clock ====== */}
       <div className="rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-transparent border border-purple-500/10 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
@@ -338,6 +367,9 @@ function DashboardView() {
       {/* ====== Business Health ====== */}
       <BusinessHealth />
 
+      {/* ====== Sales by Product ====== */}
+      <ProductSales />
+
       {/* ====== What to do today ====== */}
       <TodayActions />
 
@@ -389,6 +421,7 @@ function SalesView() {
         </p>
       </div>
       <MetricsOverview />
+      <ProductSales />
       <BusinessHealth />
     </div>
   );
@@ -425,6 +458,8 @@ function AnalyticsView() {
       <AudienceInsights />
       <AICalendar />
       <Competitors />
+      <ReviewsManager />
+      <StaffOverview />
     </div>
   );
 }
@@ -941,6 +976,9 @@ export default function HomePage() {
         {showAIContent && (
           <AIContentDialog onClose={() => setShowAIContent(false)} />
         )}
+
+        {/* Toast Notifications */}
+        <ToastNotifications />
       </div>
     </div>
   );

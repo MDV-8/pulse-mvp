@@ -31,7 +31,10 @@ export type OwnerView =
   | 'analytics'
   | 'loyalty'
   | 'goals'
-  | 'settings';
+  | 'settings'
+  | 'reviews'
+  | 'team'
+  | 'smm';
 export type ClientView =
   | 'home'
   | 'map'

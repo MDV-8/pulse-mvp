@@ -19,6 +19,8 @@ import {
   Search,
   Sun,
   Moon,
+  MessageSquare,
+  PenLine,
 } from 'lucide-react';
 import { useAppStore, type OwnerView } from '@/stores/app-store';
 import {
@@ -45,6 +47,9 @@ const navItems: { label: string; icon: React.ElementType; view: OwnerView }[] = 
   { label: 'Лояльность', icon: Heart, view: 'loyalty' },
   { label: 'Цели', icon: Target, view: 'goals' },
   { label: 'Настройки', icon: Settings, view: 'settings' },
+  { label: 'Отзывы', icon: MessageSquare, view: 'reviews' },
+  { label: 'Команда', icon: Users, view: 'team' },
+  { label: 'SMM', icon: PenLine, view: 'smm' },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
