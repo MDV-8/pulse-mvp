@@ -49,7 +49,7 @@ export default function Competitors() {
           <Eye className="w-5 h-5 text-purple-400" />
         </div>
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Рынок рядом</h1>
+          <h1 className="text-2xl font-bold text-shadow-glow">Рынок рядом</h1>
           <Badge variant="outline" className="text-[10px] text-purple-400 border-purple-500/30 bg-purple-500/10">
             DEMO
           </Badge>

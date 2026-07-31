@@ -184,7 +184,7 @@ export function ReservationsView() {
             <CalendarDays className="size-5 text-purple-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-foreground">Бронирования</h2>
+            <h2 className="text-xl font-bold text-shadow-glow">Бронирования</h2>
             <p className="text-xs text-muted-foreground">Управление столиками и бронями</p>
           </div>
         </div>

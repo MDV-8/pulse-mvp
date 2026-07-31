@@ -89,7 +89,7 @@ export default function ClientsList() {
         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
           <Users className="w-5 h-5 text-purple-400" />
         </div>
-        <h1 className="text-2xl font-bold">Клиенты</h1>
+        <h1 className="text-2xl font-bold text-shadow-glow">Клиенты</h1>
         <div className="ml-auto">
           <ExportButton
             title="Клиенты"

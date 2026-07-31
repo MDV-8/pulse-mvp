@@ -169,7 +169,7 @@ export function InventoryList() {
             <Package className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Инвентарь и меню</h2>
+            <h2 className="text-xl font-bold text-shadow-glow">Инвентарь и меню</h2>
             <p className="text-xs text-muted-foreground">
               Управление запасами и меню
             </p>

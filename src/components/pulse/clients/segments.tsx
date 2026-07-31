@@ -67,7 +67,7 @@ export default function Segments() {
         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
           <PieChart className="w-5 h-5 text-purple-400" />
         </div>
-        <h1 className="text-2xl font-bold">Сегменты клиентов</h1>
+        <h1 className="text-2xl font-bold text-shadow-glow">Сегменты клиентов</h1>
       </motion.div>
 
       {/* Segment Visualization */}

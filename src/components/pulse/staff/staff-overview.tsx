@@ -81,7 +81,7 @@ export function StaffOverview() {
           <Users className="w-5 h-5 text-purple-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold">Команда</h2>
+          <h2 className="text-xl font-bold text-shadow-glow">Команда</h2>
           <p className="text-sm text-muted-foreground">
             {workingCount} из {employees.length} сотрудников на смене
           </p>

@@ -532,6 +532,14 @@
   text-shadow: 0 0 12px rgba(6, 182, 212, 0.5), 0 0 24px rgba(6, 182, 212, 0.2);
 }
 
+.stat-glow-emerald {
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.5), 0 0 24px rgba(16, 185, 129, 0.2);
+}
+
+.stat-glow-pink {
+  text-shadow: 0 0 12px rgba(236, 72, 153, 0.5), 0 0 24px rgba(236, 72, 153, 0.2);
+}
+
 /* Glass card premium — aurora border + stronger blur + inner shadow */
 .glass-card-premium {
   position: relative;
@@ -998,6 +1006,14 @@
   text-shadow: 0 0 8px rgba(8, 145, 178, 0.2), 0 0 16px rgba(8, 145, 178, 0.08);
 }
 
+.light .stat-glow-emerald {
+  text-shadow: 0 0 8px rgba(5, 150, 105, 0.2), 0 0 16px rgba(5, 150, 105, 0.08);
+}
+
+.light .stat-glow-pink {
+  text-shadow: 0 0 8px rgba(190, 18, 60, 0.2), 0 0 16px rgba(190, 18, 60, 0.08);
+}
+
 .light .stat-glow-red {
   text-shadow: 0 0 8px rgba(220, 38, 38, 0.2), 0 0 16px rgba(220, 38, 38, 0.08);
 }
@@ -1205,5 +1221,310 @@
 
 .success-bounce {
   animation: success-bounce-key 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ============================================================
+   Task 17: New CSS Animation Classes
+   ============================================================ */
+
+/* 1. Ripple Effect — click creates expanding ripple */
+@keyframes ripple-expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.5;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.3);
+  animation: ripple-expand 0.6s ease-out;
+  pointer-events: none;
+}
+
+/* 2. Shine Sweep — horizontal light sweep on hover */
+@keyframes shine-sweep-key {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  transition: none;
+  pointer-events: none;
+}
+
+.shine-sweep:hover::after {
+  animation: shine-sweep-key 0.6s ease-in-out;
+}
+
+/* 3. Glow Border Animated — rotating glow using conic-gradient */
+@keyframes gradient-shift {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.glow-border-animated {
+  position: relative;
+  border: 1px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  animation: gradient-shift 4s linear infinite;
+}
+
+.glow-border-animated::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--angle),
+    rgba(139, 92, 246, 0.6),
+    rgba(168, 85, 247, 0.2),
+    rgba(59, 130, 246, 0.4),
+    rgba(139, 92, 246, 0.1),
+    rgba(139, 92, 246, 0.6)
+  );
+  z-index: -1;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  animation: gradient-shift 4s linear infinite;
+  opacity: 0.6;
+}
+
+/* 4. Text Gradient Animate — shifting gradient text */
+@keyframes text-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-gradient-animate {
+  background: linear-gradient(
+    270deg,
+    #8b5cf6,
+    #a78bfa,
+    #c084fc,
+    #8b5cf6
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-gradient-shift 6s ease infinite;
+}
+
+/* 5. Card 3D Hover — subtle perspective tilt */
+.card-3d-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card-3d-hover:hover {
+  transform: perspective(800px) rotateX(1.5deg) rotateY(-1.5deg) scale(1.01);
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.12);
+}
+
+/* 6. Scroll Fade In — elements fade in when visible */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 7. Stat Card Pulse — subtle scale breathing */
+@keyframes stat-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+.stat-card-pulse {
+  animation: stat-pulse 3s ease-in-out infinite;
+}
+
+/* 8. Progress Bar Animated — gradient fill that moves */
+@keyframes progress-fill-move {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+.progress-bar-animated {
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    #8b5cf6 0%,
+    #a78bfa 50%,
+    #8b5cf6 100%
+  );
+  animation: progress-fill-move 2s linear infinite;
+}
+
+/* 9. Badge Glow — glowing badge effect */
+.badge-glow {
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.1);
+  animation: stat-pulse 2.5s ease-in-out infinite;
+}
+
+/* 10. Tooltip Pop — spring pop animation */
+@keyframes tooltip-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tooltip-pop {
+  animation: tooltip-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 11. Float 3D — gentle 3D floating */
+@keyframes float-3d {
+  0%, 100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotateX(2deg);
+  }
+}
+
+/* 12. Floating Orb — decorative ambient orb */
+@keyframes orb-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(20px, -15px) scale(1.05);
+  }
+  66% {
+    transform: translate(-10px, 10px) scale(0.95);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.15;
+  animation: orb-drift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* 13. Grid Pattern — subtle dot grid background */
+.grid-pattern {
+  background-image: radial-gradient(circle, rgba(139, 92, 246, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* 14. Text Shadow Glow — glowing text shadow */
+.text-shadow-glow {
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.1);
+}
+
+/* 15. Stat glow variants that may be missing */
+.stat-glow-emerald {
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.stat-glow-pink {
+  text-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
+}
+
+/* Light theme overrides for new classes */
+.light .text-shadow-glow {
+  text-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
+}
+
+.light .card-3d-hover:hover {
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.06);
+}
+
+.light .badge-glow {
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.15);
+}
+
+.light .glow-border-animated::before {
+  opacity: 0.3;
+}
+
+.light .stat-card-pulse {
+  animation: none;
 }
 

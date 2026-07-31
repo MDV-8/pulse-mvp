@@ -132,7 +132,7 @@ export function ScheduleView() {
             <Calendar className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">График сотрудников</h2>
+            <h2 className="text-xl font-bold text-shadow-glow">График сотрудников</h2>
             <p className="text-sm text-muted-foreground">
               Расписание на неделю
             </p>

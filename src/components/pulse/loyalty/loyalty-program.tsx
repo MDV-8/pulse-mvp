@@ -102,7 +102,7 @@ export default function LoyaltyProgram() {
         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-pink-500/20">
           <Heart className="w-5 h-5 text-pink-400" />
         </div>
-        <h1 className="text-2xl font-bold">Программа лояльности</h1>
+        <h1 className="text-2xl font-bold text-shadow-glow">Программа лояльности</h1>
       </motion.div>
 
       {/* Stats */}

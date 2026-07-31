@@ -7,6 +7,7 @@ import { useAppStore } from '@/stores/app-store';
 import { PulseScore } from '@/components/pulse/dashboard/pulse-score';
 import { BusinessHealth } from '@/components/pulse/dashboard/business-health';
 import { AIInsight } from '@/components/pulse/dashboard/ai-insight';
+import { TodayActionsDraggable } from '@/components/pulse/dashboard/today-actions-draggable';
 import { TodayActions } from '@/components/pulse/dashboard/today-actions';
 import { MetricsOverview } from '@/components/pulse/dashboard/metrics-overview';
 import { WeeklyReport } from '@/components/pulse/dashboard/weekly-report';
@@ -16,6 +17,7 @@ import { LiveOrders } from '@/components/pulse/dashboard/live-orders';
 import { PerformanceRadar } from '@/components/pulse/dashboard/performance-radar';
 import { PeakHours } from '@/components/pulse/dashboard/peak-hours';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useDBData } from '@/hooks/use-db-data';
 
 // Shared
 import { NotificationCenter } from '@/components/pulse/shared/notification-center';
@@ -23,6 +25,9 @@ import { WelcomeTour } from '@/components/pulse/shared/welcome-tour';
 import { FeedbackPopup } from '@/components/pulse/shared/feedback-popup';
 import { BottomSheet } from '@/components/pulse/shared/bottom-sheet';
 import { NotificationHistory } from '@/components/pulse/shared/notification-history';
+import { RevenueChart } from '@/components/pulse/shared/revenue-chart';
+import { CustomerFeedback } from '@/components/pulse/shared/customer-feedback';
+import { QuickStats } from '@/components/pulse/shared/quick-stats';
 
 // Clients
 import ClientsList from '@/components/pulse/clients/clients-list';
@@ -260,15 +265,7 @@ export function DashboardView() {
       {/* ====== AI Insights Feed ====== */}
       <AIInsightsFeed />
 
-      {/* ====== Section Divider: AI Feed → Weekly Report ====== */}
-      <div className="section-divider" aria-hidden="true">
-        <span className="divider-dot" />
-      </div>
-
-      {/* ====== Weekly Report ====== */}
-      <WeeklyReport />
-
-      {/* ====== Section Divider: Weekly Report → Radar ====== */}
+      {/* ====== Section Divider: AI Feed → Radar ====== */}
       <div className="section-divider" aria-hidden="true">
         <span className="divider-dot" />
       </div>
@@ -276,14 +273,23 @@ export function DashboardView() {
       {/* ====== Performance Radar ====== */}
       <PerformanceRadar />
 
+      {/* ====== Quick Stats Mini-Dashboard ====== */}
+      <QuickStats />
+
+      {/* ====== Revenue Trend Chart ====== */}
+      <RevenueChart />
+
       {/* ====== Sales by Product ====== */}
       <ProductSales />
 
       {/* ====== Peak Hours Heatmap ====== */}
       <PeakHours />
 
+      {/* ====== Customer Feedback ====== */}
+      <CustomerFeedback />
+
       {/* ====== What to do today ====== */}
-      <TodayActions />
+      <TodayActionsDraggable />
 
       {/* ====== Section Divider: Today Actions → AI Footer ====== */}
       <div className="section-divider" aria-hidden="true">
@@ -330,7 +336,7 @@ export function TodayView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Что делать сегодня</h1>
+        <h1 className="text-2xl font-bold text-shadow-glow">Что делать сегодня</h1>
         <p className="text-muted-foreground mt-1">
           AI выбрал приоритетные действия для вашего бизнеса
         </p>
@@ -344,7 +350,7 @@ export function SalesView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Продажи</h1>
+        <h1 className="text-2xl font-bold text-shadow-glow">Продажи</h1>
         <p className="text-muted-foreground mt-1">
           Анализ продаж и выручки
         </p>
@@ -366,8 +372,24 @@ export function ClientsView() {
 }
 
 export function PromotionsView() {
+  const { promotions: dbPromotions } = useDBData();
+  const isSynced = dbPromotions.length > 0;
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold">Акции и промо</h1>
+        {isSynced ? (
+          <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/25 text-xs gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            Синхронизировано
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
+            Демо режим
+          </Badge>
+        )}
+      </div>
       <PromotionsList />
       <AISimulator />
     </div>
@@ -378,7 +400,7 @@ export function AnalyticsView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Аналитика</h1>
+        <h1 className="text-2xl font-bold text-shadow-glow">Аналитика</h1>
         <p className="text-muted-foreground mt-1">
           Подробная аналитика вашего бизнеса
         </p>
@@ -591,7 +613,7 @@ export function SettingsView() {
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Версия</span>
-            <span className="font-medium">PULSE MVP v1.0</span>
+            <span className="font-medium">PULSE MVP v1.5</span>
           </div>
         </div>
       </div>

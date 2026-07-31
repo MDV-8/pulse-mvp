@@ -141,7 +141,7 @@ export function PromotionsList() {
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-4">
-        <h2 className="text-base font-semibold">Акции</h2>
+        <h2 className="text-base font-semibold text-gradient-animate">Акции</h2>
         <div className="flex items-center gap-2">
           <ExportButton
             title="Акции"
@@ -155,7 +155,7 @@ export function PromotionsList() {
           />
           <Button
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 border-glow"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 border-glow shine-sweep"
             onClick={() => setShowCreatePromotion(true)}
           >
             <Plus className="h-4 w-4" />

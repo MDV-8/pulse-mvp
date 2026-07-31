@@ -71,7 +71,7 @@ export default function AIContent() {
         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
           <PenLine className="w-5 h-5 text-purple-400" />
         </div>
-        <h1 className="text-2xl font-bold">AI Контент</h1>
+        <h1 className="text-2xl font-bold text-gradient-animate">AI Контент</h1>
       </motion.div>
 
       {/* Input */}

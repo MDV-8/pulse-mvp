@@ -283,7 +283,7 @@ export function FinanceDashboard() {
             <Wallet className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-base font-semibold">Финансы</h2>
+            <h2 className="text-base font-semibold text-gradient-animate">Финансы</h2>
           </div>
           <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px]">
             Демо-данные
