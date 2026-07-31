@@ -30,3 +30,44 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Promotion {
+  id          String   @id @default(cuid())
+  name        String
+  discount    Int
+  product     String
+  audience    String
+  status      String   @default("active")
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  orderNumber Int
+  items       String
+  total       Int
+  status      String   @default("new")
+  createdAt   DateTime @default(now())
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  author      String
+  rating      Int
+  text        String
+  platform    String
+  replied     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model NotificationRecord {
+  id          String   @id @default(cuid())
+  title       String
+  message     String
+  type        String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}

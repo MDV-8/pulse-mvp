@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppStore } from '@/stores/app-store';
 
 // Dashboard
@@ -21,6 +21,8 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { NotificationCenter } from '@/components/pulse/shared/notification-center';
 import { WelcomeTour } from '@/components/pulse/shared/welcome-tour';
 import { FeedbackPopup } from '@/components/pulse/shared/feedback-popup';
+import { BottomSheet } from '@/components/pulse/shared/bottom-sheet';
+import { NotificationHistory } from '@/components/pulse/shared/notification-history';
 
 // Clients
 import ClientsList from '@/components/pulse/clients/clients-list';
@@ -72,15 +74,28 @@ export function DashboardView() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showFeedback, setShowFeedback] = useState(false);
   const notifBellRef = useRef<HTMLButtonElement>(null);
+  const prevPromoLengthRef = useRef<number>(0);
   const showNotifications = useAppStore((s) => s.showNotifications);
   const setShowNotifications = useAppStore((s) => s.setShowNotifications);
+  const promotions = useAppStore((s) => s.promotions);
   const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
   const setShowReturnClients = useAppStore((s) => s.setShowReturnClients);
   const setShowAIContent = useAppStore((s) => s.setShowAIContent);
   const setOwnerView = useAppStore((s) => s.setOwnerView);
+  const [showNotifHistory, setShowNotifHistory] = useState(false);
 
   // Keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Auto-trigger feedback popup when a new promotion is created
+  useEffect(() => {
+    const currentLen = promotions.length;
+    if (prevPromoLengthRef.current > 0 && currentLen > prevPromoLengthRef.current) {
+      const timer = setTimeout(() => setShowFeedback(true), 2000);
+      return () => clearTimeout(timer);
+    }
+    prevPromoLengthRef.current = currentLen;
+  }, [promotions.length]);
 
   // Live clock — update every minute
   useEffect(() => {
@@ -130,6 +145,12 @@ export function DashboardView() {
       label: 'Спросить AI',
       emoji: '💬',
       action: () => setOwnerView('ai'),
+    },
+    {
+      icon: Bell,
+      label: 'Уведомления',
+      emoji: '🔔',
+      action: () => setShowNotifHistory(true),
     },
   ];
 
@@ -214,7 +235,7 @@ export function DashboardView() {
         <h2 className="text-sm font-medium text-muted-foreground mb-3">
           Быстрые действия
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {quickActions.map((item) => (
             <button
               key={item.label}
@@ -292,6 +313,15 @@ export function DashboardView() {
 
       {/* ====== Feedback Popup ====== */}
       <FeedbackPopup open={showFeedback} onClose={() => setShowFeedback(false)} />
+
+      {/* ====== Notification History Bottom Sheet ====== */}
+      <BottomSheet
+        open={showNotifHistory}
+        onClose={() => setShowNotifHistory(false)}
+        title="Все уведомления"
+      >
+        <NotificationHistory />
+      </BottomSheet>
     </div>
   );
 }

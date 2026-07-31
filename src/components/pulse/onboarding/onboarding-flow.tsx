@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Coffee,
@@ -12,7 +12,6 @@ import {
   HelpCircle,
   ArrowRight,
   ArrowLeft,
-  Check,
 } from 'lucide-react';
 import { useAppStore } from '@/stores/app-store';
 import { Button } from '@/components/ui/button';
@@ -101,6 +100,25 @@ export function OnboardingFlow() {
     );
   };
 
+  // Confetti particles config
+  const confettiParticles = useMemo(() => {
+    const colors = ['#8b5cf6', '#a78bfa', '#06b6d4', '#22d3ee', '#d946ef', '#ec4899'];
+    return Array.from({ length: 20 }, (_, i) => {
+      const angle = (i / 20) * 360;
+      const rad = (angle * Math.PI) / 180;
+      const distance = 120 + Math.random() * 200;
+      return {
+        id: i,
+        color: colors[i % colors.length],
+        size: 4 + Math.random() * 6,
+        tx: Math.cos(rad) * distance,
+        ty: Math.sin(rad) * distance - 40,
+        duration: 1.2 + Math.random() * 0.8,
+        delay: 0.1 + Math.random() * 0.3,
+      };
+    });
+  }, []);
+
   const handleComplete = () => {
     setIsCompleting(true);
     setTimeout(() => {
@@ -121,7 +139,7 @@ export function OnboardingFlow() {
           createdAt: new Date().toISOString().split('T')[0],
         });
         setAppMode('owner');
-      }, 1200);
+      }, 2500);
     }, 300);
   };
 
@@ -223,47 +241,6 @@ export function OnboardingFlow() {
 
         {/* Card container */}
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card/80 backdrop-blur-xl p-6 sm:p-8 pulse-glow">
-          {/* Success animation overlay */}
-          <AnimatePresence>
-            {showSuccess && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-card/95 backdrop-blur-xl rounded-2xl"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-                  className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center mb-4"
-                >
-                  <motion.div
-                    initial={{ scale: 0, rotate: -45 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
-                  >
-                    <Check className="w-10 h-10 text-purple-400" strokeWidth={3} />
-                  </motion.div>
-                </motion.div>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-xl font-bold pulse-text-gradient"
-                >
-                  PULSE готов
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="text-sm text-muted-foreground mt-1"
-                >
-                  Загружаем ваш дашборд...
-                </motion.p>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
@@ -545,6 +522,107 @@ export function OnboardingFlow() {
           Шаг {step} из {TOTAL_STEPS}
         </p>
       </div>
+
+      {/* Full-screen completion overlay with confetti */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(18,16,28,0.97) 0%, rgba(10,10,18,0.99) 100%)',
+            }}
+          >
+            {/* Confetti particles (CSS-only, 20 circles) */}
+            {confettiParticles.map((p) => (
+              <span
+                key={p.id}
+                className="absolute left-1/2 top-1/2 rounded-full pointer-events-none"
+                style={{
+                  width: p.size,
+                  height: p.size,
+                  backgroundColor: p.color,
+                  ['--tx' as string]: `${p.tx}px`,
+                  ['--ty' as string]: `${p.ty}px`,
+                  animation: `confetti-burst ${p.duration}s ease-out ${p.delay}s both`,
+                }}
+              />
+            ))}
+
+            {/* Animated SVG Checkmark */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+              className="relative z-10 mb-6"
+            >
+              <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+                {/* Background circle */}
+                <motion.circle
+                  cx="48" cy="48" r="42"
+                  stroke="url(#checkGrad)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 1.2, ease: 'easeInOut', delay: 0.15 }}
+                  style={{
+                    strokeDasharray: 264,
+                    strokeDashoffset: 264,
+                  }}
+                />
+                {/* Checkmark path */}
+                <motion.path
+                  d="M30 50 L42 62 L66 36"
+                  stroke="url(#checkGrad)"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 0.6, ease: 'easeOut', delay: 0.7 }}
+                  style={{
+                    strokeDasharray: 60,
+                    strokeDashoffset: 60,
+                  }}
+                />
+                <defs>
+                  <linearGradient id="checkGrad" x1="0" y1="0" x2="96" y2="96">
+                    <stop offset="0%" stopColor="#8b5cf6" />
+                    <stop offset="50%" stopColor="#a78bfa" />
+                    <stop offset="100%" stopColor="#06b6d4" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              {/* Glow behind checkmark */}
+              <div className="absolute inset-0 rounded-full bg-purple-500/15 blur-2xl pointer-events-none" />
+            </motion.div>
+
+            {/* Main title with scale animation */}
+            <motion.h2
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
+              className="text-3xl sm:text-4xl font-bold pulse-text-gradient relative z-10"
+            >
+              PULSE готов к работе!
+            </motion.h2>
+
+            {/* Subtitle fading in after 0.5s delay */}
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.8 }}
+              className="text-base text-muted-foreground mt-3 relative z-10"
+            >
+              Ваш AI помощник активирован
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

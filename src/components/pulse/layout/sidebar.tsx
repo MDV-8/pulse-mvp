@@ -84,12 +84,25 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar glass-shine">
-      {/* Logo with animated gradient line */}
+      {/* Logo with animated gradient ring */}
       <div className="flex flex-col">
-        <div className="flex h-16 items-center px-5">
-          <span className="text-2xl font-bold tracking-tight pulse-text-gradient float-y">
-            PULSE
-          </span>
+        <div className="flex h-16 items-center justify-center px-5">
+          {/* Animated gradient ring behind logo */}
+          <div className="absolute left-0 top-0 w-full h-16 overflow-hidden pointer-events-none" aria-hidden="true">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-10 rounded-full opacity-30"
+              style={{
+                background: 'conic-gradient(from 0deg, #8b5cf6, #d946ef, #06b6d4, #8b5cf6)',
+                animation: 'gradient-border-rotate 4s linear infinite',
+                filter: 'blur(8px)',
+              }}
+            />
+          </div>
+          <div className="relative flex flex-col items-center">
+            <span className="text-2xl font-bold tracking-tight pulse-text-gradient float-y">
+              PULSE
+            </span>
+            <span className="text-[9px] text-muted-foreground/40 tracking-widest">v1.3</span>
+          </div>
         </div>
         {/* Animated gradient line below logo */}
         <div className="mx-5 h-[2px] rounded-full bg-gradient-to-r from-purple-500/80 via-violet-400/60 to-transparent sidebar-gradient-line" />
@@ -203,7 +216,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
             <span className="text-xs">{theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}</span>
           </Button>
+
+          {/* Support link */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
+          >
+            <MessageSquare className="size-4" />
+            <span className="text-xs">Поддержка</span>
+          </Button>
         </div>
+
+        {/* Keyboard shortcuts hint */}
+        <p className="text-[9px] text-muted-foreground/30 text-center mt-2">
+          ⌘K поиск
+        </p>
       </div>
     </div>
   );
