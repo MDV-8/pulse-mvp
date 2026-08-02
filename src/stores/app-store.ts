@@ -13,7 +13,26 @@ import {
   mockPromotions,
   mockTodayActions,
   mockInsights,
+  mockAdminTools,
+  mockAdminTemplates,
 } from '@/data/mock-data';
+
+// Admin types (used by admin-dashboard and store)
+export interface AdminTool {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  enabled: boolean;
+}
+
+export interface AdminTemplate {
+  id: string;
+  name: string;
+  description: string;
+  discount: number;
+  category: string;
+}
 
 // ============================================================
 // Types
@@ -162,6 +181,23 @@ interface AppStore {
   // User Settings (persisted)
   userSettings: { name: string; email: string; city: string; businessType: string };
   setUserSettings: (s: Partial<{ name: string; email: string; city: string; businessType: string }>) => void;
+
+  // Admin Tools (persisted)
+  adminTools: AdminTool[];
+  setAdminTools: (tools: AdminTool[]) => void;
+  addAdminTool: (tool: AdminTool) => void;
+  updateAdminTool: (id: string, updates: Partial<AdminTool>) => void;
+  deleteAdminTool: (id: string) => void;
+  toggleAdminTool: (id: string) => void;
+
+  // Admin Templates (persisted)
+  adminTemplates: AdminTemplate[];
+  setAdminTemplates: (templates: AdminTemplate[]) => void;
+  addAdminTemplate: (template: AdminTemplate) => void;
+  deleteAdminTemplate: (id: string) => void;
+
+  // Reset all data
+  resetAllData: () => void;
 }
 
 export const useAppStore = create<AppStore>()(
@@ -299,6 +335,66 @@ export const useAppStore = create<AppStore>()(
       setUserSettings: (s) => set((state) => ({
         userSettings: { ...state.userSettings, ...s },
       })),
+
+      // Admin Tools
+      adminTools: mockAdminTools,
+      setAdminTools: (tools) => set({ adminTools: tools }),
+      addAdminTool: (tool) => set((state) => ({ adminTools: [...state.adminTools, tool] })),
+      updateAdminTool: (id, updates) => set((state) => ({
+        adminTools: state.adminTools.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+      })),
+      deleteAdminTool: (id) => set((state) => ({ adminTools: state.adminTools.filter((t) => t.id !== id) })),
+      toggleAdminTool: (id) => set((state) => ({
+        adminTools: state.adminTools.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t)),
+      })),
+
+      // Admin Templates
+      adminTemplates: mockAdminTemplates,
+      setAdminTemplates: (templates) => set({ adminTemplates: templates }),
+      addAdminTemplate: (template) => set((state) => ({ adminTemplates: [...state.adminTemplates, template] })),
+      deleteAdminTemplate: (id) => set((state) => ({ adminTemplates: state.adminTemplates.filter((t) => t.id !== id) })),
+
+      // Reset all data
+      resetAllData: () => {
+        // Clear all localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('pulse-storage');
+          localStorage.removeItem('pulse-admin-tools');
+          sessionStorage.clear();
+        }
+        // Reset store to initial defaults
+        set({
+          appMode: 'onboarding',
+          ownerView: 'dashboard',
+          clientView: 'home',
+          adminView: 'dashboard',
+          onboardingStep: 1,
+          business: null,
+          pulseScore: mockPulseScore,
+          insights: mockInsights,
+          todayActions: mockTodayActions,
+          promotions: mockPromotions,
+          aiChatMessages: [],
+          clientCoupons: [],
+          isDemoAccount: true,
+          sidebarOpen: false,
+          showCreatePromotion: false,
+          promotionFromInsight: null,
+          showReturnClients: false,
+          showAIContent: false,
+          showSearch: false,
+          searchQuery: '',
+          showNotifications: false,
+          userEmail: null,
+          userName: null,
+          isLoggedIn: false,
+          isFirstTime: true,
+          theme: 'dark',
+          userSettings: { name: 'Coffee & Co', email: 'owner@coffee-co.kz', city: 'Алматы', businessType: 'Кофейня' },
+          adminTools: mockAdminTools,
+          adminTemplates: mockAdminTemplates,
+        });
+      },
     }),
     {
       name: 'pulse-storage',
@@ -319,6 +415,8 @@ export const useAppStore = create<AppStore>()(
         isLoggedIn: state.isLoggedIn,
         isFirstTime: state.isFirstTime,
         userSettings: state.userSettings,
+        adminTools: state.adminTools,
+        adminTemplates: state.adminTemplates,
       }),
     }
   )

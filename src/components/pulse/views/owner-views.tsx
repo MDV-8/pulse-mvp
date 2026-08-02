@@ -482,6 +482,7 @@ export function GoalsView() {
 export function SettingsView() {
   const theme = useAppStore((s) => s.theme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const resetAllData = useAppStore((s) => s.resetAllData);
   const userSettings = useAppStore((s) => s.userSettings);
   const setUserSettings = useAppStore((s) => s.setUserSettings);
   const [notifEmail, setNotifEmail] = useState(true);
@@ -745,7 +746,8 @@ export function SettingsView() {
             variant="destructive"
             size="sm"
             onClick={() => {
-              useAppStore.getState().setAppMode('onboarding');
+              resetAllData();
+              toast.success('Все данные сброшены. Приложение возвращено к демо-состоянию.');
             }}
           >
             Сбросить

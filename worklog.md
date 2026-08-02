@@ -2302,3 +2302,32 @@ Stage Summary:
 - Registration → instant dashboard, toast about demo company
 - Admin tools persist, create/edit/delete with toasts
 - Search finds real results, shows "nothing found" for no matches
+
+---
+Task ID: 1
+Agent: Main Developer
+Task: Fix admin panel sync (tools/templates CRUD → Zustand store + localStorage persistence) and fix "Сброс данных" to fully clear all user data
+
+Work Log:
+- Analyzed existing architecture: app-store.ts (Zustand), admin-dashboard.tsx, owner-views.tsx
+- Added AdminTool and AdminTemplate interfaces to app-store.ts
+- Added adminTools/adminTemplates state fields with full CRUD operations (add, update, delete, toggle)
+- Added adminTools/adminTemplates to Zustand persist partialize
+- Added resetAllData() function that clears localStorage, sessionStorage, and resets store to defaults
+- Updated admin-dashboard.tsx: removed local state + separate localStorage, now reads/writes through Zustand store
+- Updated TemplatesTab: added localStorage persistence (was missing), now reads/writes through Zustand store
+- Fixed "Сброс данных" button in SettingsView to call resetAllData() instead of just setAppMode('onboarding')
+
+Stage Summary:
+- 3 files modified: src/stores/app-store.ts, src/components/pulse/admin/admin-dashboard.tsx, src/components/pulse/views/owner-views.tsx
+- All scenarios tested and verified via agent-browser:
+  1. ✅ Create tool → appears in admin tools list immediately
+  2. ✅ Reload page → tool persists
+  3. ✅ Edit tool → changes appear immediately
+  4. ✅ Delete tool → disappears immediately
+  5. ✅ Create template → appears in admin templates list immediately
+  6. ✅ Reload page → template persists
+  7. ✅ Reset data → all custom tools/templates cleared, app returns to onboarding
+  8. ✅ After reset + onboarding → only default 8 tools and 5 templates remain
+  9. ✅ Dashboard, search, sidebar, all existing functionality unaffected
+- No UI/design changes made, no new functionality added

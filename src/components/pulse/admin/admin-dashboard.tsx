@@ -21,10 +21,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  mockAdminTools, mockAdminTemplates,
-} from '@/data/mock-data';
-import { useAppStore } from '@/stores/app-store';
+import { useAppStore, type AdminTool, type AdminTemplate } from '@/stores/app-store';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -156,47 +153,15 @@ function DashboardTab() {
 }
 
 // ---- Tools Tab ----
-interface AdminTool {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  enabled: boolean;
-}
-
-const TOOLS_STORAGE_KEY = 'pulse-admin-tools';
-
-function loadTools(): AdminTool[] {
-  if (typeof window === 'undefined') return mockAdminTools;
-  try {
-    const raw = localStorage.getItem(TOOLS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : mockAdminTools;
-  } catch { return mockAdminTools; }
-}
-
-function saveTools(tools: AdminTool[]) {
-  localStorage.setItem(TOOLS_STORAGE_KEY, JSON.stringify(tools));
-}
-
 function ToolsTab() {
-  const [tools, setTools] = useState<AdminTool[]>(loadTools);
+  const tools = useAppStore((s) => s.adminTools);
+  const addAdminTool = useAppStore((s) => s.addAdminTool);
+  const updateAdminTool = useAppStore((s) => s.updateAdminTool);
+  const deleteAdminTool = useAppStore((s) => s.deleteAdminTool);
+  const toggleAdminTool = useAppStore((s) => s.toggleAdminTool);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editDesc, setEditDesc] = useState('');
-
-  const updateTools = (updater: (prev: AdminTool[]) => AdminTool[]) => {
-    setTools((prev) => {
-      const next = updater(prev);
-      saveTools(next);
-      return next;
-    });
-  };
-
-  const toggleTool = (id: string) => {
-    updateTools((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t))
-    );
-  };
 
   const startEdit = (tool: AdminTool) => {
     setEditingId(tool.id);
@@ -206,17 +171,13 @@ function ToolsTab() {
 
   const saveEdit = () => {
     if (!editingId) return;
-    updateTools((prev) =>
-      prev.map((t) =>
-        t.id === editingId ? { ...t, name: editName, description: editDesc } : t
-      )
-    );
+    updateAdminTool(editingId, { name: editName, description: editDesc });
     setEditingId(null);
     toast.success('Инструмент обновлён');
   };
 
   const deleteTool = (id: string) => {
-    updateTools((prev) => prev.filter((t) => t.id !== id));
+    deleteAdminTool(id);
     if (editingId === id) setEditingId(null);
     toast.success('Инструмент удалён');
   };
@@ -229,7 +190,7 @@ function ToolsTab() {
       icon: 'Lightbulb',
       enabled: false,
     };
-    updateTools((prev) => [...prev, newTool]);
+    addAdminTool(newTool);
     startEdit(newTool);
     toast.success('✅ Инструмент успешно опубликован');
   };
@@ -322,14 +283,6 @@ function ToolsTab() {
 }
 
 // ---- Templates Tab ----
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  discount: number;
-  category: string;
-}
-
 const templateGradients = [
   'from-purple-500/10 to-violet-500/5',
   'from-green-500/10 to-emerald-500/5',
@@ -339,7 +292,9 @@ const templateGradients = [
 ];
 
 function TemplatesTab() {
-  const [templates, setTemplates] = useState<Template[]>(mockAdminTemplates);
+  const templates = useAppStore((s) => s.adminTemplates);
+  const addAdminTemplate = useAppStore((s) => s.addAdminTemplate);
+  const deleteAdminTemplate = useAppStore((s) => s.deleteAdminTemplate);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -348,25 +303,25 @@ function TemplatesTab() {
 
   const addTemplate = () => {
     if (!newName.trim()) return;
-    setTemplates((prev) => [
-      ...prev,
-      {
-        id: `tpl-${Date.now()}`,
-        name: newName,
-        description: newDesc,
-        discount: parseInt(newDiscount) || 0,
-        category: newCategory || 'Все',
-      },
-    ]);
+    const newTemplate: AdminTemplate = {
+      id: `tpl-${Date.now()}`,
+      name: newName,
+      description: newDesc,
+      discount: parseInt(newDiscount) || 0,
+      category: newCategory || 'Все',
+    };
+    addAdminTemplate(newTemplate);
     setShowAdd(false);
     setNewName('');
     setNewDesc('');
     setNewDiscount('');
     setNewCategory('');
+    toast.success('✅ Шаблон успешно создан');
   };
 
   const deleteTemplate = (id: string) => {
-    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    deleteAdminTemplate(id);
+    toast.success('Шаблон удалён');
   };
 
   return (

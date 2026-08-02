@@ -1,0 +1,703 @@
+     1→'use client';
+     2→
+     3→import { useState } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import {
+     6→  LayoutDashboard, Wrench, FileText, Users, Pen,
+     7→  Plus, Pencil, Trash2, Search, Activity, Building2, Sparkles, MessageSquare,
+     8→  Brain, Lightbulb, UserPlus, Heart, TrendingUp, Eye, Calendar, PenTool, Check,
+     9→  ArrowUpRight, ArrowDownRight, Minus, Instagram, Mail, Megaphone, Bell, Zap,
+    10→} from 'lucide-react';
+    11→import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+    12→import { Button } from '@/components/ui/button';
+    13→import { Badge } from '@/components/ui/badge';
+    14→import { Input } from '@/components/ui/input';
+    15→import { Switch } from '@/components/ui/switch';
+    16→import { ScrollArea } from '@/components/ui/scroll-area';
+    17→import { Separator } from '@/components/ui/separator';
+    18→import {
+    19→  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
+    20→} from '@/components/ui/table';
+    21→import {
+    22→  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+    23→} from '@/components/ui/dialog';
+    24→import {
+    25→  mockAdminTools, mockAdminTemplates,
+    26→} from '@/data/mock-data';
+    27→import { useAppStore } from '@/stores/app-store';
+    28→import { cn } from '@/lib/utils';
+    29→import { toast } from 'sonner';
+    30→
+    31→const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    32→  Brain, Sparkles, Users: UserPlus, Heart, Pen: PenTool, TrendingUp, Eye, Calendar,
+    33→};
+    34→
+    35→type AdminTab = 'dashboard' | 'tools' | 'templates' | 'users' | 'content';
+    36→
+    37→const adminTabs: { key: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    38→  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    39→  { key: 'tools', label: 'Инструменты', icon: Wrench },
+    40→  { key: 'templates', label: 'Шаблоны', icon: FileText },
+    41→  { key: 'users', label: 'Пользователи', icon: Users },
+    42→  { key: 'content', label: 'Контент', icon: Pen },
+    43→];
+    44→
+    45→const statColors = [
+    46→  'from-purple-500 to-violet-500',
+    47→  'from-green-500 to-emerald-500',
+    48→  'from-cyan-500 to-blue-500',
+    49→  'from-pink-500 to-rose-500',
+    50→];
+    51→
+    52→const toolColors: Record<string, string> = {
+    53→  'Brain': 'bg-purple-500/15 text-purple-400',
+    54→  'Sparkles': 'bg-amber-500/15 text-amber-400',
+    55→  'Users': 'bg-green-500/15 text-green-400',
+    56→  'Heart': 'bg-pink-500/15 text-pink-400',
+    57→  'Pen': 'bg-cyan-500/15 text-cyan-400',
+    58→  'TrendingUp': 'bg-emerald-500/15 text-emerald-400',
+    59→  'Eye': 'bg-blue-500/15 text-blue-400',
+    60→  'Calendar': 'bg-orange-500/15 text-orange-400',
+    61→  'Lightbulb': 'bg-yellow-500/15 text-yellow-400',
+    62→  'MessageSquare': 'bg-teal-500/15 text-teal-400',
+    63→};
+    64→
+    65→// ---- Dashboard Tab ----
+    66→function DashboardTab() {
+    67→  const stats = [
+    68→    { label: 'Всего пользователей', value: '2 847', icon: Users, trend: '+12%', trendDir: 'up' as const },
+    69→    { label: 'Активных бизнесов', value: '342', icon: Building2, trend: '+8%', trendDir: 'up' as const },
+    70→    { label: 'Акций создано', value: '1 204', icon: Sparkles, trend: '-3%', trendDir: 'down' as const },
+    71→    { label: 'AI-запросов', value: '18 942', icon: Brain, trend: '+24%', trendDir: 'up' as const },
+    72→  ];
+    73→
+    74→  const recentActivity = [
+    75→    { id: '1', text: 'Coffee & Co запустил акцию «Happy Hour»', time: '5 мин назад' },
+    76→    { id: '2', text: 'Новый бизнес зарегистрирован: FitZone', time: '12 мин назад' },
+    77→    { id: '3', text: 'AI сгенерировал 8 рекомендаций', time: '18 мин назад' },
+    78→    { id: '4', text: 'Обновлён шаблон «Комбо-набор»', time: '1 час назад' },
+    79→    { id: '5', text: 'Регистрация 23 новых пользователей', time: '2 часа назад' },
+    80→    { id: '6', text: 'Отчёт по финансам за январь готов', time: '3 часа назад' },
+    81→  ];
+    82→
+    83→  return (
+    84→    <div className="space-y-6">
+    85→      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    86→        {stats.map((s, i) => (
+    87→          <motion.div
+    88→            key={s.label}
+    89→            initial={{ opacity: 0, y: 20 }}
+    90→            animate={{ opacity: 1, y: 0 }}
+    91→            transition={{ delay: i * 0.05 }}
+    92→          >
+    93→            <Card className="py-4 px-4 overflow-hidden relative card-hover-lift micro-interaction">
+    94→              {/* Gradient left border accent */}
+    95→              <div className={cn('absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-gradient-to-b', statColors[i])} />
+    96→              <CardContent className="p-0">
+    97→                <div className="flex items-center gap-3 pl-2">
+    98→                  <div className="p-2 rounded-lg bg-muted">
+    99→                    <s.icon className="w-4 h-4" />
+   100→                  </div>
+   101→                  <div className="flex-1 min-w-0">
+   102→                    <p className="text-xs text-muted-foreground truncate">{s.label}</p>
+   103→                    <div className="flex items-center gap-2">
+   104→                      <p className="text-xl font-bold">{s.value}</p>
+   105→                    </div>
+   106→                  </div>
+   107→                  <div className={cn(
+   108→                    'flex items-center gap-0.5 text-xs font-medium shrink-0',
+   109→                    s.trendDir === 'up' ? 'text-green-400' : 'text-red-400'
+   110→                  )}>
+   111→                    {s.trendDir === 'up' ? (
+   112→                      <ArrowUpRight className="w-3.5 h-3.5" />
+   113→                    ) : (
+   114→                      <ArrowDownRight className="w-3.5 h-3.5" />
+   115→                    )}
+   116→                    {s.trend}
+   117→                  </div>
+   118→                </div>
+   119→              </CardContent>
+   120→            </Card>
+   121→          </motion.div>
+   122→        ))}
+   123→      </div>
+   124→
+   125→      <Card>
+   126→        <CardHeader>
+   127→          <CardTitle className="text-base flex items-center gap-2">
+   128→            <Activity className="w-4 h-4 text-purple-400" />
+   129→            Последняя активность
+   130→          </CardTitle>
+   131→        </CardHeader>
+   132→        <CardContent>
+   133→          <div className="space-y-3">
+   134→            {recentActivity.map((a, i) => (
+   135→              <motion.div
+   136→                key={a.id}
+   137→                initial={{ opacity: 0, x: -10 }}
+   138→                animate={{ opacity: 1, x: 0 }}
+   139→                transition={{ delay: 0.05 + i * 0.03 }}
+   140→                className="flex items-center justify-between gap-4"
+   141→              >
+   142→                <div className="flex items-center gap-2 text-sm">
+   143→                  <div className="w-2 h-2 rounded-full bg-purple-500" />
+   144→                  <span>{a.text}</span>
+   145→                </div>
+   146→                <span className="text-xs text-muted-foreground whitespace-nowrap">
+   147→                  {a.time}
+   148→                </span>
+   149→              </motion.div>
+   150→            ))}
+   151→          </div>
+   152→        </CardContent>
+   153→      </Card>
+   154→    </div>
+   155→  );
+   156→}
+   157→
+   158→// ---- Tools Tab ----
+   159→interface AdminTool {
+   160→  id: string;
+   161→  name: string;
+   162→  description: string;
+   163→  icon: string;
+   164→  enabled: boolean;
+   165→}
+   166→
+   167→const TOOLS_STORAGE_KEY = 'pulse-admin-tools';
+   168→
+   169→function loadTools(): AdminTool[] {
+   170→  if (typeof window === 'undefined') return mockAdminTools;
+   171→  try {
+   172→    const raw = localStorage.getItem(TOOLS_STORAGE_KEY);
+   173→    return raw ? JSON.parse(raw) : mockAdminTools;
+   174→  } catch { return mockAdminTools; }
+   175→}
+   176→
+   177→function saveTools(tools: AdminTool[]) {
+   178→  localStorage.setItem(TOOLS_STORAGE_KEY, JSON.stringify(tools));
+   179→}
+   180→
+   181→function ToolsTab() {
+   182→  const [tools, setTools] = useState<AdminTool[]>(loadTools);
+   183→  const [editingId, setEditingId] = useState<string | null>(null);
+   184→  const [editName, setEditName] = useState('');
+   185→  const [editDesc, setEditDesc] = useState('');
+   186→
+   187→  const updateTools = (updater: (prev: AdminTool[]) => AdminTool[]) => {
+   188→    setTools((prev) => {
+   189→      const next = updater(prev);
+   190→      saveTools(next);
+   191→      return next;
+   192→    });
+   193→  };
+   194→
+   195→  const toggleTool = (id: string) => {
+   196→    updateTools((prev) =>
+   197→      prev.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t))
+   198→    );
+   199→  };
+   200→
+   201→  const startEdit = (tool: AdminTool) => {
+   202→    setEditingId(tool.id);
+   203→    setEditName(tool.name);
+   204→    setEditDesc(tool.description);
+   205→  };
+   206→
+   207→  const saveEdit = () => {
+   208→    if (!editingId) return;
+   209→    updateTools((prev) =>
+   210→      prev.map((t) =>
+   211→        t.id === editingId ? { ...t, name: editName, description: editDesc } : t
+   212→      )
+   213→    );
+   214→    setEditingId(null);
+   215→    toast.success('Инструмент обновлён');
+   216→  };
+   217→
+   218→  const deleteTool = (id: string) => {
+   219→    updateTools((prev) => prev.filter((t) => t.id !== id));
+   220→    if (editingId === id) setEditingId(null);
+   221→    toast.success('Инструмент удалён');
+   222→  };
+   223→
+   224→  const addTool = () => {
+   225→    const newTool: AdminTool = {
+   226→      id: `at-${Date.now()}`,
+   227→      name: 'Новый инструмент',
+   228→      description: 'Описание инструмента',
+   229→      icon: 'Lightbulb',
+   230→      enabled: false,
+   231→    };
+   232→    updateTools((prev) => [...prev, newTool]);
+   233→    startEdit(newTool);
+   234→    toast.success('✅ Инструмент успешно опубликован');
+   235→  };
+   236→
+   237→  return (
+   238→    <div className="space-y-4">
+   239→      <div className="flex items-center justify-between">
+   240→        <h2 className="text-lg font-semibold">Инструменты</h2>
+   241→        <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={addTool}>
+   242→          <Plus className="w-4 h-4 mr-1" />
+   243→          Добавить
+   244→        </Button>
+   245→      </div>
+   246→
+   247→      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   248→        {tools.map((tool, i) => {
+   249→          const IconComponent = iconMap[tool.icon] || Lightbulb;
+   250→          const isEditing = editingId === tool.id;
+   251→          const colorClass = toolColors[tool.icon] || toolColors['Lightbulb'];
+   252→
+   253→          return (
+   254→            <motion.div
+   255→              key={tool.id}
+   256→              initial={{ opacity: 0, y: 10 }}
+   257→              animate={{ opacity: 1, y: 0 }}
+   258→              transition={{ delay: i * 0.03 }}
+   259→            >
+   260→              <Card className={cn('p-0 transition-opacity card-hover-lift micro-interaction', !tool.enabled && 'opacity-60')}>
+   261→                <CardContent className="p-4 space-y-3">
+   262→                  <div className="flex items-start justify-between">
+   263→                    <div className="flex items-start gap-3">
+   264→                      {/* Circular colored icon container */}
+   265→                      <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', colorClass)}>
+   266→                        <IconComponent className="w-5 h-5" />
+   267→                      </div>
+   268→                      {isEditing ? (
+   269→                        <div className="space-y-1 flex-1">
+   270→                          <Input
+   271→                            value={editName}
+   272→                            onChange={(e) => setEditName(e.target.value)}
+   273→                            className="h-7 text-sm"
+   274→                          />
+   275→                          <Input
+   276→                            value={editDesc}
+   277→                            onChange={(e) => setEditDesc(e.target.value)}
+   278→                            className="h-7 text-sm"
+   279→                          />
+   280→                        </div>
+   281→                      ) : (
+   282→                        <div>
+   283→                          <h3 className="font-semibold text-sm">{tool.name}</h3>
+   284→                          <p className="text-xs text-muted-foreground mt-0.5">
+   285→                            {tool.description}
+   286→                          </p>
+   287→                        </div>
+   288→                      )}
+   289→                    </div>
+   290→                    <div className="flex items-center gap-1 shrink-0">
+   291→                      {isEditing ? (
+   292→                        <Button size="sm" variant="ghost" onClick={saveEdit} className="text-green-400 hover:text-green-300">
+   293→                          <Check className="w-4 h-4" />
+   294→                        </Button>
+   295→                      ) : (
+   296→                        <Button size="sm" variant="ghost" onClick={() => startEdit(tool)} className="text-muted-foreground hover:text-foreground">
+   297→                          <Pencil className="w-4 h-4" />
+   298→                        </Button>
+   299→                      )}
+   300→                      <Button size="sm" variant="ghost" onClick={() => deleteTool(tool.id)} className="text-muted-foreground hover:text-red-400">
+   301→                        <Trash2 className="w-4 h-4" />
+   302→                      </Button>
+   303→                    </div>
+   304→                  </div>
+   305→                  <div className="flex items-center justify-between">
+   306→                    <span className={cn(
+   307→                      'text-xs font-medium',
+   308→                      tool.enabled ? 'text-green-400' : 'text-red-400/70'
+   309→                    )}>
+   310→                      {tool.enabled ? '● Включён' : '○ Выключен'}
+   311→                    </span>
+   312→                    <Switch checked={tool.enabled} onCheckedChange={() => toggleTool(tool.id)} />
+   313→                  </div>
+   314→                </CardContent>
+   315→              </Card>
+   316→            </motion.div>
+   317→          );
+   318→        })}
+   319→      </div>
+   320→    </div>
+   321→  );
+   322→}
+   323→
+   324→// ---- Templates Tab ----
+   325→interface Template {
+   326→  id: string;
+   327→  name: string;
+   328→  description: string;
+   329→  discount: number;
+   330→  category: string;
+   331→}
+   332→
+   333→const templateGradients = [
+   334→  'from-purple-500/10 to-violet-500/5',
+   335→  'from-green-500/10 to-emerald-500/5',
+   336→  'from-cyan-500/10 to-blue-500/5',
+   337→  'from-pink-500/10 to-rose-500/5',
+   338→  'from-amber-500/10 to-orange-500/5',
+   339→];
+   340→
+   341→function TemplatesTab() {
+   342→  const [templates, setTemplates] = useState<Template[]>(mockAdminTemplates);
+   343→  const [showAdd, setShowAdd] = useState(false);
+   344→  const [newName, setNewName] = useState('');
+   345→  const [newDesc, setNewDesc] = useState('');
+   346→  const [newDiscount, setNewDiscount] = useState('');
+   347→  const [newCategory, setNewCategory] = useState('');
+   348→
+   349→  const addTemplate = () => {
+   350→    if (!newName.trim()) return;
+   351→    setTemplates((prev) => [
+   352→      ...prev,
+   353→      {
+   354→        id: `tpl-${Date.now()}`,
+   355→        name: newName,
+   356→        description: newDesc,
+   357→        discount: parseInt(newDiscount) || 0,
+   358→        category: newCategory || 'Все',
+   359→      },
+   360→    ]);
+   361→    setShowAdd(false);
+   362→    setNewName('');
+   363→    setNewDesc('');
+   364→    setNewDiscount('');
+   365→    setNewCategory('');
+   366→  };
+   367→
+   368→  const deleteTemplate = (id: string) => {
+   369→    setTemplates((prev) => prev.filter((t) => t.id !== id));
+   370→  };
+   371→
+   372→  return (
+   373→    <div className="space-y-4">
+   374→      <div className="flex items-center justify-between">
+   375→        <h2 className="text-lg font-semibold">Шаблоны акций</h2>
+   376→        <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => setShowAdd(true)}>
+   377→          <Plus className="w-4 h-4 mr-1" />
+   378→          Добавить шаблон
+   379→        </Button>
+   380→      </div>
+   381→
+   382→      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+   383→        <ScrollArea className="max-h-[500px] md:contents">
+   384→          {templates.map((tpl, i) => (
+   385→            <motion.div
+   386→              key={tpl.id}
+   387→              initial={{ opacity: 0, y: 10 }}
+   388→              animate={{ opacity: 1, y: 0 }}
+   389→              transition={{ delay: i * 0.03 }}
+   390→            >
+   391→              <Card className={cn('p-0 overflow-hidden hover:border-purple-500/30 transition-colors card-hover-lift micro-interaction')}>
+   392→                {/* Top gradient strip */}
+   393→                <div className={cn('h-1.5 bg-gradient-to-r', templateGradients[i % templateGradients.length])} />
+   394→                <CardContent className="p-4">
+   395→                  <div className="flex items-start justify-between gap-2 mb-3">
+   396→                    <div className="flex-1 min-w-0">
+   397→                      <h3 className="font-semibold text-sm">{tpl.name}</h3>
+   398→                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+   399→                        {tpl.description}
+   400→                      </p>
+   401→                    </div>
+   402→                    {tpl.discount > 0 && (
+   403→                      <div className="shrink-0 w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex flex-col items-center justify-center">
+   404→                        <span className="text-lg font-bold text-green-400">-{tpl.discount}%</span>
+   405→                      </div>
+   406→                    )}
+   407→                  </div>
+   408→                  <div className="flex items-center justify-between">
+   409→                    <Badge variant="outline" className="text-xs">
+   410→                      {tpl.category}
+   411→                    </Badge>
+   412→                    <div className="flex gap-1">
+   413→                      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground h-7 w-7 p-0" onClick={() => toast.info(`Редактирование шаблона «${tpl.name}» будет доступно в следующей версии`)}>
+   414→                        <Pencil className="w-3.5 h-3.5" />
+   415→                      </Button>
+   416→                      <Button
+   417→                        size="sm"
+   418→                        variant="ghost"
+   419→                        className="text-muted-foreground hover:text-red-400 h-7 w-7 p-0"
+   420→                        onClick={() => deleteTemplate(tpl.id)}
+   421→                      >
+   422→                        <Trash2 className="w-3.5 h-3.5" />
+   423→                      </Button>
+   424→                    </div>
+   425→                  </div>
+   426→                </CardContent>
+   427→              </Card>
+   428→            </motion.div>
+   429→          ))}
+   430→        </ScrollArea>
+   431→      </div>
+   432→
+   433→      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+   434→        <DialogContent className="bg-card border-border">
+   435→          <DialogHeader>
+   436→            <DialogTitle>Добавить шаблон</DialogTitle>
+   437→          </DialogHeader>
+   438→          <div className="space-y-3 py-2">
+   439→            <div>
+   440→              <label className="text-sm text-muted-foreground mb-1 block">Название</label>
+   441→              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Название шаблона" />
+   442→            </div>
+   443→            <div>
+   444→              <label className="text-sm text-muted-foreground mb-1 block">Описание</label>
+   445→              <Input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="Описание" />
+   446→            </div>
+   447→            <div className="grid grid-cols-2 gap-3">
+   448→              <div>
+   449→                <label className="text-sm text-muted-foreground mb-1 block">Скидка (%)</label>
+   450→                <Input value={newDiscount} onChange={(e) => setNewDiscount(e.target.value)} placeholder="0" type="number" />
+   451→              </div>
+   452→              <div>
+   453→                <label className="text-sm text-muted-foreground mb-1 block">Категория</label>
+   454→                <Input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Все" />
+   455→              </div>
+   456→            </div>
+   457→          </div>
+   458→          <DialogFooter>
+   459→            <Button variant="outline" onClick={() => setShowAdd(false)}>Отмена</Button>
+   460→            <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={addTemplate}>
+   461→              Создать
+   462→            </Button>
+   463→          </DialogFooter>
+   464→        </DialogContent>
+   465→      </Dialog>
+   466→    </div>
+   467→  );
+   468→}
+   469→
+   470→// ---- Users Tab ----
+   471→const mockUsers = [
+   472→  { id: 'u1', name: 'Айсара К.', email: 'aisara@coffee-co.kz', business: 'Coffee & Co', plan: 'Про', status: 'active', joined: '2024-03-15' },
+   473→  { id: 'u2', name: 'Дмитрий С.', email: 'dmitry@beanbrew.kz', business: 'Bean & Brew', plan: 'Старт', status: 'active', joined: '2024-06-22' },
+   474→  { id: 'u3', name: 'Мария Л.', email: 'maria@pizza-mi.kz', business: 'Pizza Milano', plan: 'Бизнес', status: 'active', joined: '2024-09-10' },
+   475→  { id: 'u4', name: 'Арман Б.', email: 'arman@style.kz', business: 'Style Studio', plan: 'Старт', status: 'trial', joined: '2025-01-05' },
+   476→  { id: 'u5', name: 'Нурлан Т.', email: 'nurlan@fitzone.kz', business: 'FitZone', plan: 'Бизнес', status: 'active', joined: '2024-11-18' },
+   477→  { id: 'u6', name: 'Сауле М.', email: 'saul@citymart.kz', business: 'CityMart', plan: 'Про', status: 'inactive', joined: '2024-04-02' },
+   478→];
+   479→
+   480→const avatarColors = [
+   481→  'bg-purple-500/20 text-purple-400',
+   482→  'bg-green-500/20 text-green-400',
+   483→  'bg-cyan-500/20 text-cyan-400',
+   484→  'bg-pink-500/20 text-pink-400',
+   485→  'bg-amber-500/20 text-amber-400',
+   486→  'bg-blue-500/20 text-blue-400',
+   487→];
+   488→
+   489→function getInitials(name: string): string {
+   490→  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+   491→}
+   492→
+   493→function UsersTab() {
+   494→  const [search, setSearch] = useState('');
+   495→  const [statusFilter, setStatusFilter] = useState<string>('all');
+   496→
+   497→  const filtered = mockUsers.filter((u) => {
+   498→    const matchSearch =
+   499→      u.name.toLowerCase().includes(search.toLowerCase()) ||
+   500→      u.email.toLowerCase().includes(search.toLowerCase()) ||
+   501→      u.business.toLowerCase().includes(search.toLowerCase());
+   502→    const matchStatus = statusFilter === 'all' || u.status === statusFilter;
+   503→    return matchSearch && matchStatus;
+   504→  });
+   505→
+   506→  const statusBadge = (status: string) => {
+   507→    switch (status) {
+   508→      case 'active': return <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">Активен</Badge>;
+   509→      case 'trial': return <Badge className="text-[10px] bg-purple-500/20 text-purple-400 border-purple-500/30">Триал</Badge>;
+   510→      case 'inactive': return <Badge className="text-[10px] bg-red-500/20 text-red-400 border-red-500/30">Неактивен</Badge>;
+   511→      default: return null;
+   512→    }
+   513→  };
+   514→
+   515→  return (
+   516→    <div className="space-y-4">
+   517→      <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+   518→        <h2 className="text-lg font-semibold">Пользователи</h2>
+   519→        <div className="flex gap-2">
+   520→          <div className="relative">
+   521→            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+   522→            <Input
+   523→              placeholder="Поиск..."
+   524→              value={search}
+   525→              onChange={(e) => setSearch(e.target.value)}
+   526→              className="pl-8 h-8 text-sm w-48"
+   527→            />
+   528→          </div>
+   529→          <select
+   530→            value={statusFilter}
+   531→            onChange={(e) => setStatusFilter(e.target.value)}
+   532→            className="h-8 bg-muted border border-border rounded-md text-sm px-2 text-foreground"
+   533→          >
+   534→            <option value="all">Все</option>
+   535→            <option value="active">Активные</option>
+   536→            <option value="trial">Триал</option>
+   537→            <option value="inactive">Неактивные</option>
+   538→          </select>
+   539→        </div>
+   540→      </div>
+   541→
+   542→      <Card className="p-0 overflow-hidden">
+   543→        <ScrollArea className="max-h-[400px] overflow-x-auto">
+   544→          <Table className="min-w-[600px]">
+   545→            <TableHeader>
+   546→              <TableRow className="hover:bg-transparent border-b border-border/50">
+   547→                <TableHead>Пользователь</TableHead>
+   548→                <TableHead className="hidden md:table-cell">Email</TableHead>
+   549→                <TableHead>Бизнес</TableHead>
+   550→                <TableHead className="hidden sm:table-cell">План</TableHead>
+   551→                <TableHead>Статус</TableHead>
+   552→                <TableHead className="hidden lg:table-cell">Дата</TableHead>
+   553→              </TableRow>
+   554→            </TableHeader>
+   555→            <TableBody>
+   556→              {filtered.map((user, idx) => (
+   557→                <TableRow key={user.id} className="border-b border-border/30 card-hover-lift">
+   558→                  <TableCell>
+   559→                    <div className="flex items-center gap-2.5">
+   560→                      <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0', avatarColors[idx % avatarColors.length])}>
+   561→                        {getInitials(user.name)}
+   562→                      </div>
+   563→                      <span className="font-medium text-sm">{user.name}</span>
+   564→                    </div>
+   565→                  </TableCell>
+   566→                  <TableCell className="hidden md:table-cell text-muted-foreground text-sm">{user.email}</TableCell>
+   567→                  <TableCell className="text-sm">{user.business}</TableCell>
+   568→                  <TableCell className="hidden sm:table-cell">
+   569→                    <Badge variant="outline" className="text-xs">{user.plan}</Badge>
+   570→                  </TableCell>
+   571→                  <TableCell>{statusBadge(user.status)}</TableCell>
+   572→                  <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">{user.joined}</TableCell>
+   573→                </TableRow>
+   574→              ))}
+   575→            </TableBody>
+   576→          </Table>
+   577→        </ScrollArea>
+   578→      </Card>
+   579→    </div>
+   580→  );
+   581→}
+   582→
+   583→// ---- Content Tab ----
+   584→const contentBlocks = [
+   585→  { id: 'cb1', name: 'Instagram посты', description: 'Автоматическая генерация постов', enabled: true, icon: Instagram },
+   586→  { id: 'cb2', name: 'Stories', description: 'Короткий контент для Stories', enabled: true, icon: Sparkles },
+   587→  { id: 'cb3', name: 'Reels сценарии', description: 'Сценарии для коротких видео', enabled: false, icon: Megaphone },
+   588→  { id: 'cb4', name: 'Email-рассылки', description: 'Недельные новости и предложения', enabled: true, icon: Mail },
+   589→  { id: 'cb5', name: 'Push-уведомления', description: 'Уведомления для клиентов', enabled: false, icon: Bell },
+   590→  { id: 'cb6', name: 'AI рекомендации', description: 'Персонализированные предложения', enabled: true, icon: Zap },
+   591→];
+   592→
+   593→const contentColors = [
+   594→  'bg-pink-500/15 text-pink-400',
+   595→  'bg-purple-500/15 text-purple-400',
+   596→  'bg-amber-500/15 text-amber-400',
+   597→  'bg-cyan-500/15 text-cyan-400',
+   598→  'bg-orange-500/15 text-orange-400',
+   599→  'bg-yellow-500/15 text-yellow-400',
+   600→];
+   601→
+   602→function ContentTab() {
+   603→  const [blocks, setBlocks] = useState(contentBlocks);
+   604→
+   605→  const toggleBlock = (id: string) => {
+   606→    setBlocks((prev) =>
+   607→      prev.map((b) => (b.id === id ? { ...b, enabled: !b.enabled } : b))
+   608→    );
+   609→  };
+   610→
+   611→  return (
+   612→    <div className="space-y-4">
+   613→      <div className="flex items-center gap-3">
+   614→        <div className="p-2 rounded-lg bg-purple-500/20">
+   615→          <Pen className="w-5 h-5 text-purple-400" />
+   616→        </div>
+   617→        <div>
+   618→          <h2 className="text-lg font-semibold">Управление контентом</h2>
+   619→          <p className="text-xs text-muted-foreground">Включайте и выключайте типы генерируемого контента</p>
+   620→        </div>
+   621→      </div>
+   622→
+   623→      <Separator />
+   624→
+   625→      <div className="space-y-3">
+   626→        {blocks.map((block, i) => {
+   627→          const BlockIcon = block.icon;
+   628→          return (
+   629→            <motion.div
+   630→              key={block.id}
+   631→              initial={{ opacity: 0, x: -10 }}
+   632→              animate={{ opacity: 1, x: 0 }}
+   633→              transition={{ delay: i * 0.04 }}
+   634→            >
+   635→              <Card className={cn('p-0 transition-opacity', !block.enabled && 'opacity-60')}>
+   636→                <CardContent className="p-4">
+   637→                  <div className="flex items-center justify-between gap-3">
+   638→                    <div className="flex items-center gap-3 flex-1 min-w-0">
+   639→                      <div className={cn('w-9 h-9 rounded-full flex items-center justify-center shrink-0', contentColors[i])}>
+   640→                        <BlockIcon className="w-4 h-4" />
+   641→                      </div>
+   642→                      <div className="flex-1 min-w-0">
+   643→                        <h3 className="font-semibold text-sm">{block.name}</h3>
+   644→                        <p className="text-xs text-muted-foreground mt-0.5">{block.description}</p>
+   645→                      </div>
+   646→                    </div>
+   647→                    <Switch checked={block.enabled} onCheckedChange={() => toggleBlock(block.id)} />
+   648→                  </div>
+   649→                </CardContent>
+   650→              </Card>
+   651→            </motion.div>
+   652→          );
+   653→        })}
+   654→      </div>
+   655→    </div>
+   656→  );
+   657→}
+   658→
+   659→// ---- Main Component ----
+   660→export default function AdminDashboard() {
+   661→  const adminView = useAppStore((s) => s.adminView);
+   662→
+   663→  return (
+   664→    <div className="space-y-6 glass-shine rounded-2xl">
+   665→      <motion.div
+   666→        initial={{ opacity: 0, y: -10 }}
+   667→        animate={{ opacity: 1, y: 0 }}
+   668→        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600/15 via-purple-500/5 to-transparent border border-purple-500/10 p-5"
+   669→      >
+   670→        <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/5 rounded-full blur-[80px]" />
+   671→        <div className="relative flex items-center gap-3">
+   672→          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20 shrink-0">
+   673→            <LayoutDashboard className="w-5 h-5 text-purple-400" />
+   674→          </div>
+   675→          <div className="min-w-0">
+   676→            <h1 className="text-lg sm:text-xl font-bold truncate">Добро пожаловать в панель управления</h1>
+   677→            <p className="text-sm text-muted-foreground mt-0.5">
+   678→              <span className="pulse-text-gradient font-medium">PULSE</span> • Admin Dashboard
+   679→            </p>
+   680→          </div>
+   681→        </div>
+   682→      </motion.div>
+   683→
+   684→      {/* Tab Content — driven by sidebar (adminView from store) */}
+   685→      <AnimatePresence mode="wait">
+   686→        <motion.div
+   687→          key={adminView}
+   688→          initial={{ opacity: 0, y: 10 }}
+   689→          animate={{ opacity: 1, y: 0 }}
+   690→          exit={{ opacity: 0, y: -10 }}
+   691→          transition={{ duration: 0.15 }}
+   692→        >
+   693→          {adminView === 'dashboard' && <DashboardTab />}
+   694→          {adminView === 'tools' && <ToolsTab />}
+   695→          {adminView === 'templates' && <TemplatesTab />}
+   696→          {adminView === 'users' && <UsersTab />}
+   697→          {adminView === 'content' && <ContentTab />}
+   698→        </motion.div>
+   699→      </AnimatePresence>
+   700→    </div>
+   701→  );
+   702→}
+   703→
