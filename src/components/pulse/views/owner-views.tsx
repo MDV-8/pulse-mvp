@@ -56,6 +56,7 @@ import { ProductSales } from '@/components/pulse/sales/product-sales';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 import {
   Sparkles,
   Settings,
@@ -73,6 +74,7 @@ import {
   Shield,
   Lock,
   MapPin,
+  RefreshCw,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -174,9 +176,12 @@ export function DashboardView() {
       {/* ====== Feature 4: Status Banner ====== */}
       <div>
         <div className="h-[3px] rounded-full bg-gradient-to-r from-purple-500 via-violet-400 to-purple-500 gradient-sweep" />
-        <p className="text-[11px] text-muted-foreground/50 mt-1.5 tracking-wider uppercase">
-          PULSE • Online • Demo Account
-        </p>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-medium text-emerald-400 tracking-wide">Demo Mode — Coffee & Co.</span>
+          </span>
+        </div>
       </div>
 
       {/* ====== Live Activity Ticker ====== */}
@@ -348,7 +353,12 @@ export function TodayView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-shadow-glow">Что делать сегодня</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-shadow-glow">Что делать сегодня</h1>
+          <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+            Демо-данные Coffee & Co.
+          </Badge>
+        </div>
         <p className="text-muted-foreground mt-1">
           AI выбрал приоритетные действия для вашего бизнеса
         </p>
@@ -362,7 +372,12 @@ export function SalesView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-shadow-glow">Продажи</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-shadow-glow">Продажи</h1>
+          <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+            Демо-данные Coffee & Co.
+          </Badge>
+        </div>
         <p className="text-muted-foreground mt-1">
           Анализ продаж и выручки
         </p>
@@ -377,6 +392,12 @@ export function SalesView() {
 export function ClientsView() {
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-shadow-glow">Клиенты</h1>
+        <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+          Демо-данные Coffee & Co.
+        </Badge>
+      </div>
       <ClientsList />
       <Segments />
     </div>
@@ -397,8 +418,8 @@ export function PromotionsView() {
             Синхронизировано
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
-            Демо режим
+          <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+            Демо-данные Coffee & Co.
           </Badge>
         )}
       </div>
@@ -409,15 +430,31 @@ export function PromotionsView() {
 }
 
 export function AnalyticsView() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefreshData = () => {
+    setRefreshKey((k) => k + 1);
+    toast.success('Данные аналитики обновлены');
+  };
+
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex items-center gap-3">
         <h1 className="text-2xl font-bold text-shadow-glow">Аналитика</h1>
-        <p className="text-muted-foreground mt-1">
-          Подробная аналитика вашего бизнеса
-        </p>
+        <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+          Демо-данные Coffee & Co.
+        </Badge>
+        <div className="ml-auto">
+          <Button variant="outline" size="sm" onClick={handleRefreshData} className="gap-1.5">
+            <RefreshCw className="w-3.5 h-3.5" />
+            Обновить данные
+          </Button>
+        </div>
       </div>
-      <BusinessHistory />
+      <p className="text-muted-foreground">
+        Подробная аналитика вашего бизнеса
+      </p>
+      <BusinessHistory key={refreshKey} />
       <AudienceInsights />
       <AICalendar />
       <Competitors />
@@ -430,6 +467,12 @@ export function AnalyticsView() {
 export function GoalsView() {
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-shadow-glow">Цели</h1>
+        <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+          Демо-данные Coffee & Co.
+        </Badge>
+      </div>
       <Goals />
       <BusinessHistory />
     </div>
@@ -439,10 +482,31 @@ export function GoalsView() {
 export function SettingsView() {
   const theme = useAppStore((s) => s.theme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const userSettings = useAppStore((s) => s.userSettings);
+  const setUserSettings = useAppStore((s) => s.setUserSettings);
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifPush, setNotifPush] = useState(true);
   const [notifWeekly, setNotifWeekly] = useState(false);
   const [twoFactor, setTwoFactor] = useState(false);
+
+  // Local edit state for settings form
+  const [editName, setEditName] = useState(userSettings.name);
+  const [editEmail, setEditEmail] = useState(userSettings.email);
+  const [editCity, setEditCity] = useState(userSettings.city);
+  const [editBusinessType, setEditBusinessType] = useState(userSettings.businessType);
+
+  // Get initials from business name
+  const getInitials = (name: string) => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleSaveSettings = () => {
+    setUserSettings({
+      name: editName,
+      email: editEmail,
+      city: editCity,
+      businessType: editBusinessType,
+    });
+    toast.success('Настройки сохранены');
+  };
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -457,50 +521,74 @@ export function SettingsView() {
       <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/30 to-violet-500/20 flex items-center justify-center border-2 border-purple-500/30 shrink-0">
-            <span className="text-2xl font-bold pulse-text-gradient">CC</span>
+            <span className="text-2xl font-bold pulse-text-gradient">{getInitials(userSettings.name)}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold truncate">Coffee & Co</h2>
-            <p className="text-sm text-muted-foreground truncate">owner@coffee-co.kz</p>
+            <h2 className="text-lg font-semibold truncate">{userSettings.name}</h2>
+            <p className="text-sm text-muted-foreground truncate">{userSettings.email}</p>
             <Badge variant="secondary" className="mt-1 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
               Демо аккаунт
             </Badge>
           </div>
-          <Button variant="outline" size="sm" className="gap-1.5 self-start shrink-0" onClick={() => toast.info('Функция редактирования профиля будет доступна в следующей версии')}>
-            <Pencil className="w-3.5 h-3.5" />
-            Редактировать
-          </Button>
         </div>
       </div>
 
-      {/* Business Info */}
+      {/* Business Info — Editable */}
       <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Store className="w-5 h-5 text-purple-400" />
           Бизнес
         </h2>
         <Separator />
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm text-muted-foreground flex items-center gap-2">
               <Store className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Название
-            </span>
-            <span className="font-medium text-sm truncate">Coffee & Co</span>
+            </label>
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              className="h-9 text-sm"
+              placeholder="Название бизнеса"
+            />
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+          <div className="space-y-1.5">
+            <label className="text-sm text-muted-foreground flex items-center gap-2">
+              <Mail className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+              Email
+            </label>
+            <Input
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+              className="h-9 text-sm"
+              placeholder="email@example.kz"
+              type="email"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm text-muted-foreground flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Категория
-            </span>
-            <span className="font-medium text-sm">Кофейня</span>
+            </label>
+            <Input
+              value={editBusinessType}
+              onChange={(e) => setEditBusinessType(e.target.value)}
+              className="h-9 text-sm"
+              placeholder="Тип бизнеса"
+            />
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+          <div className="space-y-1.5">
+            <label className="text-sm text-muted-foreground flex items-center gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Город
-            </span>
-            <span className="font-medium text-sm">Алматы</span>
+            </label>
+            <Input
+              value={editCity}
+              onChange={(e) => setEditCity(e.target.value)}
+              className="h-9 text-sm"
+              placeholder="Город"
+            />
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -509,6 +597,9 @@ export function SettingsView() {
             </span>
             <span className="font-medium text-sm text-right">Малый (1-5 сотрудников)</span>
           </div>
+          <Button onClick={handleSaveSettings} className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto">
+            Сохранить
+          </Button>
         </div>
       </div>
 

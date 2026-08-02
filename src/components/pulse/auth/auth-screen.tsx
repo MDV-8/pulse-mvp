@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Zap, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
 
 // ============================================================
 // Constants
@@ -149,10 +150,9 @@ export function AuthScreen() {
       if (found.isFirstTime) {
         // Mark as not first time
         saveUser({ ...found, isFirstTime: false });
-        setAppMode('onboarding');
-      } else {
-        setAppMode('owner');
       }
+      toast.info('Для демонстрации используется тестовая компания Coffee & Co.');
+      setAppMode('owner');
     } else {
       setLoading(false);
       setErrors({
@@ -183,11 +183,12 @@ export function AuthScreen() {
       email: regEmail.trim(),
       name: regName.trim(),
       password: regPassword,
-      isFirstTime: true,
+      isFirstTime: false,
     });
 
     login(regEmail.trim(), regName.trim());
-    setAppMode('onboarding');
+    toast.info('Для демонстрации используется тестовая компания Coffee & Co.');
+    setAppMode('owner');
   };
 
   const handleDemoLogin = () => {

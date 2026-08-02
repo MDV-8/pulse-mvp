@@ -250,8 +250,8 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-[240px] shrink-0 h-screen sticky top-0 border-r border-sidebar-border">
-        <div className="w-full">
+      <aside className="hidden md:flex w-[240px] shrink-0 h-screen sticky top-0 border-r border-sidebar-border overflow-hidden">
+        <div className="w-full h-full">
           <SidebarContent />
         </div>
       </aside>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
 
@@ -93,6 +94,8 @@ function ClientDashboard() {
 // ============================================================
 export default function HomePage() {
   const appMode = useAppStore((s) => s.appMode);
+  const isLoggedIn = useAppStore((s) => s.isLoggedIn);
+  const setAppMode = useAppStore((s) => s.setAppMode);
   const showCreatePromotion = useAppStore((s) => s.showCreatePromotion);
   const setShowCreatePromotion = useAppStore((s) => s.setShowCreatePromotion);
   const promotionFromInsight = useAppStore((s) => s.promotionFromInsight);
@@ -101,6 +104,13 @@ export default function HomePage() {
   const showAIContent = useAppStore((s) => s.showAIContent);
   const setShowAIContent = useAppStore((s) => s.setShowAIContent);
   const theme = useAppStore((s) => s.theme);
+
+  // Auto-redirect to owner if logged in but stuck on auth screen (e.g. after reload)
+  useEffect(() => {
+    if (appMode === 'auth' && isLoggedIn) {
+      setAppMode('owner');
+    }
+  }, []);
 
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>

@@ -158,6 +158,10 @@ interface AppStore {
   // Settings
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
+
+  // User Settings (persisted)
+  userSettings: { name: string; email: string; city: string; businessType: string };
+  setUserSettings: (s: Partial<{ name: string; email: string; city: string; businessType: string }>) => void;
 }
 
 export const useAppStore = create<AppStore>()(
@@ -289,6 +293,12 @@ export const useAppStore = create<AppStore>()(
       // Settings
       theme: 'dark',
       setTheme: (theme) => set({ theme }),
+
+      // User Settings
+      userSettings: { name: 'Coffee & Co', email: 'owner@coffee-co.kz', city: 'Алматы', businessType: 'Кофейня' },
+      setUserSettings: (s) => set((state) => ({
+        userSettings: { ...state.userSettings, ...s },
+      })),
     }),
     {
       name: 'pulse-storage',
@@ -308,6 +318,7 @@ export const useAppStore = create<AppStore>()(
         userName: state.userName,
         isLoggedIn: state.isLoggedIn,
         isFirstTime: state.isFirstTime,
+        userSettings: state.userSettings,
       }),
     }
   )

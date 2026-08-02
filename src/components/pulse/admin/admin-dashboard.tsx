@@ -164,14 +164,36 @@ interface AdminTool {
   enabled: boolean;
 }
 
+const TOOLS_STORAGE_KEY = 'pulse-admin-tools';
+
+function loadTools(): AdminTool[] {
+  if (typeof window === 'undefined') return mockAdminTools;
+  try {
+    const raw = localStorage.getItem(TOOLS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : mockAdminTools;
+  } catch { return mockAdminTools; }
+}
+
+function saveTools(tools: AdminTool[]) {
+  localStorage.setItem(TOOLS_STORAGE_KEY, JSON.stringify(tools));
+}
+
 function ToolsTab() {
-  const [tools, setTools] = useState<AdminTool[]>(mockAdminTools);
+  const [tools, setTools] = useState<AdminTool[]>(loadTools);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editDesc, setEditDesc] = useState('');
 
+  const updateTools = (updater: (prev: AdminTool[]) => AdminTool[]) => {
+    setTools((prev) => {
+      const next = updater(prev);
+      saveTools(next);
+      return next;
+    });
+  };
+
   const toggleTool = (id: string) => {
-    setTools((prev) =>
+    updateTools((prev) =>
       prev.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t))
     );
   };
@@ -184,12 +206,19 @@ function ToolsTab() {
 
   const saveEdit = () => {
     if (!editingId) return;
-    setTools((prev) =>
+    updateTools((prev) =>
       prev.map((t) =>
         t.id === editingId ? { ...t, name: editName, description: editDesc } : t
       )
     );
     setEditingId(null);
+    toast.success('Инструмент обновлён');
+  };
+
+  const deleteTool = (id: string) => {
+    updateTools((prev) => prev.filter((t) => t.id !== id));
+    if (editingId === id) setEditingId(null);
+    toast.success('Инструмент удалён');
   };
 
   const addTool = () => {
@@ -200,8 +229,9 @@ function ToolsTab() {
       icon: 'Lightbulb',
       enabled: false,
     };
-    setTools((prev) => [...prev, newTool]);
+    updateTools((prev) => [...prev, newTool]);
     startEdit(newTool);
+    toast.success('✅ Инструмент успешно опубликован');
   };
 
   return (
@@ -257,7 +287,7 @@ function ToolsTab() {
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       {isEditing ? (
                         <Button size="sm" variant="ghost" onClick={saveEdit} className="text-green-400 hover:text-green-300">
                           <Check className="w-4 h-4" />
@@ -267,6 +297,9 @@ function ToolsTab() {
                           <Pencil className="w-4 h-4" />
                         </Button>
                       )}
+                      <Button size="sm" variant="ghost" onClick={() => deleteTool(tool.id)} className="text-muted-foreground hover:text-red-400">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
