@@ -550,11 +550,11 @@ export function AIAssistant() {
         </div>
         <div className="flex items-center gap-2">
           {/* AI Mode Toggle */}
-          <div className="flex items-center gap-1.5 rounded-lg bg-card border border-border p-0.5">
+          <div className="flex items-center gap-1 rounded-lg bg-card border border-border p-0.5">
             <button
               onClick={() => setAiMode('keywords')}
               className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
+                'px-2 py-1 sm:px-2.5 rounded-md text-[11px] sm:text-xs font-medium transition-all whitespace-nowrap',
                 aiMode === 'keywords'
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -565,14 +565,15 @@ export function AIAssistant() {
             <button
               onClick={() => setAiMode('neural')}
               className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
+                'px-2 py-1 sm:px-2.5 rounded-md text-[11px] sm:text-xs font-medium transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap',
                 aiMode === 'neural'
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Zap className="h-3 w-3" />
-              Нейросеть
+              <span className="hidden sm:inline">Нейросеть</span>
+              <span className="sm:hidden">Нейро</span>
               <span className={cn(
                 'text-[9px] font-bold px-1 py-0.5 rounded leading-none',
                 aiMode === 'neural'

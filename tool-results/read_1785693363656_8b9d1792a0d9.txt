@@ -1,0 +1,785 @@
+     1→'use client';
+     2→
+     3→import React, { useState, useEffect } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import {
+     6→  Calculator,
+     7→  CreditCard,
+     8→  Banknote,
+     9→  Receipt,
+    10→  Clock,
+    11→  CheckCircle,
+    12→  ArrowRight,
+    13→  Coffee,
+    14→  Plus,
+    15→  QrCode,
+    16→  X,
+    17→  CakeSlice,
+    18→  Croissant,
+    19→  CupSoda,
+    20→} from 'lucide-react';
+    21→import { Badge } from '@/components/ui/badge';
+    22→import { Button } from '@/components/ui/button';
+    23→import { cn } from '@/lib/utils';
+    24→
+    25→// ============================================================
+    26→// Types
+    27→// ============================================================
+    28→
+    29→type OrderStatus = 'new' | 'ready' | 'paid';
+    30→type PaymentMethod = 'cash' | 'card' | 'account';
+    31→type FilterTab = 'all' | 'new' | 'ready' | 'paid';
+    32→
+    33→interface OrderItem {
+    34→  name: string;
+    35→  qty: number;
+    36→  price: number;
+    37→}
+    38→
+    39→interface Order {
+    40→  id: string;
+    41→  number: string;
+    42→  time: string;
+    43→  customer: string;
+    44→  items: OrderItem[];
+    45→  total: number;
+    46→  status: OrderStatus;
+    47→}
+    48→
+    49→interface QuickProduct {
+    50→  name: string;
+    51→  price: number;
+    52→  icon: React.ElementType;
+    53→}
+    54→
+    55→interface Transaction {
+    56→  id: string;
+    57→  time: string;
+    58→  amount: number;
+    59→  method: 'cash' | 'card' | 'account';
+    60→}
+    61→
+    62→// ============================================================
+    63→// Mock Data
+    64→// ============================================================
+    65→
+    66→const mockOrders: Order[] = [
+    67→  {
+    68→    id: '8',
+    69→    number: '#008',
+    70→    time: '14:52',
+    71→    customer: 'Айдана',
+    72→    items: [
+    73→      { name: 'Капучино', qty: 2, price: 1200 },
+    74→      { name: 'Чизкейк', qty: 1, price: 2800 },
+    75→    ],
+    76→    total: 5200,
+    77→    status: 'new',
+    78→  },
+    79→  {
+    80→    id: '7',
+    81→    number: '#007',
+    82→    time: '14:48',
+    83→    customer: 'Марат',
+    84→    items: [
+    85→      { name: 'Латте', qty: 1, price: 1400 },
+    86→      { name: 'Круассан', qty: 1, price: 1600 },
+    87→    ],
+    88→    total: 3000,
+    89→    status: 'ready',
+    90→  },
+    91→  {
+    92→    id: '6',
+    93→    number: '#006',
+    94→    time: '14:45',
+    95→    customer: 'Дина',
+    96→    items: [{ name: 'Раф', qty: 1, price: 1500 }],
+    97→    total: 1500,
+    98→    status: 'ready',
+    99→  },
+   100→  {
+   101→    id: '5',
+   102→    number: '#005',
+   103→    time: '14:38',
+   104→    customer: 'Бекзат',
+   105→    items: [{ name: 'Американо', qty: 3, price: 900 }],
+   106→    total: 2700,
+   107→    status: 'paid',
+   108→  },
+   109→  {
+   110→    id: '4',
+   111→    number: '#004',
+   112→    time: '14:32',
+   113→    customer: 'Сания',
+   114→    items: [
+   115→      { name: 'Капучино', qty: 1, price: 1200 },
+   116→      { name: 'Латте', qty: 2, price: 1400 },
+   117→      { name: 'Мокко', qty: 1, price: 1900 },
+   118→    ],
+   119→    total: 5900,
+   120→    status: 'paid',
+   121→  },
+   122→  {
+   123→    id: '3',
+   124→    number: '#003',
+   125→    time: '14:25',
+   126→    customer: 'Ерлан',
+   127→    items: [
+   128→      { name: 'Флэт уайт', qty: 1, price: 1300 },
+   129→      { name: 'Чизкейк', qty: 2, price: 2800 },
+   130→    ],
+   131→    total: 6900,
+   132→    status: 'paid',
+   133→  },
+   134→  {
+   135→    id: '2',
+   136→    number: '#002',
+   137→    time: '14:18',
+   138→    customer: 'Асель',
+   139→    items: [{ name: 'Латте', qty: 1, price: 1400 }],
+   140→    total: 1400,
+   141→    status: 'paid',
+   142→  },
+   143→  {
+   144→    id: '1',
+   145→    number: '#001',
+   146→    time: '14:10',
+   147→    customer: 'Данияр',
+   148→    items: [
+   149→      { name: 'Капучино', qty: 2, price: 1200 },
+   150→      { name: 'Круассан', qty: 1, price: 1600 },
+   151→    ],
+   152→    total: 4000,
+   153→    status: 'paid',
+   154→  },
+   155→];
+   156→
+   157→const quickProducts: QuickProduct[] = [
+   158→  { name: 'Капучино', price: 1200, icon: Coffee },
+   159→  { name: 'Латте', price: 1400, icon: CupSoda },
+   160→  { name: 'Раф', price: 1500, icon: Coffee },
+   161→  { name: 'Американо', price: 900, icon: Coffee },
+   162→  { name: 'Чизкейк', price: 2800, icon: CakeSlice },
+   163→  { name: 'Круассан', price: 1600, icon: Croissant },
+   164→];
+   165→
+   166→const recentTransactions: Transaction[] = [
+   167→  { id: 't1', time: '14:38', amount: 2700, method: 'cash' },
+   168→  { id: 't2', time: '14:32', amount: 5900, method: 'card' },
+   169→  { id: 't3', time: '14:25', amount: 6900, method: 'card' },
+   170→  { id: 't4', time: '14:18', amount: 1400, method: 'account' },
+   171→  { id: 't5', time: '14:10', amount: 4000, method: 'cash' },
+   172→];
+   173→
+   174→// ============================================================
+   175→// Config
+   176→// ============================================================
+   177→
+   178→const statusConfig: Record<
+   179→  OrderStatus,
+   180→  { label: string; className: string }>
+   181→= {
+   182→  new: {
+   183→    label: 'Новый',
+   184→    className: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+   185→  },
+   186→  ready: {
+   187→    label: 'Готов',
+   188→    className: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+   189→  },
+   190→  paid: {
+   191→    label: 'Оплачен',
+   192→    className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+   193→  },
+   194→};
+   195→
+   196→const filterTabs: { key: FilterTab; label: string }[] = [
+   197→  { key: 'all', label: 'Все' },
+   198→  { key: 'new', label: 'Новый' },
+   199→  { key: 'ready', label: 'Готов' },
+   200→  { key: 'paid', label: 'Оплачен' },
+   201→];
+   202→
+   203→const paymentMethods: {
+   204→  key: PaymentMethod;
+   205→  label: string;
+   206→  icon: React.ElementType;
+   207→}[] = [
+   208→  { key: 'cash', label: 'Наличные', icon: Banknote },
+   209→  { key: 'card', label: 'Картой', icon: CreditCard },
+   210→  { key: 'account', label: 'Счёт', icon: QrCode },
+   211→];
+   212→
+   213→// ============================================================
+   214→// Animation Variants
+   215→// ============================================================
+   216→
+   217→const containerVariants = {
+   218→  hidden: { opacity: 0 },
+   219→  show: {
+   220→    opacity: 1,
+   221→    transition: { staggerChildren: 0.06 },
+   222→  },
+   223→};
+   224→
+   225→const itemVariants = {
+   226→  hidden: { opacity: 0, y: 12 },
+   227→  show: { opacity: 1, y: 0 },
+   228→};
+   229→
+   230→// ============================================================
+   231→// Component
+   232→// ============================================================
+   233→
+   234→export function CashierView() {
+   235→  const [orders, setOrders] = useState<Order[]>(mockOrders);
+   236→  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+   237→  const [activeTab, setActiveTab] = useState<FilterTab>('all');
+   238→  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
+   239→  const [currentTime, setCurrentTime] = useState(new Date());
+   240→  const [quickAddAnim, setQuickAddAnim] = useState<string | null>(null);
+   241→
+   242→  // Live clock
+   243→  useEffect(() => {
+   244→    const interval = setInterval(() => setCurrentTime(new Date()), 30_000);
+   245→    return () => clearInterval(interval);
+   246→  }, []);
+   247→
+   248→  const activeOrder = orders.find((o) => o.id === activeOrderId) ?? null;
+   249→
+   250→  const filteredOrders =
+   251→    activeTab === 'all'
+   252→      ? orders
+   253→      : orders.filter((o) => o.status === activeTab);
+   254→
+   255→  const handleAccept = (id: string) => {
+   256→    setOrders((prev) =>
+   257→      prev.map((o) => (o.id === id ? { ...o, status: 'ready' as const } : o)),
+   258→    );
+   259→  };
+   260→
+   261→  const handleServe = (id: string) => {
+   262→    setOrders((prev) =>
+   263→      prev.map((o) => (o.id === id ? { ...o, status: 'paid' as const } : o)),
+   264→    );
+   265→  };
+   266→
+   267→  const handleQuickAdd = (product: QuickProduct) => {
+   268→    if (!activeOrder) return;
+   269→    setQuickAddAnim(product.name);
+   270→    setTimeout(() => setQuickAddAnim(null), 400);
+   271→    setOrders((prev) =>
+   272→      prev.map((o) => {
+   273→        if (o.id !== activeOrder.id) return o;
+   274→        const existing = o.items.find((i) => i.name === product.name);
+   275→        if (existing) {
+   276→          return {
+   277→            ...o,
+   278→            items: o.items.map((i) =>
+   279→              i.name === product.name ? { ...i, qty: i.qty + 1 } : i,
+   280→            ),
+   281→            total: o.total + product.price,
+   282→          };
+   283→        }
+   284→        return {
+   285→          ...o,
+   286→          items: [...o.items, { name: product.name, qty: 1, price: product.price }],
+   287→          total: o.total + product.price,
+   288→        };
+   289→      }),
+   290→    );
+   291→  };
+   292→
+   293→  const handleRemoveItem = (orderItemId: number) => {
+   294→    if (!activeOrder) return;
+   295→    setOrders((prev) =>
+   296→      prev.map((o) => {
+   297→        if (o.id !== activeOrder.id) return o;
+   298→        const item = o.items[orderItemId];
+   299→        if (!item) return o;
+   300→        const newItems = o.items
+   301→          .map((i, idx) =>
+   302→            idx === orderItemId
+   303→              ? i.qty > 1
+   304→                ? { ...i, qty: i.qty - 1 }
+   305→                : null
+   306→              : i,
+   307→          )
+   308→          .filter(Boolean) as OrderItem[];
+   309→        return {
+   310→          ...o,
+   311→          items: newItems,
+   312→          total: newItems.reduce((sum, i) => sum + i.price * i.qty, 0),
+   313→        };
+   314→      }),
+   315→    );
+   316→  };
+   317→
+   318→  const formatCurrency = (amount: number) =>
+   319→    amount.toLocaleString('ru-RU') + ' ₸';
+   320→
+   321→  const dateStr = currentTime.toLocaleDateString('ru-RU', {
+   322→    day: 'numeric',
+   323→    month: 'long',
+   324→    year: 'numeric',
+   325→  });
+   326→  const timeStr = currentTime.toLocaleTimeString('ru-RU', {
+   327→    hour: '2-digit',
+   328→    minute: '2-digit',
+   329→  });
+   330→
+   331→  const getMethodIcon = (method: 'cash' | 'card' | 'account') => {
+   332→    switch (method) {
+   333→      case 'cash':
+   334→        return <Banknote className="size-3.5 text-amber-400" />;
+   335→      case 'card':
+   336→        return <CreditCard className="size-3.5 text-purple-400" />;
+   337→      case 'account':
+   338→        return <QrCode className="size-3.5 text-cyan-400" />;
+   339→    }
+   340→  };
+   341→
+   342→  return (
+   343→    <motion.div
+   344→      className="space-y-6"
+   345→      variants={containerVariants}
+   346→      initial="hidden"
+   347→      animate="show"
+   348→    >
+   349→      {/* ====== Header ====== */}
+   350→      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+   351→        <div className="flex items-center gap-3">
+   352→          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/15">
+   353→            <Calculator className="size-5 text-purple-400" />
+   354→          </div>
+   355→          <div>
+   356→            <h2 className="text-xl font-bold text-shadow-glow">Касса</h2>
+   357→            <p className="text-xs text-muted-foreground">
+   358→              Управление заказами и платежами
+   359→            </p>
+   360→          </div>
+   361→        </div>
+   362→        <div className="flex items-center gap-4">
+   363→          {/* Status indicator */}
+   364→          <div className="flex items-center gap-2">
+   365→            <span className="relative flex h-2.5 w-2.5">
+   366→              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+   367→              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+   368→            </span>
+   369→            <span className="text-xs text-emerald-400 font-medium">
+   370→              Касса открыта
+   371→            </span>
+   372→          </div>
+   373→          {/* Date/Time */}
+   374→          <div className="flex items-center gap-2 text-muted-foreground">
+   375→            <Clock className="size-3.5" />
+   376→            <span className="text-xs tabular-nums">
+   377→              {dateStr}, {timeStr}
+   378→            </span>
+   379→          </div>
+   380→        </div>
+   381→      </motion.div>
+   382→
+   383→      {/* ====== Neon Line Divider ====== */}
+   384→      <motion.div variants={itemVariants}>
+   385→        <div className="neon-line" />
+   386→      </motion.div>
+   387→
+   388→      {/* ====== Stats Row ====== */}
+   389→      <motion.div
+   390→        variants={itemVariants}
+   391→        className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+   392→      >
+   393→        {/* Today */}
+   394→        <div className="glass-card rounded-xl p-4">
+   395→          <div className="flex items-center gap-2 mb-1">
+   396→            <Receipt className="size-4 text-purple-400" />
+   397→            <span className="text-xs text-muted-foreground">Сегодня</span>
+   398→          </div>
+   399→          <p className="text-2xl font-bold text-foreground stat-glow-purple tabular-nums number-glow">
+   400→            386 000 ₸
+   401→          </p>
+   402→          <p className="text-xs text-muted-foreground mt-0.5">
+   403→            47 заказов
+   404→          </p>
+   405→        </div>
+   406→
+   407→        {/* Average Check */}
+   408→        <div className="glass-card rounded-xl p-4">
+   409→          <div className="flex items-center gap-2 mb-1">
+   410→            <Calculator className="size-4 text-purple-400" />
+   411→            <span className="text-xs text-muted-foreground">
+   412→              Средний чек
+   413→            </span>
+   414→          </div>
+   415→          <p className="text-2xl font-bold text-foreground tabular-nums number-glow">
+   416→            8 214 ₸
+   417→          </p>
+   418→          <p className="text-xs text-emerald-400 mt-0.5">+12% от вчера</p>
+   419→        </div>
+   420→
+   421→        {/* Work Time */}
+   422→        <div className="glass-card rounded-xl p-4">
+   423→          <div className="flex items-center gap-2 mb-1">
+   424→            <Clock className="size-4 text-purple-400" />
+   425→            <span className="text-xs text-muted-foreground">
+   426→              Время работы
+   427→            </span>
+   428→          </div>
+   429→          <p className="text-2xl font-bold text-foreground tabular-nums number-glow">
+   430→            7ч 32м
+   431→          </p>
+   432→          <p className="text-xs text-muted-foreground mt-0.5">
+   433→            С 07:30 до текущего
+   434→          </p>
+   435→        </div>
+   436→      </motion.div>
+   437→
+   438→      {/* ====== Main Content: 2 columns ====== */}
+   439→      <motion.div
+   440→        variants={itemVariants}
+   441→        className="grid grid-cols-1 lg:grid-cols-5 gap-4"
+   442→      >
+   443→        {/* Left Column — Order Queue (3/5) */}
+   444→        <div className="lg:col-span-3 space-y-3">
+   445→          {/* Filter Tabs */}
+   446→          <div className="flex items-center gap-1 p-1 glass-card rounded-xl">
+   447→            {filterTabs.map((tab) => (
+   448→              <button
+   449→                key={tab.key}
+   450→                onClick={() => setActiveTab(tab.key)}
+   451→                className={cn(
+   452→                  'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200',
+   453→                  activeTab === tab.key
+   454→                    ? 'bg-purple-500/20 text-purple-400 shadow-[0_0_12px_rgba(139,92,246,0.15)]'
+   455→                    : 'text-muted-foreground hover:text-foreground hover:bg-accent',
+   456→                )}
+   457→              >
+   458→                {tab.label}
+   459→              </button>
+   460→            ))}
+   461→          </div>
+   462→
+   463→          {/* Order List */}
+   464→          <div className="space-y-2 max-h-[500px] overflow-y-auto scrollbar-thin pr-1">
+   465→            <AnimatePresence mode="popLayout">
+   466→              {filteredOrders.map((order, idx) => {
+   467→                const config = statusConfig[order.status];
+   468→                const isActive = activeOrderId === order.id;
+   469→                const staggerClass =
+   470→                  idx < 5
+   471→                    ? (cn('stagger-' + (idx + 1) as 'stagger-1' | 'stagger-2' | 'stagger-3' | 'stagger-4' | 'stagger-5'))
+   472→                    : '';
+   473→                return (
+   474→                  <motion.div
+   475→                    key={order.id}
+   476→                    layout
+   477→                    initial={{ opacity: 0, y: 10 }}
+   478→                    animate={{ opacity: 1, y: 0 }}
+   479→                    exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+   480→                    transition={{ duration: 0.25, delay: idx * 0.04 }}
+   481→                    className={cn(
+   482→                      'glass-card rounded-xl p-4 cursor-pointer transition-all duration-200 card-hover-lift',
+   483→                      'slide-in-right opacity-0',
+   484→                      staggerClass,
+   485→                      isActive && 'ring-1 ring-purple-500/40 border-purple-500/20',
+   486→                    )}
+   487→                    onClick={() => setActiveOrderId(order.id)}
+   488→                  >
+   489→                    <div className="flex items-start justify-between gap-3">
+   490→                      {/* Left: Order info */}
+   491→                      <div className="flex-1 min-w-0">
+   492→                        <div className="flex items-center gap-2 flex-wrap">
+   493→                          <span className="text-sm font-bold text-foreground tabular-nums">
+   494→                            {order.number}
+   495→                          </span>
+   496→                          <Badge
+   497→                            variant="outline"
+   498→                            className={cn(
+   499→                              'text-[10px] px-1.5 py-0',
+   500→                              config.className,
+   501→                            )}
+   502→                          >
+   503→                            {config.label}
+   504→                          </Badge>
+   505→                          <span className="text-[10px] text-muted-foreground ml-auto">
+   506→                            {order.time}
+   507→                          </span>
+   508→                        </div>
+   509→                        <p className="text-xs text-muted-foreground mt-1">
+   510→                          {order.customer}
+   511→                        </p>
+   512→                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+   513→                          {order.items.map((item, iIdx) => (
+   514→                            <span
+   515→                              key={iIdx}
+   516→                              className="text-[11px] text-muted-foreground/80"
+   517→                            >
+   518→                              {item.name} x{item.qty}
+   519→                            </span>
+   520→                          ))}
+   521→                        </div>
+   522→                      </div>
+   523→
+   524→                      {/* Right: Total + Action */}
+   525→                      <div className="flex flex-col items-end gap-2 shrink-0">
+   526→                        <span className="text-sm font-bold text-foreground tabular-nums">
+   527→                          {formatCurrency(order.total)}
+   528→                        </span>
+   529→                        {order.status === 'new' && (
+   530→                          <Button
+   531→                            size="sm"
+   532→                            className="h-7 text-[11px] gap-1 bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_10px_rgba(139,92,246,0.25)]"
+   533→                            onClick={(e) => {
+   534→                              e.stopPropagation();
+   535→                              handleAccept(order.id);
+   536→                            }}
+   537→                          >
+   538→                            <ArrowRight className="size-3" />
+   539→                            Принять
+   540→                          </Button>
+   541→                        )}
+   542→                        {order.status === 'ready' && (
+   543→                          <Button
+   544→                            size="sm"
+   545→                            variant="outline"
+   546→                            className="h-7 text-[11px] gap-1 text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+   547→                            onClick={(e) => {
+   548→                              e.stopPropagation();
+   549→                              handleServe(order.id);
+   550→                            }}
+   551→                          >
+   552→                            <CheckCircle className="size-3" />
+   553→                            Выдать
+   554→                          </Button>
+   555→                        )}
+   556→                        {order.status === 'paid' && (
+   557→                          <CheckCircle className="size-4 text-emerald-400" />
+   558→                        )}
+   559→                      </div>
+   560→                    </div>
+   561→                  </motion.div>
+   562→                );
+   563→              })}
+   564→            </AnimatePresence>
+   565→          </div>
+   566→        </div>
+   567→
+   568→        {/* Right Column — Active Order + Quick Add (2/5) */}
+   569→        <div className="lg:col-span-2 space-y-4">
+   570→          {/* Active Order Details */}
+   571→          <div className="glass-card-premium rounded-xl p-4">
+   572→            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+   573→              <Receipt className="size-4 text-purple-400" />
+   574→              Текущий заказ
+   575→            </h3>
+   576→            <AnimatePresence mode="wait">
+   577→              {activeOrder ? (
+   578→                <motion.div
+   579→                  key={activeOrder.id}
+   580→                  initial={{ opacity: 0, y: 8 }}
+   581→                  animate={{ opacity: 1, y: 0 }}
+   582→                  exit={{ opacity: 0, y: -8 }}
+   583→                  transition={{ duration: 0.2 }}
+   584→                >
+   585→                  <div className="flex items-center justify-between mb-3">
+   586→                    <div>
+   587→                      <span className="text-lg font-bold text-foreground tabular-nums">
+   588→                        {activeOrder.number}
+   589→                      </span>
+   590→                      <span className="text-xs text-muted-foreground ml-2">
+   591→                        {activeOrder.customer} · {activeOrder.time}
+   592→                      </span>
+   593→                    </div>
+   594→                    <Badge
+   595→                      variant="outline"
+   596→                      className={cn(
+   597→                        'text-[10px] px-1.5 py-0',
+   598→                        statusConfig[activeOrder.status].className,
+   599→                      )}
+   600→                    >
+   601→                      {statusConfig[activeOrder.status].label}
+   602→                    </Badge>
+   603→                  </div>
+   604→
+   605→                  {/* Items list */}
+   606→                  <div className="space-y-2 mb-3 max-h-48 overflow-y-auto scrollbar-thin">
+   607→                    {activeOrder.items.map((item, idx) => (
+   608→                      <div
+   609→                        key={idx}
+   610→                        className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-accent/50"
+   611→                      >
+   612→                        <div className="flex items-center gap-2 min-w-0">
+   613→                          <Coffee className="size-3 text-purple-400/60 shrink-0" />
+   614→                          <span className="text-xs text-foreground truncate">
+   615→                            {item.name}
+   616→                          </span>
+   617→                          <span className="text-[10px] text-muted-foreground">
+   618→                            x{item.qty}
+   619→                          </span>
+   620→                        </div>
+   621→                        <div className="flex items-center gap-2 shrink-0">
+   622→                          <span className="text-xs font-medium text-foreground tabular-nums">
+   623→                            {formatCurrency(item.price * item.qty)}
+   624→                          </span>
+   625→                          {activeOrder.status === 'new' && (
+   626→                            <button
+   627→                              className="p-0.5 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400 transition-colors"
+   628→                              onClick={() => handleRemoveItem(idx)}
+   629→                              aria-label={`Удалить ${item.name}`}
+   630→                            >
+   631→                              <X className="size-3" />
+   632→                            </button>
+   633→                          )}
+   634→                        </div>
+   635→                      </div>
+   636→                    ))}
+   637→                  </div>
+   638→
+   639→                  {/* Total */}
+   640→                  <div className="neon-line mb-3" />
+   641→                  <div className="flex items-center justify-between">
+   642→                    <span className="text-sm font-semibold text-foreground">
+   643→                      Итого
+   644→                    </span>
+   645→                    <span className="text-lg font-bold text-foreground stat-glow-purple tabular-nums number-glow">
+   646→                      {formatCurrency(activeOrder.total)}
+   647→                    </span>
+   648→                  </div>
+   649→                </motion.div>
+   650→              ) : (
+   651→                <motion.div
+   652→                  key="empty"
+   653→                  initial={{ opacity: 0 }}
+   654→                  animate={{ opacity: 1 }}
+   655→                  exit={{ opacity: 0 }}
+   656→                  className="flex flex-col items-center justify-center py-8 text-center"
+   657→                >
+   658→                  <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
+   659→                    <Receipt className="size-5 text-purple-400/50" />
+   660→                  </div>
+   661→                  <p className="text-sm text-muted-foreground">
+   662→                    Выберите заказ
+   663→                  </p>
+   664→                  <p className="text-[11px] text-muted-foreground/60 mt-1">
+   665→                    Нажмите на заказ из списка слева
+   666→                  </p>
+   667→                </motion.div>
+   668→              )}
+   669→            </AnimatePresence>
+   670→          </div>
+   671→
+   672→          {/* Quick Add Products */}
+   673→          <div className="glass-card rounded-xl p-4">
+   674→            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+   675→              <Plus className="size-4 text-purple-400" />
+   676→              Быстрое добавление
+   677→            </h3>
+   678→            <div className="grid grid-cols-2 gap-2">
+   679→              {quickProducts.map((product) => {
+   680→                const Icon = product.icon;
+   681→                const isAnimating = quickAddAnim === product.name;
+   682→                return (
+   683→                  <motion.button
+   684→                    key={product.name}
+   685→                    whileTap={{ scale: 0.95 }}
+   686→                    onClick={() => handleQuickAdd(product)}
+   687→                    disabled={!activeOrder || activeOrder?.status !== 'new'}
+   688→                    className={cn(
+   689→                      'glass-card rounded-lg p-3 text-left transition-all duration-200',
+   690→                      'hover:border-purple-500/30 hover:shadow-[0_0_12px_rgba(139,92,246,0.15)]',
+   691→                      'disabled:opacity-40 disabled:cursor-not-allowed',
+   692→                      isAnimating && 'border-glow border-purple-500/40',
+   693→                    )}
+   694→                  >
+   695→                    <div className="flex items-center gap-2 mb-1">
+   696→                      <Icon className="size-3.5 text-purple-400" />
+   697→                      <span className="text-[11px] font-medium text-foreground">
+   698→                        {product.name}
+   699→                      </span>
+   700→                    </div>
+   701→                    <span className="text-xs text-muted-foreground tabular-nums">
+   702→                      {formatCurrency(product.price)}
+   703→                    </span>
+   704→                  </motion.button>
+   705→                );
+   706→              })}
+   707→            </div>
+   708→          </div>
+   709→
+   710→          {/* Payment Method Selector */}
+   711→          <div className="glass-card rounded-xl p-4">
+   712→            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+   713→              <CreditCard className="size-4 text-purple-400" />
+   714→              Способ оплаты
+   715→            </h3>
+   716→            <div className="flex gap-2">
+   717→              {paymentMethods.map((pm) => {
+   718→                const Icon = pm.icon;
+   719→                return (
+   720→                  <button
+   721→                    key={pm.key}
+   722→                    onClick={() => setPaymentMethod(pm.key)}
+   723→                    className={cn(
+   724→                      'flex-1 flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all duration-200 border',
+   725→                      paymentMethod === pm.key
+   726→                        ? 'bg-purple-500/15 border-purple-500/30 text-purple-400'
+   727→                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-accent',
+   728→                    )}
+   729→                  >
+   730→                    <Icon className="size-4" />
+   731→                    <span className="text-[11px] font-medium">{pm.label}</span>
+   732→                  </button>
+   733→                );
+   734→              })}
+   735→            </div>
+   736→          </div>
+   737→        </div>
+   738→      </motion.div>
+   739→
+   740→      {/* ====== Section Divider ====== */}
+   741→      <div className="section-divider" aria-hidden="true">
+   742→        <span className="divider-dot" />
+   743→      </div>
+   744→
+   745→      {/* ====== Recent Transactions ====== */}
+   746→      <motion.div variants={itemVariants}>
+   747→        <div className="glass-card rounded-xl p-4">
+   748→          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+   749→            <Receipt className="size-4 text-purple-400" />
+   750→            Последние транзакции
+   751→          </h3>
+   752→          <div className="space-y-2">
+   753→            {recentTransactions.map((tx, idx) => (
+   754→              <motion.div
+   755→                key={tx.id}
+   756→                initial={{ opacity: 0, x: 20 }}
+   757→                animate={{ opacity: 1, x: 0 }}
+   758→                transition={{ duration: 0.3, delay: 0.1 + idx * 0.08 }}
+   759→                className={cn(
+   760→                  'flex items-center justify-between py-2 px-3 rounded-lg bg-accent/30',
+   761→                  'slide-in-right opacity-0',
+   762→                  idx < 5 && 'stagger-' + (idx + 1),
+   763→                )}
+   764→              >
+   765→                <div className="flex items-center gap-3">
+   766→                  <span className="text-xs text-muted-foreground tabular-nums w-10">
+   767→                    {tx.time}
+   768→                  </span>
+   769→                  {getMethodIcon(tx.method)}
+   770→                </div>
+   771→                <div className="flex items-center gap-3">
+   772→                  <span className="text-sm font-medium text-foreground tabular-nums">
+   773→                    {formatCurrency(tx.amount)}
+   774→                  </span>
+   775→                  <CheckCircle className="size-3.5 text-emerald-400" />
+   776→                </div>
+   777→              </motion.div>
+   778→            ))}
+   779→          </div>
+   780→        </div>
+   781→      </motion.div>
+   782→    </motion.div>
+   783→  );
+   784→}
+   785→

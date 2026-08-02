@@ -9,6 +9,9 @@ import { MobileHeader } from '@/components/pulse/layout/mobile-header';
 import { ClientNav } from '@/components/pulse/layout/client-nav';
 import { AdminNav } from '@/components/pulse/layout/admin-nav';
 
+// Auth
+import { AuthScreen } from '@/components/pulse/auth/auth-screen';
+
 // Onboarding
 import { OnboardingFlow } from '@/components/pulse/onboarding/onboarding-flow';
 
@@ -108,6 +111,9 @@ export default function HomePage() {
         {/* Global Search (always rendered) */}
         <GlobalSearch />
 
+        {/* Auth */}
+        {appMode === 'auth' && <AuthScreen />}
+
         {/* Onboarding */}
         {appMode === 'onboarding' && (
           <div className="flex-1 flex items-center justify-center p-4">
@@ -155,9 +161,7 @@ export default function HomePage() {
         {appMode === 'admin' && (
           <>
             <AdminNav />
-            <div className="hidden md:block">
-              <MobileHeader />
-            </div>
+            <MobileHeader />
             <div className="flex-1 overflow-hidden">
               <ScrollArea className="h-full">
                 <AnimatePresence mode="wait">

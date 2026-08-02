@@ -86,12 +86,14 @@ export default function ClientsList() {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-3"
       >
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20 shrink-0">
           <Users className="w-5 h-5 text-purple-400" />
         </div>
-        <h1 className="text-2xl font-bold text-shadow-glow">Клиенты</h1>
-        <span className="w-2 h-2 rounded-full bg-purple-400 particle-drift" />
-        <div className="ml-auto">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold text-shadow-glow">Клиенты</h1>
+        </div>
+        <span className="w-2 h-2 rounded-full bg-purple-400 particle-drift shrink-0" />
+        <div className="ml-auto shrink-0">
           <ExportButton
             title="Клиенты"
             headers={['Имя', 'Телефон', 'Покупки', 'Сумма', 'Сегмент']}
@@ -165,8 +167,8 @@ export default function ClientsList() {
 
       {/* Client Table */}
       <Card className="p-0 overflow-hidden">
-        <ScrollArea className="max-h-[480px]">
-          <Table>
+        <ScrollArea className="max-h-[480px] overflow-x-auto">
+          <Table className="min-w-[500px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border/50">
                 <TableHead>Имя</TableHead>

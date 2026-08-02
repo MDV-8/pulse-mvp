@@ -110,6 +110,14 @@ export function PulseScore() {
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
+  // Mobile-responsive SVG dimensions
+  const svgSize = radius * 2;
+  const mobileRadius = 60;
+  const mobileStrokeWidth = 6;
+  const mobileNormalizedRadius = mobileRadius - mobileStrokeWidth / 2;
+  const mobileCircumference = mobileNormalizedRadius * 2 * Math.PI;
+  const mobileStrokeDashoffset = mobileCircumference - (animatedScore / 100) * mobileCircumference;
+
   useEffect(() => {
     const duration = 1500;
     const startTime = Date.now();
@@ -135,10 +143,11 @@ export function PulseScore() {
           style={{ backgroundColor: '#8b5cf6' }}
         />
 
+        {/* Desktop SVG */}
         <svg
-          width={radius * 2}
-          height={radius * 2}
-          className="relative transform -rotate-90 score-glow glow-rotate"
+          width={svgSize}
+          height={svgSize}
+          className="relative transform -rotate-90 score-glow glow-rotate hidden sm:block"
         >
           {/* Background circle */}
           <circle
@@ -168,12 +177,44 @@ export function PulseScore() {
           />
         </svg>
 
+        {/* Mobile SVG (smaller) */}
+        <svg
+          width={mobileRadius * 2}
+          height={mobileRadius * 2}
+          className="relative transform -rotate-90 score-glow glow-rotate sm:hidden"
+        >
+          <circle
+            stroke="rgba(255,255,255,0.05)"
+            fill="transparent"
+            strokeWidth={mobileStrokeWidth}
+            strokeLinecap="round"
+            r={mobileNormalizedRadius}
+            cx={mobileRadius}
+            cy={mobileRadius}
+          />
+          <circle
+            stroke={color}
+            fill="transparent"
+            strokeWidth={mobileStrokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={mobileCircumference + ' ' + mobileCircumference}
+            style={{
+              strokeDashoffset: mobileStrokeDashoffset,
+              transition: 'stroke 0.5s ease',
+            }}
+            r={mobileNormalizedRadius}
+            cx={mobileRadius}
+            cy={mobileRadius}
+            className="score-ring"
+          />
+        </svg>
+
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <HoverCard openDelay={400} closeDelay={100}>
             <HoverCardTrigger asChild>
               <motion.span
-                className="text-5xl font-bold tracking-tighter pulse-text-gradient cursor-default stat-glow-purple text-gradient-cycle"
+                className="text-4xl sm:text-5xl font-bold tracking-tighter pulse-text-gradient cursor-default stat-glow-purple text-gradient-cycle"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.5 }}

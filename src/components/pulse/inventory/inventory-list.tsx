@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type StockStatus = 'normal' | 'low' | 'critical';
 type TrendDirection = 'up' | 'down' | 'stable';
@@ -178,6 +179,7 @@ export function InventoryList() {
         <Button
           size="sm"
           className="bg-purple-600 hover:bg-purple-700 text-white"
+          onClick={() => toast.info('Функция добавления позиции будет доступна в следующей версии')}
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Добавить
@@ -323,6 +325,7 @@ export function InventoryList() {
                   <Button
                     size="sm"
                     className="bg-red-600 hover:bg-red-700 text-white text-xs h-7 px-3"
+                    onClick={() => toast.success(`Заказ на «${item.name}» отправлен поставщику`)}
                   >
                     <ShoppingCart className="w-3 h-3 mr-1" />
                     Заказать
@@ -332,6 +335,7 @@ export function InventoryList() {
                     size="sm"
                     variant="ghost"
                     className="text-xs h-7 px-3 text-muted-foreground hover:text-foreground"
+                    onClick={() => toast.info(`Подробности по «${item.name}» будут доступны в следующей версии`)}
                   >
                     Подробнее
                   </Button>
@@ -384,6 +388,7 @@ export function InventoryList() {
             <Button
               size="sm"
               className="bg-purple-600 hover:bg-purple-700 text-white text-xs"
+              onClick={() => toast.success('Заказ на все критические позиции отправлен')}
             >
               <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
               Заказать всё
@@ -392,6 +397,7 @@ export function InventoryList() {
               size="sm"
               variant="outline"
               className="text-xs border-border"
+              onClick={() => toast.info('Аналитика запасов будет доступна в следующей версии')}
             >
               <TrendingDown className="w-3.5 h-3.5 mr-1.5" />
               Аналитика запасов

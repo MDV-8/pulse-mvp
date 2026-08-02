@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppStore } from '@/stores/app-store';
+import { toast } from 'sonner';
 
 // Dashboard
 import { PulseScore } from '@/components/pulse/dashboard/pulse-score';
@@ -306,20 +307,22 @@ export function DashboardView() {
       </div>
 
       {/* ====== AI Footer ====== */}
-      <div className="glass-card rounded-xl p-4 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
-          <Sparkles className="w-5 h-5 text-purple-400" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-muted-foreground">
-            Нужен совет? Задайте вопрос{' '}
-            <span className="text-purple-400 font-medium">AI ассистенту</span>
-          </p>
+      <div className="glass-card rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-purple-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-muted-foreground">
+              Нужен совет? Задайте вопрос{' '}
+              <span className="text-purple-400 font-medium">AI ассистенту</span>
+            </p>
+          </div>
         </div>
         <Button
           variant="outline"
           size="sm"
-          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 shrink-0 hover-glow"
+          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 shrink-0 hover-glow self-start sm:self-auto"
           onClick={() => useAppStore.getState().setOwnerView('ai')}
         >
           Открыть AI
@@ -439,6 +442,7 @@ export function SettingsView() {
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifPush, setNotifPush] = useState(true);
   const [notifWeekly, setNotifWeekly] = useState(false);
+  const [twoFactor, setTwoFactor] = useState(false);
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -450,19 +454,19 @@ export function SettingsView() {
       </div>
 
       {/* Profile Section */}
-      <div className="glass-card rounded-xl p-6 space-y-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/30 to-violet-500/20 flex items-center justify-center border-2 border-purple-500/30">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/30 to-violet-500/20 flex items-center justify-center border-2 border-purple-500/30 shrink-0">
             <span className="text-2xl font-bold pulse-text-gradient">CC</span>
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold">Coffee & Co</h2>
-            <p className="text-sm text-muted-foreground">owner@coffee-co.kz</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-semibold truncate">Coffee & Co</h2>
+            <p className="text-sm text-muted-foreground truncate">owner@coffee-co.kz</p>
             <Badge variant="secondary" className="mt-1 bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
               Демо аккаунт
             </Badge>
           </div>
-          <Button variant="outline" size="sm" className="gap-1.5">
+          <Button variant="outline" size="sm" className="gap-1.5 self-start shrink-0" onClick={() => toast.info('Функция редактирования профиля будет доступна в следующей версии')}>
             <Pencil className="w-3.5 h-3.5" />
             Редактировать
           </Button>
@@ -470,46 +474,46 @@ export function SettingsView() {
       </div>
 
       {/* Business Info */}
-      <div className="glass-card rounded-xl p-6 space-y-4">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Store className="w-5 h-5 text-purple-400" />
           Бизнес
         </h2>
         <Separator />
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground flex items-center gap-2">
-              <Store className="w-4 h-4 text-muted-foreground/50" />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+              <Store className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Название
             </span>
-            <span className="font-medium">Coffee & Co</span>
+            <span className="font-medium text-sm truncate">Coffee & Co</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-muted-foreground/50" />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+              <Sparkles className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Категория
             </span>
-            <span className="font-medium">Кофейня</span>
+            <span className="font-medium text-sm">Кофейня</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-muted-foreground/50" />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+              <MapPin className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Город
             </span>
-            <span className="font-medium">Алматы</span>
+            <span className="font-medium text-sm">Алматы</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground flex items-center gap-2">
-              <UserPlus className="w-4 h-4 text-muted-foreground/50" />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted-foreground flex items-center gap-2 text-sm">
+              <UserPlus className="w-4 h-4 text-muted-foreground/50 shrink-0" />
               Размер
             </span>
-            <span className="font-medium">Малый (1-5 сотрудников)</span>
+            <span className="font-medium text-sm text-right">Малый (1-5 сотрудников)</span>
           </div>
         </div>
       </div>
 
       {/* Theme */}
-      <div className="glass-card rounded-xl p-6 space-y-4">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Settings className="w-5 h-5 text-purple-400" />
           Внешний вид
@@ -537,7 +541,7 @@ export function SettingsView() {
       </div>
 
       {/* Notifications */}
-      <div className="glass-card rounded-xl p-6 space-y-4">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Bell className="w-5 h-5 text-purple-400" />
           Уведомления
@@ -580,7 +584,7 @@ export function SettingsView() {
       </div>
 
       {/* Security */}
-      <div className="glass-card rounded-xl p-6 space-y-4">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Shield className="w-5 h-5 text-purple-400" />
           Безопасность
@@ -595,7 +599,7 @@ export function SettingsView() {
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Последняя смена: 30 дней назад</p>
             </div>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast.info('Функция смены пароля будет доступна в следующей версии')}>
               Изменить
             </Button>
           </div>
@@ -608,15 +612,23 @@ export function SettingsView() {
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">Дополнительная защита аккаунта</p>
             </div>
-            <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
-              Выкл
+            <Badge
+              variant="secondary"
+              className={`${twoFactor ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-muted text-muted-foreground'} text-xs cursor-pointer hover:opacity-80 transition-opacity`}
+              onClick={() => {
+                const next = !twoFactor;
+                setTwoFactor(next);
+                toast.info(next ? 'Двухфакторная аутентификация включена (демо)' : 'Двухфакторная аутентификация выключена (демо)');
+              }}
+            >
+              {twoFactor ? 'Вкл' : 'Выкл'}
             </Badge>
           </div>
         </div>
       </div>
 
       {/* Account */}
-      <div className="glass-card rounded-xl p-6 space-y-4">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg font-semibold">Аккаунт</h2>
         <Separator />
         <div className="space-y-3">
@@ -628,7 +640,7 @@ export function SettingsView() {
       </div>
 
       {/* Danger Zone */}
-      <div className="glass-card rounded-xl p-6 space-y-4 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.08)]">
+      <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.08)]">
         <h2 className="text-lg font-semibold text-red-400">Опасная зона</h2>
         <Separator />
         <div className="flex items-center justify-between">

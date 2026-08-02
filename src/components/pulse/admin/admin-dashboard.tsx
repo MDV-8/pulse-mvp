@@ -26,6 +26,7 @@ import {
 } from '@/data/mock-data';
 import { useAppStore } from '@/stores/app-store';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Brain, Sparkles, Users: UserPlus, Heart, Pen: PenTool, TrendingUp, Eye, Calendar,
@@ -376,7 +377,7 @@ function TemplatesTab() {
                       {tpl.category}
                     </Badge>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground h-7 w-7 p-0">
+                      <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground h-7 w-7 p-0" onClick={() => toast.info(`Редактирование шаблона «${tpl.name}» будет доступно в следующей версии`)}>
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
                       <Button
@@ -506,8 +507,8 @@ function UsersTab() {
       </div>
 
       <Card className="p-0 overflow-hidden">
-        <ScrollArea className="max-h-[400px]">
-          <Table>
+        <ScrollArea className="max-h-[400px] overflow-x-auto">
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border/50">
                 <TableHead>Пользователь</TableHead>
@@ -635,11 +636,11 @@ export default function AdminDashboard() {
       >
         <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/5 rounded-full blur-[80px]" />
         <div className="relative flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/20 shrink-0">
             <LayoutDashboard className="w-5 h-5 text-purple-400" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold">Добро пожаловать в панель управления</h1>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold truncate">Добро пожаловать в панель управления</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               <span className="pulse-text-gradient font-medium">PULSE</span> • Admin Dashboard
             </p>

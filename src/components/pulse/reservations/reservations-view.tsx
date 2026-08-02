@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type ReservationStatus = 'confirmed' | 'pending' | 'cancelled';
 
@@ -191,6 +192,7 @@ export function ReservationsView() {
         <Button
           size="sm"
           className="gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+          onClick={() => toast.info('Функция создания бронирования будет доступна в следующей версии')}
         >
           <Plus className="size-4" />
           <span className="hidden sm:inline">Новое бронирование</span>

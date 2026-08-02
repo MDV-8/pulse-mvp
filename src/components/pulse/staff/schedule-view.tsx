@@ -11,6 +11,7 @@ import {
   Edit3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 // ── Mock data ──────────────────────────────────────────────
 
@@ -116,7 +117,9 @@ function shiftCellClass(type: Shift['type'], isCurrentDay: boolean) {
 // ── Component ──────────────────────────────────────────────
 
 export function ScheduleView() {
-  const [weekLabel] = useState('27 января — 2 февраля');
+  const [weekIndex, setWeekIndex] = useState(0);
+  const weeks = ['27 января — 2 февраля', '3 февраля — 9 февраля', '10 февраля — 16 февраля'];
+  const weekLabel = weeks[weekIndex % weeks.length];
 
   const totalHours = employees.reduce((acc, e) => acc + e.totalHours, 0);
   const avgHours = (totalHours / employees.length).toFixed(1);
@@ -142,6 +145,7 @@ export function ScheduleView() {
           variant="outline"
           size="sm"
           className="gap-2 border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+          onClick={() => toast.info('Функция добавления смены будет доступна в следующей версии')}
         >
           <Plus className="w-4 h-4" />
           Добавить смену
@@ -155,6 +159,7 @@ export function ScheduleView() {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={() => setWeekIndex((i) => Math.max(0, i - 1))}
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -166,6 +171,7 @@ export function ScheduleView() {
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={() => setWeekIndex((i) => i + 1)}
           >
             <ChevronRight className="w-4 h-4" />
           </Button>

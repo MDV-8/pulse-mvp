@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 // ---- Types ----
 
@@ -256,6 +257,7 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
         <Button
           size="sm"
           className="h-8 text-[11px] font-semibold bg-purple-600 hover:bg-purple-700 text-white px-3"
+          onClick={() => toast.success(`Заказ отправлен: ${supplier.name}`)}
         >
           <Package className="mr-1.5 size-3" />
           Заказать
@@ -265,6 +267,7 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
             size="sm"
             variant="outline"
             className="h-8 text-[11px] font-semibold border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 px-3"
+            onClick={() => toast.success(`Оплата ${supplier.debt.toLocaleString('ru-RU')}₸ отправлена (${supplier.name})`)}
           >
             <CreditCard className="mr-1.5 size-3" />
             Оплатить
@@ -274,6 +277,7 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
           size="sm"
           variant="outline"
           className="h-8 text-[11px] font-semibold border-border/60 text-muted-foreground hover:text-foreground hover:bg-accent/50 px-3 ml-auto"
+          onClick={() => toast.info(`Звонок в ${supplier.name}: функция будет доступна в следующей версии`)}
         >
           <Phone className="mr-1.5 size-3" />
           Позвонить

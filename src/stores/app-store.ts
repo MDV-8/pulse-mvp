@@ -19,7 +19,7 @@ import {
 // Types
 // ============================================================
 
-export type AppMode = 'onboarding' | 'owner' | 'client' | 'admin';
+export type AppMode = 'auth' | 'onboarding' | 'owner' | 'client' | 'admin';
 export type OwnerView =
   | 'dashboard'
   | 'today'
@@ -147,6 +147,14 @@ interface AppStore {
   showNotifications: boolean;
   setShowNotifications: (show: boolean) => void;
 
+  // Auth
+  userEmail: string | null;
+  userName: string | null;
+  isLoggedIn: boolean;
+  isFirstTime: boolean;
+  login: (email: string, name: string) => void;
+  logout: () => void;
+
   // Settings
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
@@ -156,7 +164,7 @@ export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       // App mode
-      appMode: 'onboarding',
+      appMode: 'auth',
       setAppMode: (mode) => set({ appMode: mode }),
 
       // Owner views
@@ -257,6 +265,27 @@ export const useAppStore = create<AppStore>()(
       showNotifications: false,
       setShowNotifications: (show) => set({ showNotifications: show }),
 
+      // Auth
+      userEmail: null,
+      userName: null,
+      isLoggedIn: false,
+      isFirstTime: true,
+      login: (email, name) =>
+        set({
+          userEmail: email,
+          userName: name,
+          isLoggedIn: true,
+          isFirstTime: false,
+        }),
+      logout: () =>
+        set({
+          userEmail: null,
+          userName: null,
+          isLoggedIn: false,
+          isFirstTime: true,
+          appMode: 'auth',
+        }),
+
       // Settings
       theme: 'dark',
       setTheme: (theme) => set({ theme }),
@@ -275,6 +304,10 @@ export const useAppStore = create<AppStore>()(
         todayActions: state.todayActions,
         promotions: state.promotions,
         theme: state.theme,
+        userEmail: state.userEmail,
+        userName: state.userName,
+        isLoggedIn: state.isLoggedIn,
+        isFirstTime: state.isFirstTime,
       }),
     }
   )

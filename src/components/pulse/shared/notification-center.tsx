@@ -120,7 +120,7 @@ export function NotificationCenter({
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
-  // Close on click outside
+  // Close on click outside (desktop only)
   React.useEffect(() => {
     if (!open) return;
 
@@ -148,21 +148,13 @@ export function NotificationCenter({
 
   return (
     <>
-      {/* Backdrop on mobile */}
-      {open && (
-        <div
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm md:hidden"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Panel */}
+      {/* Desktop: Dropdown panel */}
       <div
         data-notification-panel
         className={
           'absolute right-0 top-full mt-2 z-50 w-[360px] max-w-[calc(100vw-2rem)] ' +
           'rounded-xl border border-border glass-card overflow-hidden ' +
-          'shadow-2xl shadow-black/40 ' +
+          'shadow-2xl shadow-black/40 hidden md:block ' +
           'transition-all duration-300 ease-out ' +
           (open
             ? 'opacity-100 translate-y-0 pointer-events-auto'
@@ -242,6 +234,97 @@ export function NotificationCenter({
           </div>
         </ScrollArea>
       </div>
+
+      {/* Mobile: Bottom sheet */}
+      {open && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          {/* Sheet */}
+          <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] rounded-t-2xl border-t border-border bg-card overflow-hidden flex flex-col">
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-purple-400" />
+                <span className="text-sm font-semibold">Уведомления</span>
+                {unreadCount > 0 && (
+                  <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 font-medium">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+              {unreadCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 gap-1.5"
+                  onClick={markAllRead}
+                >
+                  <CheckCheck className="w-3.5 h-3.5" />
+                  Все
+                </Button>
+              )}
+            </div>
+            {/* List */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="divide-y divide-border">
+                {notifications.map((n) => {
+                  const IconComp = iconMap[n.icon] || Bell;
+                  const colorClass = iconColorMap[n.icon] || 'text-muted-foreground bg-muted';
+                  return (
+                    <div
+                      key={n.id}
+                      className={
+                        'flex items-start gap-3 px-4 py-3.5 transition-colors active:bg-accent/50 ' +
+                        (!n.read ? 'bg-purple-500/[0.03]' : '')
+                      }
+                    >
+                      <div
+                        className={
+                          'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ' +
+                          colorClass
+                        }
+                      >
+                        <IconComp className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start gap-2">
+                          <p
+                            className={
+                              'text-sm leading-snug ' +
+                              (!n.read ? 'font-medium text-foreground' : 'text-muted-foreground')
+                            }
+                          >
+                            {n.title}
+                          </p>
+                          {!n.read && (
+                            <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0 mt-1.5" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                          {n.desc}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/60 mt-1">
+                          {n.time}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Safe area for iOS */}
+            <div className="h-[env(safe-area-inset-bottom)]" />
+          </div>
+        </div>
+      )}
     </>
   );
 }

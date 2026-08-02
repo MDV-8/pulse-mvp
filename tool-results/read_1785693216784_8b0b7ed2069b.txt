@@ -1,0 +1,685 @@
+     1→'use client';
+     2→
+     3→import { useState, useRef, useEffect, useMemo } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import { Brain, Send, Sparkles, Zap } from 'lucide-react';
+     6→import { Button } from '@/components/ui/button';
+     7→import { Input } from '@/components/ui/input';
+     8→import { ScrollArea } from '@/components/ui/scroll-area';
+     9→import { Separator } from '@/components/ui/separator';
+    10→import { useAppStore } from '@/stores/app-store';
+    11→import { aiChatResponses } from '@/data/mock-data';
+    12→import type { AIChatMessage } from '@/stores/app-store';
+    13→
+    14→type AIMode = 'keywords' | 'neural';
+    15→
+    16→const DEFAULT_GREETINGS = [
+    17→  'Хороший вопрос! Давайте посмотрим на данные "Coffee & Co". Попробуйте спросить про продажи, акции, клиентов или конкурентов — у меня есть точные данные по вашему бизнесу.',
+    18→  'Интересно! Я постоянно анализирую данные вашего "Coffee & Co". Спросите меня про средний чек, возврат клиентов или лучшую акцию — помогу с конкретикой.',
+    19→  'Я здесь, чтобы помочь вашему бизнесу "Coffee & Co" 💜 Задайте вопрос про продажи, прибыль, лояльность или маркетинг — и я дам рекомендации на основе реальных данных.',
+    20→  'Отличный день для анализа бизнеса! Попросите меня проанализировать аудиторию, проверить запасы или подобрать стратегию ценообразования для "Coffee & Co".',
+    21→];
+    22→
+    23→function getRandomGreeting(): string {
+    24→  return DEFAULT_GREETINGS[Math.floor(Math.random() * DEFAULT_GREETINGS.length)];
+    25→}
+    26→
+    27→function getAIResponse(message: string): string {
+    28→  const lower = message.toLowerCase();
+    29→  if (lower.includes('помощь') || lower.includes('помоги') || lower.includes('что можешь'))
+    30→    return aiChatResponses.help;
+    31→  if (lower.includes('конкурент') || lower.includes('рынок') || lower.includes('сосед'))
+    32→    return aiChatResponses.competitors;
+    33→  if (lower.includes('лояльност') || lower.includes('бонус') || lower.includes('программа'))
+    34→    return aiChatResponses.loyalty;
+    35→  if (lower.includes('спасибо') || lower.includes('благодар'))
+    36→    return aiChatResponses.thanks;
+    37→  if (lower.includes('продаж')) return aiChatResponses.sales_down;
+    38→  if (lower.includes('прибыл')) return aiChatResponses.profit_down;
+    39→  if (lower.includes('чек') || lower.includes('средний')) return aiChatResponses.average_check;
+    40→  if (lower.includes('вернуть') || lower.includes('клиент')) return aiChatResponses.clients_return;
+    41→  if (lower.includes('ацци') || lower.includes('выгод')) return aiChatResponses.best_promotion;
+    42→  if (lower.includes('аудитори') || lower.includes('кто')) return aiChatResponses.audience;
+    43→
+    44→  // Weather-based: suggest promotions based on weather
+    45→  if (lower.includes('погода') || lower.includes('дождь') || lower.includes('холодно') || lower.includes('жара') || lower.includes('снег') || lower.includes('ветер'))
+    46→    return `Погода напрямую влияет на трафик "Coffee & Co"!
+    47→
+    48→**Анализ по типам погоды:**
+    49→— Дождь/снег: трафик −22%, но средний чек +8% (клиенты задерживаются)
+    50→— Жара (+35°C): спрос на айс-напитки +45%, горячий кофе −30%
+    51→— Холодно: какао и горячий шоколад +38%
+    52→
+    53→**Рекомендации:**
+    54→1. При плохой погоде — запустите промо "Дождь не помеха": скидка 10% на доставку
+    55→2. В жару — выделите айс-напитки на видное место, добавьте "охлаждённый комбо" за 3 500₸
+    56→3. Автоматические пуш-уведомления при смене погоды
+    57→
+    58→Ожидаемый эффект: +12–18% выручки в "непогожие" дни.`;
+    59→
+    60→  // Staff/scheduling
+    61→  if (lower.includes('сотрудник') || lower.includes('график') || lower.includes('смен') || lower.includes('персонал') || lower.includes('бариста'))
+    62→    return `Анализ загрузки персонала "Coffee & Co":
+    63→
+    64→**Текущая ситуация:**
+    65→— Утренняя смена (7:00–14:00): 2 бариста, загрузка 92%
+    66→— Дневная смена (14:00–20:00): 2 бариста, загрузка 58%
+    67→— Вечерняя (20:00–23:00): 1 бариста, загрузка 34%
+    68→
+    69→**Проблемы:**
+    70→• Утром — очереди, время обслуживания +4 мин
+    71→• Днём — переизбыток персонала (зарплаты −15 000₸/мес впустую)
+    72→
+    73→**Оптимизация графика:**
+    74→1. Утро: +1 бариста (7:00–11:00), стоимость 4 500₸/смена
+    75→2. День: −1 бариста после 16:00
+    76→3. Вечер: совмещать с закрытием
+    77→
+    78→**Экономия:** до 45 000₸/мес при сохранении качества обслуживания.`;
+    79→
+    80→  // Inventory
+    81→  if (lower.includes('запас') || lower.includes('остаток') || lower.includes('ингредиент') || lower.includes('сырь') || lower.includes('кофе зерно') || lower.includes('молок'))
+    82→    return `Состояние запасов "Coffee & Co" на сегодня:
+    83→
+    84→**Критичные (осталось < 3 дней):**
+    85→• Арабика Эфиопия — 2.1 кг (расход 1.2 кг/день)
+    86→• Молоко 3.2% — 8 л (расход 3.5 л/день)
+    87→• Сироп карамельный — 0.4 л
+    88→
+    89→**Норма (3–7 дней):**
+    90→• Робуста — 4.8 кг
+    91→• Чизкейк — 6 штук
+    92→• Круассаны — 12 штук
+    93→
+    94→**Профицит (> 7 дней):**
+    95→• Стаканы бумажные — запас на 21 день
+    96→• Крышки — запас на 18 дней (переизбыток 12 000₸ в замороженном капитале)
+    97→
+    98→**Рекомендации:**
+    99→1. Срочно заказать арабику и молоко — прогноз поставки 2 дня
+   100→2. Снизить заказ стаканов на 30%
+   101→3. Включить автоуведомление при остатке < 3 дней
+   102→
+   103→Прогноз потерь при бездействии: ~38 000₸/неделю из-за упущенных продаж.`;
+   104→
+   105→  // Marketing
+   106→  if (lower.includes('реклама') || lower.includes('трафик') || lower.includes('продвижен') || lower.includes('маркетинг') || lower.includes('бюджет'))
+   107→    return `Анализ маркетинга "Coffee & Co" за последний месяц:
+   108→
+   109→**Каналы привлечения:**
+   110→1. Instagram — 48% новых клиентов, стоимость привлечения 320₸
+   111→2. Сарафанное радио — 28%, стоимость 0₸
+   112→3. 2GIS/Google Maps — 15%, стоимость 180₸
+   113→4. Промокоды в мессенджерах — 9%, стоимость 450₸
+   114→
+   115→**Что работает лучше всего:**
+   116→• Stories с процессом приготовления кофе — охват +35%
+   117→• Реферальная программа "Приведи друга" — ROI 4.1₸ на 1₸
+   118→
+   119→**Что не работает:**
+   120→• Таргетированная реклама — стоимость клика выросла на 40%
+   121→
+   122→**Рекомендации:**
+   123→1. Увеличить бюджет на реферальную программу на 20 000₸
+   124→2. Публиковать 5–7 Stories/неделю (сейчас 2–3)
+   125→3. Запустить акцию "Отметь нас" — бонус 200₸ за пост
+   126→
+   127→Прогноз: +25% новых клиентов при бюджете 50 000₸/мес.`;
+   128→
+   129→  // Morning/evening time-based
+   130→  if (lower.includes('утро') || lower.includes('утренн') || lower.includes('вечер') || lower.includes('вечерн') || lower.includes('сегодня') || lower.includes('сейчас'))
+   131→    return `Бизнес-прогноз для "Coffee & Co" на текущий день:
+   132→
+   133→**Утро (7:00–10:00):**
+   134→• Ожидается 85–110 клиентов (пик в 8:30)
+   135→• Популярные: капучино (48%), латте (28%), американо (15%)
+   136→• Рекомендация: подготовить 120 порций молока, все бариста на смене
+   137→
+   138→**День (10:00–17:00):**
+   139→• Ожидается 45–60 клиентов
+   140→• Спрос на десерты: +22% к утру
+   141→• Рекомендация: выложить свежую выпечку к 11:00 для Instagram Stories
+   142→
+   143→**Вечер (17:00–23:00):**
+   144→• Ожидается 25–35 клиентов (потенциально +40% с акцией)
+   145→• Если запущен Happy Hour: прогноз 40–50 клиентов
+   146→• Рекомендация: активировать пуш-уведомление о Happy Hour в 17:30
+   147→
+   148→**Прогноз выручки на день:** 42 000–48 000₸`;
+   149→
+   150→  // Price/pricing
+   151→  if (lower.includes('цена') || lower.includes('стоимость') || lower.includes('поднять') || lower.includes('снизить') || lower.includes('скидк') || lower.includes('наценк'))
+   152→    return `Анализ ценообразования "Coffee & Co":
+   153→
+   154→**Текущие цены vs конкуренты:**
+   155→— Капучино: 1 800₸ (средний по району 1 650₸, +9%)
+   156→— Латте: 2 000₸ (средний 1 800₸, +11%)
+   157→— Раф: 2 200₸ (средний 2 100₸, +5%)
+   158→— Десерты: 1 200–1 800₸ (ниже рынка на 8%)
+   159→
+   160→**Ценовая эластичность:**
+   161→• Напитки: повышение на 100₸ → −3% продаж (приемлемо)
+   162→• Десерты: повышение на 200₸ → −12% продаж (рискованно)
+   163→
+   164→**Рекомендации:**
+   165→1. Повысить цены на напитки на 100₸ (ожидаемый эффект: +18 000₸/мес при потере 3% клиентов)
+   166→2. НЕ повышать цены на десерты — они привлекают трафик
+   167→3. Ввести "двойной размер" за +500₸ — маржа +65%
+   168→4. Комбо "Кофе + десерт" за 2 800₸ вместо 3 000₸ — повышение чека на 15%
+   169→
+   170→Итого потенциальный рост прибыли: +12% (≈46 000₸/мес).`;
+   171→
+   172→  // Reviews/ratings
+   173→  if (lower.includes('отзыв') || lower.includes('рейтинг') || lower.includes('оценк') || lower.includes('звезд') || lower.includes('google') || lower.includes('2gis'))
+   174→    return `Управление отзывами "Coffee & Co":
+   175→
+   176→**Текущий рейтинг:**
+   177→• Google Maps: 4.8 ⭐ (312 отзывов)
+   178→• 2GIS: 4.7 ⭐ (189 отзывов)
+   179→• Instagram: 4.6 ⭐ (на основе упоминаний)
+   180→
+   181→**Новые отзывы (последние 7 дней):**
+   182→• 5⭐ — 8 отзывов
+   183→• 4⭐ — 3 отзыва
+   184→• 3⭐ — 1 отзыв (жалоба на время ожидания)
+   185→• Без ответа — 5 отзывов
+   186→
+   187→**Тренды из отзывов:**
+   188→• Позитивные: вкус кофе (67%), атмосфера (23%), персонал (10%)
+   189→• Негативные: время ожидания (2 упоминания), отсутствие парковки (1)
+   190→
+   191→**Рекомендации:**
+   192→1. Ответить на все 5 неответственных отзыва за 24 часа
+   193→2. При негативном отзыве — предложить бонус 300₸ на следующий визит
+   194→3. Попросить довольных клиентов оставить отзыв (карточка с QR-кодом на чеке)
+   195→
+   196→Цель: 4.9⭐ на Google к концу месяца.`;
+   197→
+   198→  // Social media
+   199→  if (lower.includes('инста') || lower.includes('соцсет') || lower.includes('пост') || lower.includes('stories') || lower.includes('контент') || lower.includes('подписч'))
+   200→    return `Соцсети "Coffee & Co" — анализ и план:
+   201→
+   202→**Текущие показатели:**
+   203→• Instagram: 2 340 подписчиков (+87 за месяц)
+   204→• Средний охват поста: 340 человек (14.5%)
+   205→• Средний охват Stories: 520 человек (22%)
+   206→• Вовлечённость: 4.2% (хороший показатель)
+   207→
+   208→**Самый успешный контент:**
+   209→1. Видео приготовления латте-арт — 1 200 просмотров
+   210→2. Утренняя атмосфера кофейни — 890 просмотров
+   211→3. "За кулисами" с бариста — 760 просмотров
+   212→
+   213→**План контента на неделю:**
+   214→• Понедельник: Reels "Рецепт недели" (айс-матча)
+   215→• Среда: Stories "Выбор клиентов" (голосование)
+   216→• Пятница: Пост "Итоги недели" с цифрами
+   217→• Воскресенье: Утренний Reels "Открываем Coffee & Co"
+   218→
+   219→**Рекомендации:**
+   220→1. Увеличить Reels до 3/неделю (алгоритм даёт +40% охвата)
+   221→2. Добавить user-generated контент (фото клиентов за 200₸ бонус)
+   222→3. Использовать геотеги и хештеги #алматыкофе #coffeealmaty`;
+   223→
+   224→  // Delivery
+   225→  if (lower.includes('доставка') || lower.includes('курьер') || lower.includes('wolt') || lower.includes('glovo') || lower.includes('самовывоз'))
+   226→    return `Доставка "Coffee & Co" — текущая ситуация:
+   227→
+   228→**Каналы доставки:**
+   229→• Wolt: 28 заказов/день, средний чек 3 200₸, комиссия 25%
+   230→• Glovo: 18 заказов/день, средний чек 2 800₸, комиссия 28%
+   231→• Самовывоз: 12 заказов/день, средний чек 4 100₸ (без комиссии)
+   232→
+   233→**Анализ прибыльности:**
+   234→— Wolt: чистая прибыль 320₸/заказ (маржа 10%)
+   235→— Glovo: чистая прибыль 140₸/заказ (маржа 5%)
+   236→— Самовывоз: чистая прибыль 1 640₸/заказ (маржа 40%)
+   237→
+   238→**Проблемы:**
+   239→• Wolt/Glovo забирают 53 000₸/неделю комиссиями
+   240→• Время доставки: 25 мин (клиенты ожидают 18 мин)
+   241→
+   242→**Рекомендации:**
+   243→1. Добавить "премиум-доставку" за 4 500₸ (минимальный заказ + десерт) — маржа +18%
+   244→2. Продвигать самовывоз: скидка 10% при самовывозе (всё равно выгоднее, чем 25% комиссии)
+   245→3. Упаковать "кофейный сет" для офисов (от 10 000₸, доставка бесплатная)
+   246→
+   247→Потенциальная экономия: 28 000₸/неделю.`;
+   248→
+   249→  // Random greeting if no keyword matches
+   250→  return getRandomGreeting();
+   251→}
+   252→
+   253→/** Variable typing delay based on response length */
+   254→function getTypingDelay(response: string): number {
+   255→  const len = response.length;
+   256→  if (len < 100) return 800 + Math.random() * 400;  // 0.8-1.2s
+   257→  if (len < 300) return 1200 + Math.random() * 600; // 1.2-1.8s
+   258→  return 1800 + Math.random() * 700;                 // 1.8-2.5s
+   259→}
+   260→
+   261→/** Simple markdown-to-JSX renderer for AI responses */
+   262→function renderMarkdown(text: string) {
+   263→  const lines = text.split('\n');
+   264→  const elements: React.ReactNode[] = [];
+   265→  let key = 0;
+   266→
+   267→  for (const line of lines) {
+   268→    const trimmed = line.trim();
+   269→
+   270→    // Empty line → paragraph break
+   271→    if (!trimmed) {
+   272→      elements.push(<div key={key++} className="h-2" />);
+   273→      continue;
+   274→    }
+   275→
+   276→    // Bullet point (•)
+   277→    if (trimmed.startsWith('•') || trimmed.startsWith('- ')) {
+   278→      const content = trimmed.startsWith('•') ? trimmed.slice(1).trim() : trimmed.slice(2).trim();
+   279→      elements.push(
+   280→        <div key={key++} className="flex items-start gap-2 ml-1">
+   281→          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+   282→          <span>{renderInlineMarkdown(content)}</span>
+   283→        </div>
+   284→      );
+   285→      continue;
+   286→    }
+   287→
+   288→    // Numbered list (e.g. "1.")
+   289→    const numMatch = trimmed.match(/^(\d+)\.\s(.+)/);
+   290→    if (numMatch) {
+   291→      elements.push(
+   292→        <div key={key++} className="flex items-start gap-2 ml-1">
+   293→          <span className="text-primary font-medium text-xs mt-0.5 shrink-0 w-4 text-right">{numMatch[1]}.</span>
+   294→          <span>{renderInlineMarkdown(numMatch[2])}</span>
+   295→        </div>
+   296→      );
+   297→      continue;
+   298→    }
+   299→
+   300→    // Regular line
+   301→    elements.push(
+   302→      <p key={key++} className="leading-relaxed">
+   303→        {renderInlineMarkdown(trimmed)}
+   304→      </p>
+   305→    );
+   306→  }
+   307→
+   308→  return elements;
+   309→}
+   310→
+   311→/** Render **bold** inline */
+   312→function renderInlineMarkdown(text: string): React.ReactNode {
+   313→  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+   314→  return parts.map((part, i) => {
+   315→    if (part.startsWith('**') && part.endsWith('**')) {
+   316→      return (
+   317→        <strong key={i} className="font-semibold text-foreground">
+   318→          {part.slice(2, -2)}
+   319→        </strong>
+   320→      );
+   321→    }
+   322→    return part;
+   323→  });
+   324→}
+   325→
+   326→/** Footer tip shown after AI responses */
+   327→const RESPONSE_FOOTER = '💡 Совет: Вы можете применить рекомендации прямо из панели управления';
+   328→
+   329→function TypingIndicator() {
+   330→  return (
+   331→    <motion.div
+   332→      initial={{ opacity: 0, y: 8 }}
+   333→      animate={{ opacity: 1, y: 0 }}
+   334→      exit={{ opacity: 0, y: -4 }}
+   335→      className="flex items-end gap-3"
+   336→    >
+   337→      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20">
+   338→        <Sparkles className="h-3.5 w-3.5 text-primary" />
+   339→      </div>
+   340→      <div className="rounded-2xl rounded-bl-sm bg-card border border-border px-4 py-3">
+   341→        <div className="flex items-center gap-1.5">
+   342→          <motion.span
+   343→            className="h-2 w-2 rounded-full bg-muted-foreground"
+   344→            animate={{ opacity: [0.3, 1, 0.3] }}
+   345→            transition={{ duration: 1.2, repeat: Infinity, delay: 0 }}
+   346→          />
+   347→          <motion.span
+   348→            className="h-2 w-2 rounded-full bg-muted-foreground"
+   349→            animate={{ opacity: [0.3, 1, 0.3] }}
+   350→            transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
+   351→          />
+   352→          <motion.span
+   353→            className="h-2 w-2 rounded-full bg-muted-foreground"
+   354→            animate={{ opacity: [0.3, 1, 0.3] }}
+   355→            transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
+   356→          />
+   357→        </div>
+   358→      </div>
+   359→    </motion.div>
+   360→  );
+   361→}
+   362→
+   363→function NeuralTypingIndicator() {
+   364→  return (
+   365→    <motion.div
+   366→      initial={{ opacity: 0, y: 8 }}
+   367→      animate={{ opacity: 1, y: 0 }}
+   368→      exit={{ opacity: 0, y: -4 }}
+   369→      className="flex items-end gap-3"
+   370→    >
+   371→      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20">
+   372→        <Sparkles className="h-3.5 w-3.5 text-primary" />
+   373→      </div>
+   374→      <div className="rounded-2xl rounded-bl-sm bg-card border border-primary/30 px-4 py-3">
+   375→        <div className="flex items-center gap-2">
+   376→          <motion.span
+   377→            className="text-primary text-sm font-medium"
+   378→            animate={{ opacity: [0.4, 1, 0.4] }}
+   379→            transition={{ duration: 1.5, repeat: Infinity }}
+   380→          >
+   381→            AI думает
+   382→          </motion.span>
+   383→          <div className="flex gap-0.5">
+   384→            <motion.span
+   385→              className="h-1.5 w-1.5 rounded-full bg-primary"
+   386→              animate={{ scale: [1, 1.4, 1] }}
+   387→              transition={{ duration: 0.8, repeat: Infinity, delay: 0 }}
+   388→            />
+   389→            <motion.span
+   390→              className="h-1.5 w-1.5 rounded-full bg-primary"
+   391→              animate={{ scale: [1, 1.4, 1] }}
+   392→              transition={{ duration: 0.8, repeat: Infinity, delay: 0.15 }}
+   393→            />
+   394→            <motion.span
+   395→              className="h-1.5 w-1.5 rounded-full bg-primary"
+   396→              animate={{ scale: [1, 1.4, 1] }}
+   397→              transition={{ duration: 0.8, repeat: Infinity, delay: 0.3 }}
+   398→            />
+   399→          </div>
+   400→        </div>
+   401→      </div>
+   402→    </motion.div>
+   403→  );
+   404→}
+   405→
+   406→function ChatMessage({ message }: { message: AIChatMessage }) {
+   407→  const isUser = message.role === 'user';
+   408→
+   409→  return (
+   410→    <motion.div
+   411→      initial={{ opacity: 0, y: 12 }}
+   412→      animate={{ opacity: 1, y: 0 }}
+   413→      transition={{ duration: 0.25, ease: 'easeOut' }}
+   414→      className={cn(
+   415→        'flex gap-3',
+   416→        isUser ? 'flex-row-reverse' : 'flex-row'
+   417→      )}
+   418→    >
+   419→      {!isUser && (
+   420→        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 mt-0.5">
+   421→          <Sparkles className="h-3.5 w-3.5 text-primary" />
+   422→        </div>
+   423→      )}
+   424→      <div
+   425→        className={cn(
+   426→          'max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
+   427→          isUser
+   428→            ? 'bg-primary text-primary-foreground rounded-br-sm'
+   429→            : 'bg-card border border-border rounded-bl-sm'
+   430→        )}
+   431→      >
+   432→        {isUser ? (
+   433→          <div className="whitespace-pre-wrap">{message.content}</div>
+   434→        ) : (
+   435→          <div>{renderMarkdown(message.content)}</div>
+   436→        )}
+   437→        {!isUser && (
+   438→          <div className="mt-2.5 pt-2 border-t border-border/50">
+   439→            <p className="text-[11px] text-muted-foreground/60 italic">{RESPONSE_FOOTER}</p>
+   440→          </div>
+   441→        )}
+   442→      </div>
+   443→    </motion.div>
+   444→  );
+   445→}
+   446→
+   447→function cn(...classes: (string | boolean | undefined)[]) {
+   448→  return classes.filter(Boolean).join(' ');
+   449→}
+   450→
+   451→const SUGGESTED_QUESTIONS = [
+   452→  'Почему упали продажи?',
+   453→  'Как увеличить средний чек?',
+   454→  'Кого стоит вернуть?',
+   455→  'Какая акция выгоднее?',
+   456→];
+   457→
+   458→export function AIAssistant() {
+   459→  const { aiChatMessages, addAIChatMessage, clearAIChat } = useAppStore();
+   460→  const [inputValue, setInputValue] = useState('');
+   461→  const [isTyping, setIsTyping] = useState(false);
+   462→  const [aiMode, setAiMode] = useState<AIMode>('neural');
+   463→  const scrollRef = useRef<HTMLDivElement>(null);
+   464→  const inputRef = useRef<HTMLInputElement>(null);
+   465→
+   466→  useEffect(() => {
+   467→    if (scrollRef.current) {
+   468→      const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+   469→      if (viewport) {
+   470→        viewport.scrollTop = viewport.scrollHeight;
+   471→      }
+   472→    }
+   473→  }, [aiChatMessages, isTyping]);
+   474→
+   475→  const handleSend = async (text?: string) => {
+   476→    const messageText = text || inputValue.trim();
+   477→    if (!messageText || isTyping) return;
+   478→
+   479→    addAIChatMessage({ role: 'user', content: messageText });
+   480→    setInputValue('');
+   481→    setIsTyping(true);
+   482→
+   483→    if (aiMode === 'neural') {
+   484→      try {
+   485→        const history = aiChatMessages.map((m) => ({
+   486→          role: m.role,
+   487→          content: m.content,
+   488→        }));
+   489→
+   490→        const res = await fetch('/api/ai-chat', {
+   491→          method: 'POST',
+   492→          headers: { 'Content-Type': 'application/json' },
+   493→          body: JSON.stringify({ messages: history }),
+   494→        });
+   495→
+   496→        const data = await res.json();
+   497→
+   498→        if (data.success && data.response) {
+   499→          setIsTyping(false);
+   500→          addAIChatMessage({ role: 'assistant', content: data.response });
+   501→          return;
+   502→        }
+   503→        // If API returns unsuccessful, fall through to keyword matching
+   504→        console.warn('AI API returned unsuccessful, falling back to keywords');
+   505→      } catch (err) {
+   506→        // Network error or other issue — fall back to keyword matching
+   507→        console.warn('AI API failed, falling back to keywords:', err);
+   508→      }
+   509→    }
+   510→
+   511→    // Keyword matching (default mode or fallback)
+   512→    const response = getAIResponse(messageText);
+   513→    const delay = getTypingDelay(response);
+   514→
+   515→    setTimeout(() => {
+   516→      setIsTyping(false);
+   517→      addAIChatMessage({ role: 'assistant', content: response });
+   518→    }, delay);
+   519→  };
+   520→
+   521→  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+   522→    if (e.key === 'Enter' && !e.shiftKey) {
+   523→      e.preventDefault();
+   524→      handleSend();
+   525→    }
+   526→  };
+   527→
+   528→  const showWelcome = aiChatMessages.length === 0 && !isTyping;
+   529→
+   530→  const welcomeMessage = useMemo(
+   531→    () =>
+   532→      'Привет! Я AI-ассистент PULSE 💜\n\nЯ анализирую данные вашего бизнеса "Coffee & Co" и помогаю принимать решения.\n\nЧто вас интересует прямо сейчас?',
+   533→    []
+   534→  );
+   535→
+   536→  return (
+   537→    <div className="flex h-full flex-col">
+   538→      {/* Header */}
+   539→      <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-4">
+   540→        <div className="flex items-center gap-3">
+   541→          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15">
+   542→            <Brain className="h-5 w-5 text-primary" />
+   543→          </div>
+   544→          <div>
+   545→            <h2 className="text-base font-semibold">AI Ассистент</h2>
+   546→            <p className="text-xs text-muted-foreground">
+   547→              Получает данные вашего бизнеса
+   548→            </p>
+   549→          </div>
+   550→        </div>
+   551→        <div className="flex items-center gap-2">
+   552→          {/* AI Mode Toggle */}
+   553→          <div className="flex items-center gap-1.5 rounded-lg bg-card border border-border p-0.5">
+   554→            <button
+   555→              onClick={() => setAiMode('keywords')}
+   556→              className={cn(
+   557→                'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
+   558→                aiMode === 'keywords'
+   559→                  ? 'bg-primary text-primary-foreground shadow-sm'
+   560→                  : 'text-muted-foreground hover:text-foreground'
+   561→              )}
+   562→            >
+   563→              Ключевые слова
+   564→            </button>
+   565→            <button
+   566→              onClick={() => setAiMode('neural')}
+   567→              className={cn(
+   568→                'px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1.5',
+   569→                aiMode === 'neural'
+   570→                  ? 'bg-primary text-primary-foreground shadow-sm'
+   571→                  : 'text-muted-foreground hover:text-foreground'
+   572→              )}
+   573→            >
+   574→              <Zap className="h-3 w-3" />
+   575→              Нейросеть
+   576→              <span className={cn(
+   577→                'text-[9px] font-bold px-1 py-0.5 rounded leading-none',
+   578→                aiMode === 'neural'
+   579→                  ? 'bg-primary-foreground/20 text-primary-foreground'
+   580→                  : 'bg-primary/15 text-primary'
+   581→              )}>
+   582→                BETA
+   583→              </span>
+   584→            </button>
+   585→          </div>
+   586→          {aiChatMessages.length > 0 && (
+   587→            <Button
+   588→              variant="ghost"
+   589→              size="sm"
+   590→              className="text-xs text-muted-foreground hover:text-foreground"
+   591→              onClick={clearAIChat}
+   592→            >
+   593→              Очистить
+   594→            </Button>
+   595→          )}
+   596→        </div>
+   597→      </div>
+   598→
+   599→      {/* Messages Area */}
+   600→      <ScrollArea ref={scrollRef} className="flex-1 px-4 sm:px-6 py-4">
+   601→        <div className="space-y-4">
+   602→          {/* Welcome Message */}
+   603→          {showWelcome && (
+   604→            <motion.div
+   605→              initial={{ opacity: 0, y: 12 }}
+   606→              animate={{ opacity: 1, y: 0 }}
+   607→              transition={{ duration: 0.4 }}
+   608→              className="flex items-start gap-3"
+   609→            >
+   610→              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20">
+   611→                <Sparkles className="h-4 w-4 text-primary" />
+   612→              </div>
+   613→              <div className="rounded-2xl rounded-bl-sm bg-card border border-border px-4 py-3 text-sm leading-relaxed max-w-[85%]">
+   614→                {renderMarkdown(welcomeMessage)}
+   615→              </div>
+   616→            </motion.div>
+   617→          )}
+   618→
+   619→          {/* Chat Messages */}
+   620→          {aiChatMessages.map((message) => (
+   621→            <ChatMessage key={message.id} message={message} />
+   622→          ))}
+   623→
+   624→          {/* Typing Indicator */}
+   625→          <AnimatePresence>
+   626→            {isTyping && (aiMode === 'neural' ? <NeuralTypingIndicator /> : <TypingIndicator />)}
+   627→          </AnimatePresence>
+   628→        </div>
+   629→      </ScrollArea>
+   630→
+   631→      {/* Suggested Questions */}
+   632→      {showWelcome && (
+   633→        <div className="border-t border-border px-4 sm:px-6 py-3">
+   634→          <div className="flex flex-wrap gap-2">
+   635→            {SUGGESTED_QUESTIONS.map((q) => (
+   636→              <motion.button
+   637→                key={q}
+   638→                whileHover={{ scale: 1.02 }}
+   639→                whileTap={{ scale: 0.98 }}
+   640→                onClick={() => handleSend(q)}
+   641→                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors"
+   642→              >
+   643→                {q}
+   644→              </motion.button>
+   645→            ))}
+   646→          </div>
+   647→        </div>
+   648→      )}
+   649→
+   650→      {/* Disclaimer for Neural mode */}
+   651→      {aiMode === 'neural' && (
+   652→        <div className="px-4 sm:px-6">
+   653→          <p className="text-[10px] text-muted-foreground/50 text-center">
+   654→            AI ответы могут быть неточными. Демо режим.
+   655→          </p>
+   656→        </div>
+   657→      )}
+   658→
+   659→      <Separator />
+   660→
+   661→      {/* Input Area */}
+   662→      <div className="px-4 sm:px-6 py-3">
+   663→        <div className="flex items-center gap-2">
+   664→          <Input
+   665→            ref={inputRef}
+   666→            value={inputValue}
+   667→            onChange={(e) => setInputValue(e.target.value)}
+   668→            onKeyDown={handleKeyDown}
+   669→            placeholder="Спросите что-нибудь..."
+   670→            className="flex-1 bg-card border-border h-10 text-sm"
+   671→            disabled={isTyping}
+   672→          />
+   673→          <Button
+   674→            size="icon"
+   675→            className="h-10 w-10 shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+   676→            onClick={() => handleSend()}
+   677→            disabled={!inputValue.trim() || isTyping}
+   678→          >
+   679→            <Send className="h-4 w-4" />
+   680→          </Button>
+   681→        </div>
+   682→      </div>
+   683→    </div>
+   684→  );
+   685→}

@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { Heart, Coffee, UtensilsCrossed, Scissors, Plus } from 'lucide-react';
 import { QRBusinessCard } from '@/components/pulse/shared/qr-business-card';
+import { toast } from 'sonner';
 
 // ============================================================
 // ClientBonuses — with level progress ring
@@ -129,7 +130,14 @@ export function ClientBonuses() {
             PULSE-USER-4821
           </p>
         </div>
-        <Button variant="outline" className="w-full">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            navigator.clipboard.writeText('PULSE-USER-4821').catch(() => {});
+            toast.success('Промокод скопирован!');
+          }}
+        >
           Скопировать код
         </Button>
       </div>
@@ -196,6 +204,7 @@ export function ClientFavorites() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.08 }}
                 className="glass-card rounded-xl px-4 py-3.5 flex items-center gap-3 card-hover-lift cursor-pointer"
+                onClick={() => toast.success(`${place.name} добавлено в избранное`)}
               >
                 <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5 text-purple-400" />
@@ -208,6 +217,10 @@ export function ClientFavorites() {
                   variant="ghost"
                   size="sm"
                   className="shrink-0 gap-1.5 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toast.success(`${place.name} добавлено в избранное`);
+                  }}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Добавить

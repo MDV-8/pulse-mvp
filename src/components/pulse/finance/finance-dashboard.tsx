@@ -309,12 +309,12 @@ export function FinanceDashboard() {
           value={displayPeriod}
           onValueChange={handlePeriodChange}
         >
-          <TabsList className="bg-muted/50 h-9 w-full">
+          <TabsList className="bg-muted/50 h-9 w-full overflow-x-auto">
             {(Object.entries(PERIOD_LABELS) as [Period, string][]).map(([key, label]) => (
               <TabsTrigger
                 key={key}
                 value={key}
-                className="text-xs px-2 sm:px-3 h-7 flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="text-[11px] sm:text-xs px-2 sm:px-3 h-7 flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap"
               >
                 {label}
               </TabsTrigger>
@@ -404,7 +404,7 @@ export function FinanceDashboard() {
             </CardHeader>
             <CardContent className="px-4 sm:px-5 pb-4">
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 text-sm">
                   <span className="text-muted-foreground">Выручка</span>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground">
@@ -422,7 +422,7 @@ export function FinanceDashboard() {
                   </div>
                 </div>
                 <Separator className="bg-border" />
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 text-sm">
                   <span className="text-muted-foreground">Прибыль</span>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground">
@@ -440,7 +440,7 @@ export function FinanceDashboard() {
                   </div>
                 </div>
                 <Separator className="bg-border" />
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 text-sm">
                   <span className="text-muted-foreground">Средний чек</span>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground">

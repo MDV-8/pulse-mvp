@@ -19,7 +19,7 @@ export function MobileHeader() {
       <Button
         variant="ghost"
         size="icon"
-        className="size-9 text-muted-foreground"
+        className="size-11 text-muted-foreground"
         onClick={() => setSidebarOpen(true)}
         aria-label="Открыть меню"
       >
@@ -44,12 +44,12 @@ export function MobileHeader() {
           ref={notifBellRef}
           variant="ghost"
           size="icon"
-          className="size-9 text-muted-foreground relative"
+          className="size-11 text-muted-foreground relative"
           aria-label="Уведомления"
           onClick={() => setShowNotifications(!showNotifications)}
         >
           <Bell className="size-5" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-primary" />
+          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
         </Button>
         <NotificationCenter
           open={showNotifications}

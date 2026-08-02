@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Star, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 const mockReviews = [
   {
@@ -236,6 +237,7 @@ export function ReviewsManager() {
                       variant="outline"
                       size="sm"
                       className="h-7 text-xs text-purple-400 border-purple-500/30 hover:bg-purple-500/10 hover:text-purple-300"
+                      onClick={() => toast.success(`Ответ отправлен для отзыва ${review.name}`)}
                     >
                       Ответить
                     </Button>

@@ -1,0 +1,629 @@
+     1→'use client';
+     2→
+     3→import React, { useState, useMemo } from 'react';
+     4→import { motion, AnimatePresence } from 'framer-motion';
+     5→import {
+     6→  Coffee,
+     7→  UtensilsCrossed,
+     8→  ShoppingBag,
+     9→  Scissors,
+    10→  Dumbbell,
+    11→  Wrench,
+    12→  HelpCircle,
+    13→  ArrowRight,
+    14→  ArrowLeft,
+    15→} from 'lucide-react';
+    16→import { useAppStore } from '@/stores/app-store';
+    17→import { Button } from '@/components/ui/button';
+    18→import { Input } from '@/components/ui/input';
+    19→import { cn } from '@/lib/utils';
+    20→
+    21→const TOTAL_STEPS = 5;
+    22→
+    23→const categories = [
+    24→  { label: 'Кофейня', icon: Coffee, id: 'coffee', gradient: 'from-amber-900/40 to-orange-900/20' },
+    25→  { label: 'Ресторан', icon: UtensilsCrossed, id: 'restaurant', gradient: 'from-red-900/40 to-rose-900/20' },
+    26→  { label: 'Магазин', icon: ShoppingBag, id: 'shop', gradient: 'from-emerald-900/40 to-green-900/20' },
+    27→  { label: 'Салон красоты', icon: Scissors, id: 'beauty', gradient: 'from-pink-900/40 to-fuchsia-900/20' },
+    28→  { label: 'Фитнес', icon: Dumbbell, id: 'fitness', gradient: 'from-cyan-900/40 to-blue-900/20' },
+    29→  { label: 'Услуги', icon: Wrench, id: 'services', gradient: 'from-yellow-900/40 to-amber-900/20' },
+    30→  { label: 'Другое', icon: HelpCircle, id: 'other', gradient: 'from-purple-900/40 to-violet-900/20' },
+    31→];
+    32→
+    33→const cities = ['Алматы', 'Астана', 'Шымкент', 'Караганда', 'Актобе', 'Тараз', 'Павлодар'];
+    34→
+    35→const sizeOptions = [
+    36→  { label: '1–5 сотрудников', id: 'small' },
+    37→  { label: '6–15 сотрудников', id: 'medium' },
+    38→  { label: '16+ сотрудников', id: 'large' },
+    39→];
+    40→
+    41→const goalOptions = [
+    42→  { label: 'Больше клиентов', id: 'more_clients' },
+    43→  { label: 'Увеличить прибыль', id: 'more_profit' },
+    44→  { label: 'Вернуть клиентов', id: 'return_clients' },
+    45→  { label: 'Улучшить маркетинг', id: 'better_marketing' },
+    46→];
+    47→
+    48→const slideVariants = {
+    49→  enter: (direction: number) => ({
+    50→    x: direction > 0 ? 300 : -300,
+    51→    opacity: 0,
+    52→  }),
+    53→  center: {
+    54→    x: 0,
+    55→    opacity: 1,
+    56→  },
+    57→  exit: (direction: number) => ({
+    58→    x: direction > 0 ? -300 : 300,
+    59→    opacity: 0,
+    60→  }),
+    61→};
+    62→
+    63→export function OnboardingFlow() {
+    64→  const setAppMode = useAppStore((s) => s.setAppMode);
+    65→  const setBusiness = useAppStore((s) => s.setBusiness);
+    66→  const onboardingStep = useAppStore((s) => s.onboardingStep);
+    67→  const setOnboardingStep = useAppStore((s) => s.setOnboardingStep);
+    68→
+    69→  const [step, setStep] = useState(onboardingStep);
+    70→  const [direction, setDirection] = useState(1);
+    71→  const [businessName, setBusinessName] = useState('');
+    72→  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    73→  const [city, setCity] = useState('');
+    74→  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    75→  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+    76→  const [isCompleting, setIsCompleting] = useState(false);
+    77→  const [showSuccess, setShowSuccess] = useState(false);
+    78→
+    79→  const goToNext = () => {
+    80→    if (step < TOTAL_STEPS) {
+    81→      setDirection(1);
+    82→      setStep(step + 1);
+    83→      setOnboardingStep(step + 1);
+    84→    }
+    85→  };
+    86→
+    87→  const goToPrev = () => {
+    88→    if (step > 1) {
+    89→      setDirection(-1);
+    90→      setStep(step - 1);
+    91→      setOnboardingStep(step - 1);
+    92→    }
+    93→  };
+    94→
+    95→  const toggleGoal = (goalId: string) => {
+    96→    setSelectedGoals((prev) =>
+    97→      prev.includes(goalId)
+    98→        ? prev.filter((g) => g !== goalId)
+    99→        : [...prev, goalId]
+   100→    );
+   101→  };
+   102→
+   103→  // Confetti particles config
+   104→  const confettiParticles = useMemo(() => {
+   105→    const colors = ['#8b5cf6', '#a78bfa', '#06b6d4', '#22d3ee', '#d946ef', '#ec4899'];
+   106→    return Array.from({ length: 20 }, (_, i) => {
+   107→      const angle = (i / 20) * 360;
+   108→      const rad = (angle * Math.PI) / 180;
+   109→      const distance = 120 + Math.random() * 200;
+   110→      return {
+   111→        id: i,
+   112→        color: colors[i % colors.length],
+   113→        size: 4 + Math.random() * 6,
+   114→        tx: Math.cos(rad) * distance,
+   115→        ty: Math.sin(rad) * distance - 40,
+   116→        duration: 1.2 + Math.random() * 0.8,
+   117→        delay: 0.1 + Math.random() * 0.3,
+   118→      };
+   119→    });
+   120→  }, []);
+   121→
+   122→  const handleComplete = () => {
+   123→    setIsCompleting(true);
+   124→    setTimeout(() => {
+   125→      setShowSuccess(true);
+   126→      setTimeout(() => {
+   127→        const categoryObj = categories.find((c) => c.id === selectedCategory);
+   128→        const sizeObj = sizeOptions.find((s) => s.id === selectedSize);
+   129→        const goalLabels = goalOptions
+   130→          .filter((g) => selectedGoals.includes(g.id))
+   131→          .map((g) => g.label);
+   132→
+   133→        setBusiness({
+   134→          name: businessName || 'Мой бизнес',
+   135→          category: categoryObj?.label || 'Другое',
+   136→          city: city || 'Алматы',
+   137→          size: sizeObj?.label || 'малый (1-5 сотрудников)',
+   138→          goals: goalLabels.length > 0 ? goalLabels : ['Больше клиентов'],
+   139→          createdAt: new Date().toISOString().split('T')[0],
+   140→        });
+   141→        setAppMode('owner');
+   142→      }, 2500);
+   143→    }, 300);
+   144→  };
+   145→
+   146→  const canProceed = () => {
+   147→    switch (step) {
+   148→      case 1:
+   149→        return businessName.trim().length > 0;
+   150→      case 2:
+   151→        return selectedCategory !== null;
+   152→      case 3:
+   153→        return city.trim().length > 0;
+   154→      case 4:
+   155→        return selectedSize !== null;
+   156→      case 5:
+   157→        return selectedGoals.length > 0;
+   158→      default:
+   159→        return false;
+   160→    }
+   161→  };
+   162→
+   163→  return (
+   164→    <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
+   165→      {/* Animated gradient background */}
+   166→      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+   167→        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(139,92,246,0.08)_0%,_transparent_70%)]" />
+   168→        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-purple-500/5 blur-[120px] animate-pulse" />
+   169→      </div>
+   170→
+   171→      {/* Grid pattern overlay */}
+   172→      <div
+   173→        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+   174→        style={{
+   175→          backgroundImage: `linear-gradient(rgba(139,92,246,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.5) 1px, transparent 1px)`,
+   176→          backgroundSize: '40px 40px',
+   177→        }}
+   178→      />
+   179→
+   180→      {/* Floating particles background */}
+   181→      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+   182→        {/* Gradient mesh / bloom at top corners */}
+   183→        <div className="absolute top-[-80px] left-[-80px] w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,_rgba(139,92,246,0.12)_0%,_rgba(139,92,246,0.04)_40%,_transparent_70%)]" />
+   184→        <div className="absolute top-[-60px] right-[-60px] w-[280px] h-[280px] rounded-full bg-[radial-gradient(circle,_rgba(168,85,247,0.1)_0%,_rgba(168,85,247,0.03)_40%,_transparent_70%)]" />
+   185→        {/* Additional bloom at bottom for depth */}
+   186→        <div className="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-[400px] h-[250px] rounded-full bg-[radial-gradient(ellipse,_rgba(139,92,246,0.06)_0%,_transparent_60%)]" />
+   187→
+   188→        {/* Floating particle dots */}
+   189→        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/30" style={{ left: '8%', bottom: '-10px', animation: 'particle-float 8s ease-in-out infinite', animationDelay: '0s' }} />
+   190→        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/25" style={{ left: '15%', bottom: '-10px', animation: 'particle-float 10s ease-in-out infinite', animationDelay: '1.2s' }} />
+   191→        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/35" style={{ left: '24%', bottom: '-10px', animation: 'particle-float 7s ease-in-out infinite', animationDelay: '0.5s' }} />
+   192→        <span className="absolute w-[4px] h-[4px] rounded-full bg-purple-400/20" style={{ left: '33%', bottom: '-10px', animation: 'particle-float 11s ease-in-out infinite', animationDelay: '2.8s' }} />
+   193→        <span className="absolute w-[6px] h-[6px] rounded-full bg-purple-400/15" style={{ left: '42%', bottom: '-10px', animation: 'particle-float 9s ease-in-out infinite', animationDelay: '0.9s' }} />
+   194→        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/30" style={{ left: '51%', bottom: '-10px', animation: 'particle-float 8.5s ease-in-out infinite', animationDelay: '3.2s' }} />
+   195→        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/35" style={{ left: '58%', bottom: '-10px', animation: 'particle-float 7.5s ease-in-out infinite', animationDelay: '1.7s' }} />
+   196→        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/20" style={{ left: '65%', bottom: '-10px', animation: 'particle-float 10.5s ease-in-out infinite', animationDelay: '4.1s' }} />
+   197→        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/25" style={{ left: '73%', bottom: '-10px', animation: 'particle-float 9.5s ease-in-out infinite', animationDelay: '0.3s' }} />
+   198→        <span className="absolute w-[4px] h-[4px] rounded-full bg-purple-400/30" style={{ left: '80%', bottom: '-10px', animation: 'particle-float 8s ease-in-out infinite', animationDelay: '2.2s' }} />
+   199→        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/35" style={{ left: '88%', bottom: '-10px', animation: 'particle-float 11.5s ease-in-out infinite', animationDelay: '5.0s' }} />
+   200→        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/18" style={{ left: '95%', bottom: '-10px', animation: 'particle-float 9s ease-in-out infinite', animationDelay: '1.5s' }} />
+   201→        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/28" style={{ left: '5%', bottom: '-10px', animation: 'particle-float 12s ease-in-out infinite', animationDelay: '3.8s' }} />
+   202→        <span className="absolute w-[6px] h-[6px] rounded-full bg-purple-400/12" style={{ left: '20%', bottom: '-10px', animation: 'particle-float 13s ease-in-out infinite', animationDelay: '6.0s' }} />
+   203→        <span className="absolute w-[2px] h-[2px] rounded-full bg-purple-400/30" style={{ left: '48%', bottom: '-10px', animation: 'particle-float 7.2s ease-in-out infinite', animationDelay: '2.5s' }} />
+   204→        <span className="absolute w-[4px] h-[4px] rounded-full bg-purple-400/22" style={{ left: '70%', bottom: '-10px', animation: 'particle-float 10.2s ease-in-out infinite', animationDelay: '4.5s' }} />
+   205→        <span className="absolute w-[3px] h-[3px] rounded-full bg-purple-400/26" style={{ left: '38%', bottom: '-10px', animation: 'particle-float 8.8s ease-in-out infinite', animationDelay: '1.0s' }} />
+   206→        <span className="absolute w-[5px] h-[5px] rounded-full bg-purple-400/16" style={{ left: '55%', bottom: '-10px', animation: 'particle-float 11.8s ease-in-out infinite', animationDelay: '3.5s' }} />
+   207→      </div>
+   208→
+   209→      <div className="relative w-full max-w-md">
+   210→        {/* PULSE Logo */}
+   211→        <div className="text-center mb-8">
+   212→          <h1 className="text-3xl font-bold pulse-text-gradient tracking-tight">PULSE</h1>
+   213→          <p className="text-xs text-muted-foreground/60 mt-1 tracking-widest uppercase">AI Operating System</p>
+   214→        </div>
+   215→
+   216→        {/* Progress dots - purple, active larger/brighter */}
+   217→        <div className="flex items-center justify-center gap-2.5 mb-8">
+   218→          {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
+   219→            <div key={s} className="flex items-center">
+   220→              <div
+   221→                className={cn(
+   222→                  'rounded-full transition-all duration-500 ease-out',
+   223→                  s === step
+   224→                    ? 'w-6 h-6 bg-purple-500 shadow-[0_0_12px_rgba(139,92,246,0.6)]'
+   225→                    : s < step
+   226→                      ? 'w-3 h-3 bg-purple-500/60'
+   227→                      : 'w-2.5 h-2.5 bg-muted-foreground/20'
+   228→                )}
+   229→              />
+   230→              {s < TOTAL_STEPS && (
+   231→                <div
+   232→                  className={cn(
+   233→                    'w-6 h-0.5 mx-0.5 transition-all duration-500',
+   234→                    s < step ? 'bg-purple-500/40' : 'bg-muted-foreground/10'
+   235→                  )}
+   236→                />
+   237→              )}
+   238→            </div>
+   239→          ))}
+   240→        </div>
+   241→
+   242→        {/* Card container */}
+   243→        <div className="relative overflow-hidden rounded-2xl border border-border bg-card/80 backdrop-blur-xl p-6 sm:p-8 pulse-glow">
+   244→
+   245→          <AnimatePresence mode="wait" custom={direction}>
+   246→            <motion.div
+   247→              key={step}
+   248→              custom={direction}
+   249→              variants={slideVariants}
+   250→              initial="enter"
+   251→              animate="center"
+   252→              exit="exit"
+   253→              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+   254→            >
+   255→              {step === 1 && (
+   256→                <div className="space-y-6">
+   257→                  <div>
+   258→                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+   259→                      Добро пожаловать в{' '}
+   260→                      <span className="pulse-text-gradient">PULSE</span>
+   261→                    </h2>
+   262→                    <p className="mt-2 text-sm text-muted-foreground">
+   263→                      Давайте настроим ваш бизнес за 1 минуту
+   264→                    </p>
+   265→                  </div>
+   266→                  <div className="space-y-2">
+   267→                    <label className="text-sm font-medium text-foreground">
+   268→                      Название бизнеса
+   269→                    </label>
+   270→                    <Input
+   271→                      placeholder="Например, Coffee & Co"
+   272→                      value={businessName}
+   273→                      onChange={(e) => setBusinessName(e.target.value)}
+   274→                      className="h-12 bg-background border-input text-foreground placeholder:text-muted-foreground/50"
+   275→                      autoFocus
+   276→                      onKeyDown={(e) => {
+   277→                        if (e.key === 'Enter' && canProceed()) goToNext();
+   278→                      }}
+   279→                    />
+   280→                  </div>
+   281→                </div>
+   282→              )}
+   283→
+   284→              {step === 2 && (
+   285→                <div className="space-y-6">
+   286→                  <div>
+   287→                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+   288→                      Чем вы занимаетесь?
+   289→                    </h2>
+   290→                    <p className="mt-1 text-sm text-muted-foreground">
+   291→                      Выберите категорию вашего бизнеса
+   292→                    </p>
+   293→                  </div>
+   294→                  <div className="grid grid-cols-2 gap-3">
+   295→                    {categories.map((cat) => {
+   296→                      const Icon = cat.icon;
+   297→                      const isSelected = selectedCategory === cat.id;
+   298→                      return (
+   299→                        <button
+   300→                          key={cat.id}
+   301→                          onClick={() => setSelectedCategory(cat.id)}
+   302→                          className={cn(
+   303→                            'flex flex-col items-center gap-2.5 rounded-xl border p-4 transition-all duration-300 cursor-pointer group',
+   304→                            isSelected
+   305→                              ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-[0_0_20px_rgba(139,92,246,0.15)]'
+   306→                              : 'border-border bg-background text-muted-foreground hover:border-purple-500/30 hover:bg-accent hover:shadow-[0_0_15px_rgba(139,92,246,0.08)]'
+   307→                          )}
+   308→                        >
+   309→                          <div className={cn(
+   310→                            'w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300',
+   311→                            isSelected
+   312→                              ? 'bg-purple-500/20'
+   313→                              : `bg-gradient-to-br ${cat.gradient}`
+   314→                          )}>
+   315→                            <Icon className={cn('size-5 transition-colors', isSelected ? 'text-purple-400' : 'text-muted-foreground group-hover:text-foreground')} />
+   316→                          </div>
+   317→                          <span className="text-xs font-medium">{cat.label}</span>
+   318→                        </button>
+   319→                      );
+   320→                    })}
+   321→                  </div>
+   322→                </div>
+   323→              )}
+   324→
+   325→              {step === 3 && (
+   326→                <div className="space-y-6">
+   327→                  <div>
+   328→                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+   329→                      Где находится ваш бизнес?
+   330→                    </h2>
+   331→                    <p className="mt-1 text-sm text-muted-foreground">
+   332→                      Укажите город для локальной аналитики
+   333→                    </p>
+   334→                  </div>
+   335→                  <div className="space-y-2">
+   336→                    <Input
+   337→                      placeholder="Введите ваш город"
+   338→                      value={city}
+   339→                      onChange={(e) => setCity(e.target.value)}
+   340→                      className="h-12 bg-background border-input text-foreground placeholder:text-muted-foreground/50"
+   341→                      autoFocus
+   342→                      onKeyDown={(e) => {
+   343→                        if (e.key === 'Enter' && canProceed()) goToNext();
+   344→                      }}
+   345→                    />
+   346→                    <div className="flex flex-wrap gap-2 mt-3">
+   347→                      {cities.map((c) => (
+   348→                        <button
+   349→                          key={c}
+   350→                          onClick={() => setCity(c)}
+   351→                          className={cn(
+   352→                            'rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer',
+   353→                            city === c
+   354→                              ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
+   355→                              : 'border-border text-muted-foreground hover:border-purple-500/30 hover:text-foreground'
+   356→                          )}
+   357→                        >
+   358→                          {c}
+   359→                        </button>
+   360→                      ))}
+   361→                    </div>
+   362→                  </div>
+   363→                </div>
+   364→              )}
+   365→
+   366→              {step === 4 && (
+   367→                <div className="space-y-6">
+   368→                  <div>
+   369→                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+   370→                      Сколько у вас сотрудников?
+   371→                    </h2>
+   372→                    <p className="mt-1 text-sm text-muted-foreground">
+   373→                      Это поможет настроить рекомендации под масштаб
+   374→                    </p>
+   375→                  </div>
+   376→                  <div className="space-y-3">
+   377→                    {sizeOptions.map((opt) => {
+   378→                      const isSelected = selectedSize === opt.id;
+   379→                      return (
+   380→                        <button
+   381→                          key={opt.id}
+   382→                          onClick={() => setSelectedSize(opt.id)}
+   383→                          className={cn(
+   384→                            'flex w-full items-center gap-3 rounded-xl border p-4 transition-all duration-200 cursor-pointer',
+   385→                            isSelected
+   386→                              ? 'border-purple-500 bg-purple-500/10'
+   387→                              : 'border-border bg-background hover:border-purple-500/30 hover:bg-accent'
+   388→                          )}
+   389→                        >
+   390→                          <div
+   391→                            className={cn(
+   392→                              'h-4 w-4 rounded-full border-2 transition-all duration-200',
+   393→                              isSelected
+   394→                                ? 'border-purple-500 bg-purple-500'
+   395→                                : 'border-muted-foreground/40'
+   396→                            )}
+   397→                          >
+   398→                            {isSelected && (
+   399→                              <div className="h-full w-full rounded-full bg-purple-500-foreground/20 flex items-center justify-center">
+   400→                                <div className="h-1.5 w-1.5 rounded-full bg-white" />
+   401→                              </div>
+   402→                            )}
+   403→                          </div>
+   404→                          <span
+   405→                            className={cn(
+   406→                              'text-sm font-medium',
+   407→                              isSelected ? 'text-purple-400' : 'text-foreground'
+   408→                            )}
+   409→                          >
+   410→                            {opt.label}
+   411→                          </span>
+   412→                        </button>
+   413→                      );
+   414→                    })}
+   415→                  </div>
+   416→                </div>
+   417→              )}
+   418→
+   419→              {step === 5 && (
+   420→                <div className="space-y-6">
+   421→                  <div>
+   422→                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+   423→                      Что для вас важнее всего?
+   424→                    </h2>
+   425→                    <p className="mt-1 text-sm text-muted-foreground">
+   426→                      Можно выбрать несколько вариантов
+   427→                    </p>
+   428→                  </div>
+   429→                  <div className="space-y-3">
+   430→                    {goalOptions.map((goal) => {
+   431→                      const isChecked = selectedGoals.includes(goal.id);
+   432→                      return (
+   433→                        <button
+   434→                          key={goal.id}
+   435→                          onClick={() => toggleGoal(goal.id)}
+   436→                          className={cn(
+   437→                            'flex w-full items-center gap-3 rounded-xl border p-4 transition-all duration-200 cursor-pointer',
+   438→                            isChecked
+   439→                              ? 'border-purple-500 bg-purple-500/10'
+   440→                              : 'border-border bg-background hover:border-purple-500/30 hover:bg-accent'
+   441→                          )}
+   442→                        >
+   443→                          <div
+   444→                            className={cn(
+   445→                              'flex h-4 w-4 items-center justify-center rounded border-2 transition-all duration-200',
+   446→                              isChecked
+   447→                                ? 'border-purple-500 bg-purple-500'
+   448→                                : 'border-muted-foreground/40'
+   449→                            )}
+   450→                          >
+   451→                            {isChecked && (
+   452→                              <svg
+   453→                                className="h-2.5 w-2.5 text-white"
+   454→                                viewBox="0 0 12 12"
+   455→                                fill="none"
+   456→                                stroke="currentColor"
+   457→                                strokeWidth="2.5"
+   458→                              >
+   459→                                <path d="M2 6l3 3 5-5" />
+   460→                              </svg>
+   461→                            )}
+   462→                          </div>
+   463→                          <span
+   464→                            className={cn(
+   465→                              'text-sm font-medium',
+   466→                              isChecked ? 'text-purple-400' : 'text-foreground'
+   467→                            )}
+   468→                          >
+   469→                            {goal.label}
+   470→                          </span>
+   471→                        </button>
+   472→                      );
+   473→                    })}
+   474→                  </div>
+   475→                </div>
+   476→              )}
+   477→            </motion.div>
+   478→          </AnimatePresence>
+   479→
+   480→          {/* Navigation buttons */}
+   481→          <div className="flex items-center justify-between mt-8">
+   482→            {step > 1 ? (
+   483→              <Button
+   484→                variant="ghost"
+   485→                size="sm"
+   486→                onClick={goToPrev}
+   487→                className="gap-1.5 text-muted-foreground"
+   488→              >
+   489→                <ArrowLeft className="size-4" />
+   490→                Назад
+   491→              </Button>
+   492→            ) : (
+   493→              <div />
+   494→            )}
+   495→
+   496→            {step < TOTAL_STEPS ? (
+   497→              <Button
+   498→                onClick={goToNext}
+   499→                disabled={!canProceed()}
+   500→                className="gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-shadow hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]"
+   501→              >
+   502→                Далее
+   503→                <ArrowRight className="size-4" />
+   504→              </Button>
+   505→            ) : (
+   506→              <Button
+   507→                onClick={handleComplete}
+   508→                disabled={!canProceed() || isCompleting}
+   509→                className="gap-1.5 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white shadow-[0_0_25px_rgba(139,92,246,0.4)] transition-shadow hover:shadow-[0_0_40px_rgba(139,92,246,0.6)]"
+   510→              >
+   511→                <span className="font-bold">
+   512→                  PULSE готов
+   513→                </span>
+   514→                <ArrowRight className="size-4" />
+   515→              </Button>
+   516→            )}
+   517→          </div>
+   518→        </div>
+   519→
+   520→        {/* Step indicator text */}
+   521→        <p className="text-center text-xs text-muted-foreground/50 mt-4">
+   522→          Шаг {step} из {TOTAL_STEPS}
+   523→        </p>
+   524→      </div>
+   525→
+   526→      {/* Full-screen completion overlay with confetti */}
+   527→      <AnimatePresence>
+   528→        {showSuccess && (
+   529→          <motion.div
+   530→            initial={{ opacity: 0 }}
+   531→            animate={{ opacity: 1 }}
+   532→            exit={{ opacity: 0 }}
+   533→            transition={{ duration: 0.4 }}
+   534→            className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+   535→            style={{
+   536→              background: 'radial-gradient(ellipse at center, rgba(18,16,28,0.97) 0%, rgba(10,10,18,0.99) 100%)',
+   537→            }}
+   538→          >
+   539→            {/* Confetti particles (CSS-only, 20 circles) */}
+   540→            {confettiParticles.map((p) => (
+   541→              <span
+   542→                key={p.id}
+   543→                className="absolute left-1/2 top-1/2 rounded-full pointer-events-none"
+   544→                style={{
+   545→                  width: p.size,
+   546→                  height: p.size,
+   547→                  backgroundColor: p.color,
+   548→                  ['--tx' as string]: `${p.tx}px`,
+   549→                  ['--ty' as string]: `${p.ty}px`,
+   550→                  animation: `confetti-burst ${p.duration}s ease-out ${p.delay}s both`,
+   551→                }}
+   552→              />
+   553→            ))}
+   554→
+   555→            {/* Animated SVG Checkmark */}
+   556→            <motion.div
+   557→              initial={{ scale: 0, opacity: 0 }}
+   558→              animate={{ scale: 1, opacity: 1 }}
+   559→              transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+   560→              className="relative z-10 mb-6"
+   561→            >
+   562→              <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+   563→                {/* Background circle */}
+   564→                <motion.circle
+   565→                  cx="48" cy="48" r="42"
+   566→                  stroke="url(#checkGrad)"
+   567→                  strokeWidth="3"
+   568→                  strokeLinecap="round"
+   569→                  initial={{ pathLength: 0, opacity: 0 }}
+   570→                  animate={{ pathLength: 1, opacity: 1 }}
+   571→                  transition={{ duration: 1.2, ease: 'easeInOut', delay: 0.15 }}
+   572→                  style={{
+   573→                    strokeDasharray: 264,
+   574→                    strokeDashoffset: 264,
+   575→                  }}
+   576→                />
+   577→                {/* Checkmark path */}
+   578→                <motion.path
+   579→                  d="M30 50 L42 62 L66 36"
+   580→                  stroke="url(#checkGrad)"
+   581→                  strokeWidth="3.5"
+   582→                  strokeLinecap="round"
+   583→                  strokeLinejoin="round"
+   584→                  initial={{ pathLength: 0, opacity: 0 }}
+   585→                  animate={{ pathLength: 1, opacity: 1 }}
+   586→                  transition={{ duration: 0.6, ease: 'easeOut', delay: 0.7 }}
+   587→                  style={{
+   588→                    strokeDasharray: 60,
+   589→                    strokeDashoffset: 60,
+   590→                  }}
+   591→                />
+   592→                <defs>
+   593→                  <linearGradient id="checkGrad" x1="0" y1="0" x2="96" y2="96">
+   594→                    <stop offset="0%" stopColor="#8b5cf6" />
+   595→                    <stop offset="50%" stopColor="#a78bfa" />
+   596→                    <stop offset="100%" stopColor="#06b6d4" />
+   597→                  </linearGradient>
+   598→                </defs>
+   599→              </svg>
+   600→              {/* Glow behind checkmark */}
+   601→              <div className="absolute inset-0 rounded-full bg-purple-500/15 blur-2xl pointer-events-none" />
+   602→            </motion.div>
+   603→
+   604→            {/* Main title with scale animation */}
+   605→            <motion.h2
+   606→              initial={{ opacity: 0, scale: 0.8 }}
+   607→              animate={{ opacity: 1, scale: 1 }}
+   608→              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
+   609→              className="text-3xl sm:text-4xl font-bold pulse-text-gradient relative z-10"
+   610→            >
+   611→              PULSE готов к работе!
+   612→            </motion.h2>
+   613→
+   614→            {/* Subtitle fading in after 0.5s delay */}
+   615→            <motion.p
+   616→              initial={{ opacity: 0, y: 8 }}
+   617→              animate={{ opacity: 1, y: 0 }}
+   618→              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.8 }}
+   619→              className="text-base text-muted-foreground mt-3 relative z-10"
+   620→            >
+   621→              Ваш AI помощник активирован
+   622→            </motion.p>
+   623→          </motion.div>
+   624→        )}
+   625→      </AnimatePresence>
+   626→    </div>
+   627→  );
+   628→}
+   629→
