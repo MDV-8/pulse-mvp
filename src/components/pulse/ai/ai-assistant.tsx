@@ -476,13 +476,20 @@ export function AIAssistant() {
     const messageText = text || inputValue.trim();
     if (!messageText || isTyping) return;
 
+    // Build the updated messages array BEFORE mutating state,
+    // so the fetch always sends the latest conversation including the new user message.
+    const updatedMessages = [
+      ...aiChatMessages,
+      { role: 'user' as const, content: messageText },
+    ];
+
     addAIChatMessage({ role: 'user', content: messageText });
     setInputValue('');
     setIsTyping(true);
 
     if (aiMode === 'neural') {
       try {
-        const history = aiChatMessages.map((m) => ({
+        const history = updatedMessages.map((m) => ({
           role: m.role,
           content: m.content,
         }));
