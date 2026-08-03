@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   DashboardView,
   TodayView,
+  ToolsView,
   SalesView,
   ClientsView,
   PromotionsView,
@@ -64,6 +65,8 @@ export function OwnerDashboard() {
         return <TodayView />;
       case 'ai':
         return <AIAssistant />;
+      case 'tools':
+        return <ToolsView />;
       case 'sales':
         return <SalesView />;
       case 'clients':

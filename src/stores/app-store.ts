@@ -43,6 +43,7 @@ export type OwnerView =
   | 'dashboard'
   | 'today'
   | 'ai'
+  | 'tools'
   | 'sales'
   | 'clients'
   | 'promotions'

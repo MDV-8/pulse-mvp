@@ -55,6 +55,7 @@ import { ProductSales } from '@/components/pulse/sales/product-sales';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import {
@@ -75,12 +76,146 @@ import {
   Lock,
   MapPin,
   RefreshCw,
+  Wrench,
+  Brain,
+  Heart,
+  TrendingUp,
+  Eye,
+  Calendar,
+  Lightbulb,
+  Users,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
+
+// Icon map for admin tools (user-facing display)
+const toolIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Brain, Sparkles, Users: UserPlus, Heart, Pen: Pencil, TrendingUp, Eye, Calendar, Lightbulb,
+};
+
+const toolColorMap: Record<string, string> = {
+  'Brain': 'bg-purple-500/15 text-purple-400',
+  'Sparkles': 'bg-amber-500/15 text-amber-400',
+  'Users': 'bg-green-500/15 text-green-400',
+  'Heart': 'bg-pink-500/15 text-pink-400',
+  'Pen': 'bg-cyan-500/15 text-cyan-400',
+  'TrendingUp': 'bg-emerald-500/15 text-emerald-400',
+  'Eye': 'bg-blue-500/15 text-blue-400',
+  'Calendar': 'bg-orange-500/15 text-orange-400',
+  'Lightbulb': 'bg-yellow-500/15 text-yellow-400',
+};
 
 // ============================================================
 // Owner Views
 // ============================================================
+
+export function ToolsView() {
+  // Single source of truth: read directly from Zustand store
+  const adminTools = useAppStore((s) => s.adminTools);
+  const enabledTools = adminTools.filter((t) => t.enabled);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-shadow-glow">Инструменты</h1>
+        <Badge variant="outline" className="bg-amber-500/5 text-amber-400/70 border-amber-500/15 text-[10px]">
+          Демо-данные Coffee & Co.
+        </Badge>
+      </div>
+      <p className="text-muted-foreground">
+        Подключённые инструменты для управления бизнесом
+      </p>
+
+      {/* Active tools count */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Wrench className="w-4 h-4" />
+        <span>
+          Активных инструментов: <span className="text-foreground font-medium">{enabledTools.length}</span> из {adminTools.length}
+        </span>
+      </div>
+
+      {enabledTools.length === 0 ? (
+        <Card className="border-dashed border-border/50">
+          <CardContent className="p-8 flex flex-col items-center justify-center text-center">
+            <Lightbulb className="w-10 h-10 text-muted-foreground/40 mb-3" />
+            <p className="text-muted-foreground">Нет активных инструментов</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">
+              Включите инструменты в админ-панели, чтобы они появились здесь
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {enabledTools.map((tool, i) => {
+            const IconComponent = toolIconMap[tool.icon] || Lightbulb;
+            const colorClass = toolColorMap[tool.icon] || toolColorMap['Lightbulb'];
+
+            return (
+              <Card key={tool.id} className="card-hover card-hover-lift">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-start gap-3">
+                    <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', colorClass)}>
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-sm">{tool.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{tool.description}</p>
+                      <Badge
+                        variant="secondary"
+                        className="mt-2 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]"
+                      >
+                        Активен
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Disabled tools section */}
+      {adminTools.some((t) => !t.enabled) && (
+        <>
+          <Separator />
+          <div>
+            <h2 className="text-sm font-medium text-muted-foreground mb-3">Отключённые инструменты</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {adminTools.filter((t) => !t.enabled).map((tool) => {
+                const IconComponent = toolIconMap[tool.icon] || Lightbulb;
+                const colorClass = toolColorMap[tool.icon] || toolColorMap['Lightbulb'];
+
+                return (
+                  <Card key={tool.id} className="opacity-50">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-start gap-3">
+                        <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', colorClass)}>
+                          <IconComponent className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-sm">{tool.name}</h3>
+                          <p className="text-xs text-muted-foreground mt-1">{tool.description}</p>
+                          <Badge
+                            variant="secondary"
+                            className="mt-2 text-[10px]"
+                          >
+                            Отключён
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function DashboardView() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showFeedback, setShowFeedback] = useState(false);
@@ -407,6 +542,9 @@ export function ClientsView() {
 export function PromotionsView() {
   const { promotions: dbPromotions } = useDBData();
   const isSynced = dbPromotions.length > 0;
+  // Read admin templates from Zustand store (single source of truth)
+  const adminTemplates = useAppStore((s) => s.adminTemplates);
+  const [activeTab, setActiveTab] = useState<'promotions' | 'templates'>('promotions');
 
   return (
     <div className="space-y-6">
@@ -423,8 +561,78 @@ export function PromotionsView() {
           </Badge>
         )}
       </div>
-      <PromotionsList />
-      <AISimulator />
+
+      {/* Tabs: Акции / Шаблоны */}
+      <div className="flex gap-2">
+        <Button
+          variant={activeTab === 'promotions' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('promotions')}
+          className={activeTab === 'promotions' ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}
+        >
+          Акции
+        </Button>
+        <Button
+          variant={activeTab === 'templates' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('templates')}
+          className={activeTab === 'templates' ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}
+        >
+          Шаблоны
+          <Badge variant="secondary" className="ml-1.5 text-[10px]">{adminTemplates.length}</Badge>
+        </Button>
+      </div>
+
+      {activeTab === 'promotions' ? (
+        <>
+          <PromotionsList />
+          <AISimulator />
+        </>
+      ) : (
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Шаблоны акций, настроенные администратором. Выберите шаблон для быстрого создания акции.
+          </p>
+          {adminTemplates.length === 0 ? (
+            <Card className="border-dashed border-border/50">
+              <CardContent className="p-8 flex flex-col items-center justify-center text-center">
+                <Sparkles className="w-10 h-10 text-muted-foreground/40 mb-3" />
+                <p className="text-muted-foreground">Нет доступных шаблонов</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">
+                  Шаблоны можно добавить в админ-панели
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {adminTemplates.map((tpl) => (
+                <Card key={tpl.id} className="card-hover card-hover-lift">
+                  <CardContent className="p-4 sm:p-5">
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm">{tpl.name}</h3>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                          {tpl.description}
+                        </p>
+                      </div>
+                      {tpl.discount > 0 && (
+                        <div className="shrink-0 w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex flex-col items-center justify-center">
+                          <span className="text-lg font-bold text-green-400">-{tpl.discount}%</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs">
+                        {tpl.category}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

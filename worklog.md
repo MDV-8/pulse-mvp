@@ -2331,3 +2331,37 @@ Stage Summary:
   8. ✅ After reset + onboarding → only default 8 tools and 5 templates remain
   9. ✅ Dashboard, search, sidebar, all existing functionality unaffected
 - No UI/design changes made, no new functionality added
+
+---
+Task ID: 2
+Agent: Main Developer
+Task: Fix admin panel architecture — single source of truth for tools/templates via Zustand store, sync admin changes to user-facing views
+
+Work Log:
+- Analyzed problem: admin stores tools/templates in Zustand, but no user-facing view reads from that store
+- No "Инструменты" section existed in the owner/user-facing part of the app
+- Added 'tools' to OwnerView type union in app-store.ts
+- Created ToolsView component in owner-views.tsx that reads adminTools from Zustand store
+  - Shows active tools with "Активен" badge
+  - Shows disabled tools in separate section with "Отключён" badge
+  - Empty state message when no active tools
+- Added templates tab ("Шаблоны") to PromotionsView with count badge
+  - Reads adminTemplates from Zustand store (single source of truth)
+  - Shows template cards with discount, description, category
+  - Empty state when no templates
+- Added "Инструменты" nav item to sidebar (with Wrench icon)
+- Added 'tools' case to owner-dashboard-router.tsx switch
+- Added necessary icon imports (Wrench, Brain, Heart, etc.) and Card import
+
+Stage Summary:
+- 4 files modified: app-store.ts, sidebar.tsx, owner-dashboard-router.tsx, owner-views.tsx
+- Architecture: admin and user parts now share the SAME Zustand store (single source of truth)
+- Tested and verified:
+  1. ✅ Admin creates tool → instantly appears in user-facing "Инструменты" section
+  2. ✅ Admin creates template → instantly appears in "Акции → Шаблоны" tab
+  3. ✅ Reload page → both tools and templates persist
+  4. ✅ Disabled tools shown in separate "Отключённые" section
+  5. ✅ Active tools shown in main grid with "Активен" badges
+  6. ✅ Sidebar shows new "Инструменты" item between "AI Ассистент" and "Продажи"
+  7. ✅ Templates tab badge shows correct count (5 default + admin additions)
+  8. ✅ Existing UI/design not changed, no broken functionality
