@@ -2365,3 +2365,44 @@ Stage Summary:
   6. ✅ Sidebar shows new "Инструменты" item between "AI Ассистент" and "Продажи"
   7. ✅ Templates tab badge shows correct count (5 default + admin additions)
   8. ✅ Existing UI/design not changed, no broken functionality
+
+---
+Task ID: sync-verify
+Agent: Main Orchestrator
+Task: Verify admin ↔ user-facing sync architecture (agent-browser E2E testing)
+
+Work Log:
+- Searched all codebase for `mockAdminTools`/`mockAdminTemplates` imports — confirmed no user-facing components import mock data directly
+- Verified `ToolsView` (owner-views.tsx:114) reads from `useAppStore((s) => s.adminTools)`
+- Verified `PromotionsView` (owner-views.tsx:546) reads from `useAppStore((s) => s.adminTemplates)`
+- Verified admin dashboard (admin-dashboard.tsx:157,295) reads from same store selectors
+- Verified persist `partialize` includes both `adminTools` and `adminTemplates`
+- Verified `resetAllData()` resets both to mock defaults
+- **Agent-browser E2E test results:**
+  1. Created "Новый инструмент" in admin → appeared instantly in "Инструменты" (disabled section)
+  2. Enabled the tool via admin switch → appeared in active section (6 of 10)
+  3. Created "Тестовый шаблон синхронизации" in admin → appeared instantly in "Шаблоны" (7 total)
+  4. All changes persist across page reload via localStorage
+- Cleaned up test data (Sync Test Tool, Sync Template Test, Новый инструмент, Тестовый шаблон)
+
+Stage Summary:
+- **Architecture is CORRECT**: Admin and user-facing parts share single Zustand store
+- **Instant sync verified**: No reload needed, changes appear immediately
+- **Persistence verified**: Changes survive page refresh
+- **No code changes needed**: Previous session's fix was complete
+- Clean state restored: 8 default tools + 5 default templates
+
+---
+Task ID: user-question-backend
+Agent: Main Orchestrator
+Task: Answer user question about backend files
+
+Work Log:
+- User asked: "вопрос в нашем проекте если я тебя скачал ты даешь все файлы бекенда?"
+- Confirmed: All project files in /home/z/my-project/ include frontend + backend + config
+- Backend = Next.js API routes in src/app/api/
+- Full stack: Next.js 16 + Prisma + SQLite + Zustand + shadcn/ui
+
+Stage Summary:
+- Answered user question affirmatively
+- All backend files (API routes, Prisma schema, DB) are part of the project
