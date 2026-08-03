@@ -2,44 +2,40 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
 export const metadata: Metadata = {
-  title: "PULSE вЂ” AI Operating System РґР»СЏ Р±РёР·РЅРµСЃР°",
+  title: "PULSE - AI Operating System для бизнеса",
   description:
-    "PULSE вЂ” С†РёС„СЂРѕРІРѕР№ СѓРїСЂР°РІР»СЏСЋС‰РёР№ РІР°С€РёРј Р±РёР·РЅРµСЃРѕРј. AI-Р°РЅР°Р»РёС‚РёРєР°, СЂРµРєРѕРјРµРЅРґР°С†РёРё Рё Р°РІС‚РѕРјР°С‚РёР·Р°С†РёСЏ РґР»СЏ РјР°Р»РѕРіРѕ РѕС„Р»Р°Р№РЅ-Р±РёР·РЅРµСЃР°.",
+    "PULSE - цифровой управляющий вашим бизнесом. AI-аналитика, рекомендации и автоматизация для малого офлайн-бизнеса.",
   keywords: [
     "PULSE",
-    "AI Р±РёР·РЅРµСЃ",
-    "Р°РЅР°Р»РёС‚РёРєР°",
+    "AI бизнес",
+    "аналитика",
     "CRM",
-    "РјР°Р»С‹Р№ Р±РёР·РЅРµСЃ",
-    "СѓРїСЂР°РІР»РµРЅРёРµ Р±РёР·РЅРµСЃРѕРј",
+    "малый бизнес",
+    "управление бизнесом",
   ],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
   },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className="dark" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
-      >
+    <html lang="ru">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
         <Toaster />
       </body>
