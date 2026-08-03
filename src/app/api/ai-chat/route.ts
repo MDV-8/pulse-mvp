@@ -1,7 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ZAI from 'z-ai-web-dev-sdk';
 
-// Simple in-memory rate limiting: max 20 requests per minute
+// ============================================================
+// Google Gemini REST API — no extra SDK needed
+// ============================================================
+const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+function getGeminiApiKey(): string | undefined {
+  return process.env.GEMINI_API_KEY;
+}
+
+/** Build Gemini `contents` array from our messages format.
+ *  Gemini uses "user" / "model" (not "assistant"). */
+function buildGeminiContents(messages: { role: string; content: string }[]) {
+  return messages
+    .filter((m) => m.role === 'user' || m.role === 'assistant')
+    .map((m) => ({
+      role: m.role === 'assistant' ? ('model' as const) : ('user' as const),
+      parts: [{ text: m.content }],
+    }));
+}
+
+/** Call Gemini generateContent endpoint and return the text. */
+async function callGemini(
+  systemPrompt: string,
+  messages: { role: string; content: string }[],
+  apiKey: string,
+): Promise<string> {
+  const url = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+  const payload = {
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents: buildGeminiContents(messages),
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 2048,
+    },
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini API error ${response.status}: ${errorBody}`);
+  }
+
+  const data = (await response.json()) as {
+    candidates?: {
+      content?: {
+        parts?: { text?: string }[];
+      };
+    }[];
+  };
+
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+// ============================================================
+// Rate limiting (unchanged)
+// ============================================================
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -19,9 +80,15 @@ function checkRateLimit(ip: string): boolean {
   return entry.count <= RATE_LIMIT_MAX;
 }
 
+// ============================================================
+// System prompt (unchanged)
+// ============================================================
 const SYSTEM_PROMPT =
   'Ты — AI ассистент PULSE, операционная система для малого бизнеса. Ты помогаешь владельцам кофеен, ресторанов и салонов в Казахстане. Отвечай на русском языке. Используй символ ₸ для валюты. Давай конкретные, actionable советы. Бизнес демо — \'Coffee & Co\' в Алматы.';
 
+// ============================================================
+// Mock fallback responses (unchanged)
+// ============================================================
 const MOCK_RESPONSES = [
   'На основе данных вашего бизнеса "Coffee & Co", я рекомендую:\n\n1. Сосредоточьтесь на возврате клиентов — это самый выгодный канал\n2. Запустите Happy Hour с 17:00 до 19:00\n3. Увеличьте бюджет на Instagram-продвижение\n\nПрогноз: +15-20% выручки за месяц.',
   'Анализ вашего бизнеса показывает:\n\n• Средний чек: 2 450₸ (выше рынка на 8%)\n• Возврат клиентов: 34% (цель: 45%)\n• Лучшая акция: "Приведи друга" (ROI 4.1₸)\n\nРекомендую активировать программу лояльности для роста возврата.',
@@ -54,6 +121,9 @@ function getMockResponse(userMessage: string): string {
   return MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
 }
 
+// ============================================================
+// POST handler
+// ============================================================
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting by IP
@@ -77,31 +147,27 @@ export async function POST(request: NextRequest) {
 
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop()?.content || '';
 
+    // Check if Gemini API key is configured
+    const apiKey = getGeminiApiKey();
+
+    if (!apiKey) {
+      console.warn('GEMINI_API_KEY not set — using mock fallback');
+      const mockResponse = getMockResponse(lastUserMessage);
+      return NextResponse.json({ success: true, response: mockResponse });
+    }
+
     try {
-      const zai = await ZAI.create();
+      const responseText = await callGemini(SYSTEM_PROMPT, messages, apiKey);
 
-      const chatMessages = [
-        { role: 'system' as const, content: SYSTEM_PROMPT },
-        ...messages.map((m) => ({
-          role: (m.role === 'user' ? 'user' as const : 'assistant' as const),
-          content: m.content,
-        })),
-      ];
-
-      const result = await zai.chat.completions.create({
-        messages: chatMessages,
-        thinking: { type: 'disabled' },
-      });
-
-      const responseText =
-        result?.choices?.[0]?.message?.content ||
-        result?.content ||
-        'Не удалось получить ответ от AI. Попробуйте ещё раз.';
+      if (!responseText.trim()) {
+        console.warn('Gemini returned empty response — using mock fallback');
+        return NextResponse.json({ success: true, response: getMockResponse(lastUserMessage) });
+      }
 
       return NextResponse.json({ success: true, response: responseText });
     } catch (aiError) {
-      // SDK failed — return mock response as fallback
-      console.warn('AI SDK failed, using mock fallback:', aiError);
+      // Gemini API failed — return mock response as fallback
+      console.warn('Gemini API failed, using mock fallback:', aiError);
       const mockResponse = getMockResponse(lastUserMessage);
       return NextResponse.json({ success: true, response: mockResponse });
     }

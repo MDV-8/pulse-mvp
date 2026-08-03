@@ -1,6 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ZAI from 'z-ai-web-dev-sdk';
 
+// ============================================================
+// Google Gemini REST API — no extra SDK needed
+// ============================================================
+const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+function getGeminiApiKey(): string | undefined {
+  return process.env.GEMINI_API_KEY;
+}
+
+/** Call Gemini generateContent endpoint and return the text. */
+async function callGemini(
+  systemPrompt: string,
+  userContent: string,
+  apiKey: string,
+): Promise<string> {
+  const url = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+  const payload = {
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents: [
+      { role: 'user' as const, parts: [{ text: userContent }] },
+    ],
+    generationConfig: {
+      temperature: 0.5,
+      maxOutputTokens: 2048,
+    },
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini API error ${response.status}: ${errorBody}`);
+  }
+
+  const data = (await response.json()) as {
+    candidates?: {
+      content?: {
+        parts?: { text?: string }[];
+      };
+    }[];
+  };
+
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+// ============================================================
+// System prompts per analysis type (unchanged)
+// ============================================================
 const SYSTEM_PROMPTS: Record<string, string> = {
   sales: 'Анализируй данные продаж кофейни. Дай 3 конкретных рекомендации.',
   marketing: 'Проанализируй маркетинговые данные. Предложи стратегии.',
@@ -8,6 +61,9 @@ const SYSTEM_PROMPTS: Record<string, string> = {
   inventory: 'Проанализируй остатки инвентаря. Предложи действия.',
 };
 
+// ============================================================
+// Mock analysis fallback (unchanged)
+// ============================================================
 const MOCK_ANALYSIS: Record<string, string> = {
   sales: `📊 Анализ продаж Coffee & Co
 
@@ -70,6 +126,9 @@ const MOCK_ANALYSIS: Record<string, string> = {
 3. Рассмотрите поставщика «Молочный мир» — лучшие цены на молочную продукцию`,
 };
 
+// ============================================================
+// POST handler
+// ============================================================
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -82,30 +141,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userMessage = typeof data === 'string'
+      ? data
+      : JSON.stringify(data, null, 2);
+
+    // Check if Gemini API key is configured
+    const apiKey = getGeminiApiKey();
+
+    if (!apiKey) {
+      console.warn('GEMINI_API_KEY not set — using mock analysis fallback');
+      return NextResponse.json({ success: true, analysis: MOCK_ANALYSIS[type] || MOCK_ANALYSIS.sales });
+    }
+
     try {
-      const zai = await ZAI.create();
+      const analysisText = await callGemini(SYSTEM_PROMPTS[type], userMessage, apiKey);
 
-      const userMessage = typeof data === 'string'
-        ? data
-        : JSON.stringify(data, null, 2);
-
-      const result = await zai.chat.completions.create({
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPTS[type] },
-          { role: 'user', content: userMessage },
-        ],
-        thinking: { type: 'disabled' },
-      });
-
-      const analysisText =
-        result?.choices?.[0]?.message?.content ||
-        result?.content ||
-        'Не удалось выполнить анализ. Попробуйте ещё раз.';
+      if (!analysisText.trim()) {
+        console.warn('Gemini returned empty analysis — using mock fallback');
+        return NextResponse.json({ success: true, analysis: MOCK_ANALYSIS[type] || MOCK_ANALYSIS.sales });
+      }
 
       return NextResponse.json({ success: true, analysis: analysisText });
     } catch (aiError) {
-      // SDK failed — return mock analysis as fallback
-      console.warn(`AI Analysis SDK failed for type "${type}", using mock fallback:`, aiError);
+      // Gemini API failed — return mock analysis as fallback
+      console.warn(`Gemini API failed for type "${type}", using mock fallback:`, aiError);
       const mockAnalysis = MOCK_ANALYSIS[type] || MOCK_ANALYSIS.sales;
       return NextResponse.json({ success: true, analysis: mockAnalysis });
     }
